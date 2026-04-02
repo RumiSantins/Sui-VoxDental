@@ -1,5 +1,59 @@
 @import "tailwindcss";
 
-body {
-    background-color: #f3f4f6;
+/* 
+  Tailwind v4: Configuración explícita del variante dark por clase.
+  Esto asegura que la clase .dark en el <html> dispare los estilos dark:
+*/
+@variant dark (&:where(.dark, .dark *));
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+@layer utilities {
+  .glow-blue {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  }
+  .glow-border-blue {
+    border-color: rgba(59, 130, 246, 0.6) !important;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+  }
+  .glow-text-blue {
+    text-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+  }
+  .glow-card {
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.8; transform: scale(1); box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+  50% { opacity: 1; transform: scale(1.02); box-shadow: 0 0 25px rgba(59, 130, 246, 0.7); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@layer components {
+  .surface-toggle {
+    @apply h-12 px-4 rounded-xl flex items-center justify-center font-bold transition-all border whitespace-nowrap;
+  }
+  .surface-toggle-active {
+    @apply bg-blue-500 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)];
+  }
+  .surface-toggle-inactive {
+    @apply bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:border-blue-300;
+  }
 }

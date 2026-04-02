@@ -13,6 +13,7 @@ except ImportError:
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from .api.routes import router
 
 app = FastAPI(title="Sui VoxDental API", version="0.1.0")
@@ -20,13 +21,17 @@ app = FastAPI(title="Sui VoxDental API", version="0.1.0")
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(router, prefix="/api/v1")
+
+# Mount static files
+os.makedirs("static/media", exist_ok=True)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def read_root():

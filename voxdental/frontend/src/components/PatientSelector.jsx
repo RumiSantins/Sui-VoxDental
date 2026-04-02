@@ -1,0 +1,281 @@
+import React, { useState, useEffect } from 'react';
+import { UserPlus, Users, Check, ChevronDown, Edit2, Trash2, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+export const PatientSelector = ({ onSelect, selectedPatient }) => {
+    const [patients, setPatients] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
+    const [newPatientName, setNewPatientName] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Edit/Delete state
+    const [editingId, setEditingId] = useState(null);
+    const [editName, setEditName] = useState("");
+    const [deletingId, setDeletingId] = useState(null);
+
+    const { token } = useAuth();
+
+    const fetchPatients = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch('http://localhost:8000/api/v1/patients', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setPatients(data);
+                if (data.length === 1 && !selectedPatient) {
+                    onSelect(data[0]);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching patients:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (token) fetchPatients();
+    }, [token]);
+
+    const handleCreatePatient = async (e) => {
+        e.preventDefault();
+        if (!newPatientName.trim()) return;
+
+        try {
+            const response = await fetch('http://localhost:8000/api/v1/patients', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name: newPatientName })
+            });
+
+            if (response.ok) {
+                const newPatient = await response.json();
+                setPatients([...patients, newPatient]);
+                onSelect(newPatient);
+                setIsCreating(false);
+                setNewPatientName("");
+                setShowDropdown(false);
+            }
+        } catch (error) {
+            console.error("Error creating patient:", error);
+        }
+    };
+
+    const handleUpdatePatient = async (e, id) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!editName.trim()) return;
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/v1/patients/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name: editName })
+            });
+
+            if (response.ok) {
+                const updated = await response.json();
+                setPatients(patients.map(p => p.id === id ? updated : p));
+                if (selectedPatient?.id === id) {
+                    onSelect(updated);
+                }
+                setEditingId(null);
+            }
+        } catch (error) {
+            console.error("Error updating patient:", error);
+        }
+    };
+
+    const handleDeletePatient = async (e, id) => {
+        e.stopPropagation();
+        try {
+            const response = await fetch(`http://localhost:8000/api/v1/patients/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                setPatients(patients.filter(p => p.id !== id));
+                if (selectedPatient?.id === id) {
+                    onSelect(null);
+                }
+                setDeletingId(null);
+            }
+        } catch (error) {
+            console.error("Error deleting patient:", error);
+        }
+    };
+
+    return (
+        <div className="relative">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className={`flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-blue-900/50 rounded-xl shadow-sm hover:border-blue-400 dark:hover:border-blue-400 transition-all min-w-0 flex-1 sm:min-w-[200px] justify-between ${showDropdown ? 'ring-2 ring-blue-500/20 dark:glow-border-blue' : ''}`}
+                >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                        <Users size={18} className="text-blue-500 flex-shrink-0 dark:animate-pulse-glow" />
+                        <span className="truncate font-medium text-gray-700 dark:text-gray-200 text-sm">
+                            {selectedPatient ? selectedPatient.name : "Seleccionar Paciente"}
+                        </span>
+                    </div>
+                    <ChevronDown size={14} className={`text-gray-400 flex-shrink-0 transition-transform ${showDropdown ? 'rotate-180 text-blue-500' : ''}`} />
+                </button>
+
+                <button
+                    onClick={() => { setIsCreating(true); setShowDropdown(true); }}
+                    className="p-2.5 bg-blue-50 dark:bg-blue-600/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-600/30 transition-all border border-blue-100 dark:border-blue-600/30 dark:shadow-[0_0_10px_rgba(59,130,246,0.2)] flex-shrink-0"
+                    title="Nuevo Paciente"
+                >
+                    <UserPlus size={18} />
+                </button>
+            </div>
+
+            {showDropdown && (
+                <div className="absolute top-full left-0 mt-2 w-full sm:min-w-[280px] bg-white dark:bg-slate-900 border border-gray-100 dark:border-blue-900/30 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 dark:shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                    {isCreating ? (
+                        <form onSubmit={handleCreatePatient} className="p-4 bg-blue-50/50 dark:bg-blue-900/10">
+                            <label className="block text-xs font-bold text-blue-600 dark:text-blue-400 uppercase mb-2">Nuevo Paciente</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    autoFocus
+                                    placeholder="Nombre completo"
+                                    value={newPatientName}
+                                    onChange={(e) => setNewPatientName(e.target.value)}
+                                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                />
+                                <button type="submit" className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                                    <Check size={18} />
+                                </button>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsCreating(false)}
+                                className="mt-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                        </form>
+                    ) : (
+                        <div className="max-h-[300px] overflow-y-auto p-2">
+                            {isLoading ? (
+                                <div className="p-4 text-center text-sm text-gray-400">Cargando...</div>
+                            ) : patients.length === 0 ? (
+                                <div className="p-4 text-center">
+                                    <p className="text-sm text-gray-500 mb-2">No hay pacientes registrados</p>
+                                    <button
+                                        onClick={() => setIsCreating(true)}
+                                        className="text-xs font-bold text-blue-500 hover:underline"
+                                    >
+                                        + REGISTRAR PRIMER PACIENTE
+                                    </button>
+                                </div>
+                            ) : (
+                                patients.map(p => (
+                                    <div key={p.id} className="group relative">
+                                        {deletingId === p.id ? (
+                                            <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/30 animate-in fade-in zoom-in duration-200">
+                                                <span className="text-xs font-bold text-red-600 dark:text-red-400">¿Eliminar?</span>
+                                                <div className="flex gap-1">
+                                                    <button onClick={(e) => handleDeletePatient(e, p.id)} className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm text-xs font-bold px-2">SÍ</button>
+                                                    <button onClick={(e) => { e.stopPropagation(); setDeletingId(null); }} className="p-1.5 bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-300 transition-colors text-xs font-bold px-2">NO</button>
+                                                </div>
+                                            </div>
+                                        ) : editingId === p.id ? (
+                                            <form onSubmit={(e) => handleUpdatePatient(e, p.id)} className="p-2 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        autoFocus
+                                                        value={editName}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        onChange={(e) => setEditName(e.target.value)}
+                                                        className="flex-1 px-2 py-1 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-md outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                                    />
+                                                    <button type="submit" className="p-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm">
+                                                        <Check size={14} />
+                                                    </button>
+                                                    <button type="button" onClick={(e) => { e.stopPropagation(); setEditingId(null); }} className="p-1.5 bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-300">
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        ) : (
+                                            <div
+                                                onClick={() => {
+                                                    onSelect(p);
+                                                    setShowDropdown(false);
+                                                }}
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all text-sm cursor-pointer group ${selectedPatient?.id === p.id
+                                                    ? 'bg-blue-600 text-white shadow-md'
+                                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800'}`}
+                                            >
+                                                <span className="font-medium truncate mr-2">{p.name}</span>
+                                                <div className="flex items-center gap-1">
+                                                    {selectedPatient?.id === p.id ? (
+                                                        <Check size={14} className="flex-shrink-0" />
+                                                    ) : (
+                                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setEditingId(p.id);
+                                                                    setEditName(p.name);
+                                                                }}
+                                                                className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-500 rounded-md transition-colors"
+                                                                title="Editar"
+                                                            >
+                                                                <Edit2 size={12} />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setDeletingId(p.id);
+                                                                }}
+                                                                className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded-md transition-colors"
+                                                                title="Eliminar"
+                                                            >
+                                                                <Trash2 size={12} />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Click outside to close */}
+            {showDropdown && (
+                <div
+                    className="fixed inset-0 z-[90]"
+                    onClick={() => {
+                        setShowDropdown(false);
+                        setIsCreating(false);
+                        setEditingId(null);
+                        setDeletingId(null);
+                    }}
+                />
+            )}
+        </div>
+    );
+};

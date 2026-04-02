@@ -1,6 +1,7 @@
 import whisper
 import os
 import tempfile
+import time
 from typing import BinaryIO
 import warnings
 import shutil
@@ -13,89 +14,112 @@ class WhisperService:
     def __init__(self):
         self.model = None
         self.use_mock = False
+        # Move log file to a more reliable location if needed, but root is fine
+        self.log_file = os.path.join(os.getcwd(), "whisper_debug.log")
         
+        # Ensure log file starts fresh or at least exists
+        self._log("--- INICIANDO WHISPERSERVICE (Tiny Model Override) ---")
+
         # --- FFMPEG ROBUST INJECTION ---
         try:
             import imageio_ffmpeg
-            # 1. Get the actual binary path (e.g. .../ffmpeg-win64-v4.2.2.exe)
             source_exe = imageio_ffmpeg.get_ffmpeg_exe()
+            self._log(f"FFMPEG Source path: {source_exe}")
             source_dir = os.path.dirname(source_exe)
             
-            # 2. Define the target alias "ffmpeg.exe"
-            # We try to put it in the same folder first (cleaner)
-            # If not writable, we put it in the current working directory of the app
-            target_exe = os.path.join(source_dir, "ffmpeg.exe")
+            # Add to PATH for this process
+            if source_dir not in os.environ["PATH"]:
+                os.environ["PATH"] += os.pathsep + source_dir
             
-            try:
-                # If it doesn't exist as "ffmpeg.exe", copy it
-                if not os.path.exists(target_exe):
-                    print(f"DEBUG: Creando alias ffmpeg.exe en {target_exe}")
-                    shutil.copy(source_exe, target_exe)
-                
-                # Add THIS folder to PATH
-                if source_dir not in os.environ["PATH"]:
-                    os.environ["PATH"] += os.pathsep + source_dir
-                    
-            except Exception as e_copy:
-                print(f"DEBUG: No se pudo escribir en {source_dir} ({e_copy}). Probando directorio local.")
-                # Fallback: Copy to App Root
-                app_root = os.getcwd() # c:\apps\Sui\voxdental
-                target_exe_local = os.path.join(app_root, "ffmpeg.exe")
-                if not os.path.exists(target_exe_local):
-                    shutil.copy(source_exe, target_exe_local)
-                
-                if app_root not in os.environ["PATH"]:
-                    os.environ["PATH"] += os.pathsep + app_root
-            
-            # Verify
             if shutil.which("ffmpeg"):
-                print(f"EXITO: ffmpeg detectado en: {shutil.which('ffmpeg')}")
+                self._log(f"FFMPEG Detectado: {shutil.which('ffmpeg')}")
             else:
-                print("DEBUG: ALERTA - ffmpeg sigue sin detectarse a pesar del alias.")
+                self._log("FFMPEG ERROR: 'ffmpeg' no encontrado en el PATH después de inyección.")
 
-        except ImportError:
-            print("DEBUG: imageio_ffmpeg no instalado.")
         except Exception as e:
-            print(f"DEBUG: Error general configurando FFMPEG: {e}")
-        # -------------------------------
+            self._log(f"ERROR configurando FFMPEG: {e}")
 
-        print("--------------------------------------------------")
-        print("INIT: Intentando cargar modelo Whisper...")
+        # --- WHISPER LOAD ---
+        self._log("Cargando modelo Whisper 'base' (más preciso para odontología)...")
         try:
+            # Fix OMP error here just in case
+            os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+            
+            start_load = time.time()
             self.model = whisper.load_model("base")
-            print("EXITO: Modelo Whisper cargado correctamente.")
+            self._log(f"Modelo Whisper cargado en {time.time() - start_load:.2f}s.")
         except Exception as e:
-            print(f"ERROR FATAL: No se pudo cargar Whisper. Detalles: {e}")
+            self._log(f"ERROR FATAL cargando modelo: {e}")
             self.use_mock = True
+
+    def _log(self, message: str):
+        try:
+            with open(self.log_file, "a", encoding="utf-8") as f:
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+                f.write(f"[{timestamp}] {message}\n")
+        except:
+            pass
+        print(message)
 
     async def transcribe(self, audio_file: BinaryIO) -> str:
         """
-        Transcribes audio to text using Whisper.
+        Transcribes audio to text using Whisper with detailed logging.
         """
         if self.use_mock or not self.model:
-            return "ERROR: El sistema de voz no está activo. Verifique la consola del servidor."
+            self._log("TRANSCRIPCION ABORTADA: Modelo no cargado.")
+            return "ERROR: El sistema de voz no está activo."
 
         try:
-            print("Procesando audio recibido...")
+            self._log("--- Nueva petición de transcripción recibida ---")
+            
+            # Read audio content
+            content = await audio_file.read()
+            if not content:
+                self._log("ADVERTENCIA: Audio vacío recibido.")
+                return ""
+
+            # Save to temporary file
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-                content = await audio_file.read() 
                 tmp.write(content)
                 tmp_path = tmp.name
             
-            # Dental context prompt to guide the model
-            dental_prompt = "Odontograma: caries, resina, amalgama, corona, endodoncia, pieza, diente, oclusal, incisal, vestibular, lingual, palatina, mesial, distal, ausente."
+            self._log(f"Audio temporal: {tmp_path} ({len(content)} bytes)")
             
-            result = self.model.transcribe(tmp_path, language="es", fp16=False, initial_prompt=dental_prompt)
-            text = result["text"]
+            # Dental context prompt (Expanded with numbers to bias the model)
+            dental_prompt = (
+                "Odontograma dental: 11, 12, 13, 14, 15, 16, 17, 18, "
+                "21, 22, 23, 24, 25, 26, 27, 28, "
+                "31, 32, 33, 34, 35, 36, 37, 38, "
+                "41, 42, 43, 44, 45, 46, 47, 48. "
+                "Comandos: caries, resina, amalgama, corona, endodoncia, conducto, ausencia, ausente, "
+                "borrar, limpiar, oclusal, incisal, vestibular, lingual, palatina, mesial, distal."
+            )
             
-            print(f"Transcripción detectada: '{text}'")
+            self._log("Llamando a model.transcribe (esto puede tardar unos segundos)...")
+            start_t = time.time()
             
+            # Final transcription call optimized for SPEED
+            result = self.model.transcribe(
+                tmp_path, 
+                language="es", 
+                fp16=False, 
+                initial_prompt=dental_prompt,
+                temperature=0       # Greedy decoding (fastest) with deterministic results
+            )
+            
+            duration = time.time() - start_t
+            text = result.get("text", "").strip()
+            
+            self._log(f"Transcripción exitosa en {duration:.2f}s: '{text}'")
+            
+            # Cleanup
             try:
                 os.remove(tmp_path)
             except:
                 pass
             
             return text
+            
         except Exception as e:
-            print(f"ERROR durante transcripción: {e}")
+            self._log(f"ERROR CRITICO en transcribe: {e}")
             return f"Error procesando audio: {str(e)}"
