@@ -142,7 +142,7 @@ def extract_findings_from_text(text: str, context_tooth: Optional[int] = None) -
 
         # Standalones (Aggressive match for single letters)
         reps.extend([
-            (r"\b(ce\s*erre|se\s*erre|c\s*r|s\s*r|cr|sr)\b", "ACRONYM_CR"),
+            (r"\b(ce\s*erre|ce\s*re|se\s*erre|se\s*re|c\s*r|s\s*r|cr|sr)\b", "ACRONYM_CR"),
             (r"\b(e\s*equis|e\s*x|eh\s*equis|eh\s*x|ex)\b", "ACRONYM_EX"),
             (r"\b(equis|x|ekis)\b", "ACRONYM_X"),
             (r"\b(e|eh|hé|he)\b", "ACRONYM_E"),

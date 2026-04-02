@@ -4,9 +4,28 @@ import { jwtDecode } from 'jwt-decode';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('token'));
-    const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(() => localStorage.getItem('token'));
+    
+    // Initialize user synchronously to prevent screen flicker
+    const [user, setUser] = useState(() => {
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+            try {
+                const decoded = jwtDecode(storedToken);
+                if (decoded.exp * 1000 > Date.now()) {
+                    return {
+                        email: decoded.sub,
+                        name: decoded.name,
+                        avatar: decoded.avatar,
+                        gender: decoded.gender,
+                        is_admin: decoded.is_admin,
+                        is_google: decoded.is_google
+                    };
+                }
+            } catch (error) {}
+        }
+        return null;
+    });
 
     const logout = useCallback(() => {
         localStorage.removeItem('token');
@@ -25,15 +44,6 @@ export const AuthProvider = ({ children }) => {
                 if (expirationTime < currentTime) {
                     logout();
                 } else {
-                    setUser({ 
-                        email: decoded.sub,
-                        name: decoded.name,
-                        avatar: decoded.avatar,
-                        gender: decoded.gender,
-                        is_admin: decoded.is_admin,
-                        is_google: decoded.is_google
-                    });
-
                     // Set a timer to logout automatically when the token expires
                     const timeRemaining = expirationTime - currentTime;
                     logoutTimer = setTimeout(() => {
@@ -45,7 +55,6 @@ export const AuthProvider = ({ children }) => {
                 logout();
             }
         }
-        setLoading(false);
         return () => {
             if (logoutTimer) clearTimeout(logoutTimer);
         };
@@ -66,12 +75,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     const value = useMemo(() => ({ 
-        user, token, login, logout, loading 
-    }), [user, token, loading]);
+        user, token, login, logout 
+    }), [user, token]);
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };

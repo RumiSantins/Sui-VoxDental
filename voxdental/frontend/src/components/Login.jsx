@@ -95,10 +95,10 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950 p-6 transition-colors duration-500 relative overflow-hidden">
             {/* Ambient Background */}
-            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/20 blur-[140px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-600/20 blur-[140px] rounded-full pointer-events-none" />
+            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/20 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-600/20 blur-3xl rounded-full pointer-events-none" />
 
-            <div className="w-full max-w-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800 rounded-3xl shadow-2xl p-8 relative z-10">
+            <div className="w-full max-w-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800 rounded-3xl shadow-2xl p-8 relative z-10 animate-in fade-in zoom-in-95 duration-300">
                 <div className="text-center mb-8">
                     <button 
                         type="button"

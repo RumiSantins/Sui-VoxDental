@@ -171,25 +171,6 @@ const ToothSVG = React.memo(({ number, surfaceConditions = {}, isMissing, onClic
                     )}
                 </svg>
 
-                {showVerification && (
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 flex gap-1 z-[100] animate-in zoom-in duration-300">
-                        <button 
-                            onClick={(e) => handleVerify(e, true)}
-                            className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition-colors border-2 border-white dark:border-slate-900"
-                            title="Acertiva ✅"
-                        >
-                            <Check size={14} strokeWidth={4} />
-                        </button>
-                        <button 
-                            onClick={(e) => handleVerify(e, false)}
-                            className="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors border-2 border-white dark:border-slate-900"
-                            title="Error ❌"
-                        >
-                            <X size={14} strokeWidth={4} />
-                        </button>
-                    </div>
-                )}
-
                 {hasMedia && (
                     <div className="absolute bottom-6 right-0 bg-blue-500 text-white p-1 rounded-md shadow-lg animate-in zoom-in duration-300 border border-white dark:border-slate-800 pointer-events-none">
                         <Camera size={10} />
