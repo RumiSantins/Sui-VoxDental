@@ -80,6 +80,7 @@ class SpeechReportBase(BaseModel):
     transcript: str
     expected_meaning: Optional[str] = None
     is_correct: Optional[bool] = True
+    comment: Optional[str] = None
 
 class SpeechReportCreate(SpeechReportBase):
     pass

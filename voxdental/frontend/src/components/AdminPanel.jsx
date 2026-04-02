@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, RefreshCw, AlertCircle, Calendar } from 'lucide-react';
+import { ChevronLeft, RefreshCw, AlertCircle, Calendar, MessageSquare, Copy, Check } from 'lucide-react';
 
 export const AdminPanel = ({ token, onBack }) => {
     const [reports, setReports] = useState([]);
@@ -56,6 +56,30 @@ export const AdminPanel = ({ token, onBack }) => {
         });
     }, [reports, filter]);
 
+    const handleCopySummary = () => {
+        let text = `=================================\nRESUMEN DE INTELIGENCIA (${filter.toUpperCase()})\n=================================\n\n`;
+        if(filteredReports.length === 0) {
+            text += "No hay reportes en esta selección.\n";
+        } else {
+            filteredReports.forEach((r, idx) => {
+                text += `${idx + 1}. DETECTADO: "${r.transcript}"\n`;
+                if (!r.is_correct && r.expected_meaning) text += `   [INTENCIÓN]: "${r.expected_meaning}"\n`;
+                if (r.comment) text += `   [COMENTARIO]: "${r.comment}"\n`;
+                text += `   [ESTADO]: ${r.is_correct ? 'ACIERTO' : 'ERROR'}\n`;
+                text += `---------------------------------\n`;
+            });
+        }
+        
+        navigator.clipboard.writeText(text);
+        
+        const btnId = "copyBtnRoot";
+        const btn = document.getElementById(btnId);
+        if(btn) {
+            btn.classList.add('text-green-500');
+            setTimeout(() => { btn.classList.remove('text-green-500'); }, 2000);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-6 sm:p-12 animate-in fade-in duration-500">
             <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
@@ -78,6 +102,9 @@ export const AdminPanel = ({ token, onBack }) => {
                             </button>
                         ))}
                     </div>
+                    <button id="copyBtnRoot" onClick={handleCopySummary} className="p-3 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-gray-100 dark:border-blue-900/30 text-gray-500 hover:text-blue-500 transition-colors" title="Copiar resumen a texto">
+                        <Copy size={20} />
+                    </button>
                     <button onClick={fetchReports} className="p-3 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-gray-100 dark:border-blue-900/30 text-gray-500 hover:text-blue-500 transition-colors">
                         <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
                     </button>
@@ -151,6 +178,15 @@ export const AdminPanel = ({ token, onBack }) => {
                                             <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2 block">Intención del Doctor</span>
                                             <div className="p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 rounded-2xl">
                                                 <p className="text-lg text-blue-700 dark:text-blue-300 leading-relaxed italic font-bold">"{report.expected_meaning}"</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {report.comment && (
+                                        <div className="mt-4">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block flex items-center gap-1"><MessageSquare size={12}/> Comentario del Doctor</span>
+                                            <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-xl relative">
+                                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-l-xl"></div>
+                                                <p className="text-sm text-slate-600 dark:text-slate-300 ml-2">{report.comment}</p>
                                             </div>
                                         </div>
                                     )}

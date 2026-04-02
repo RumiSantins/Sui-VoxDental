@@ -567,6 +567,7 @@ def create_speech_report(
         user_id=current_user.id,
         transcript=report.transcript,
         expected_meaning=report.expected_meaning,
+        comment=report.comment,
         is_correct=report.is_correct
     )
     db.add(db_report)
@@ -592,6 +593,7 @@ def get_admin_reports(
             "user_id": report.user_id,
             "transcript": report.transcript,
             "expected_meaning": report.expected_meaning,
+            "comment": report.comment,
             "is_correct": report.is_correct,
             "created_at": report.created_at,
             "user_full_name": full_name

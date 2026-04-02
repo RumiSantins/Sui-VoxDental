@@ -133,9 +133,10 @@ def extract_findings_from_text(text: str, context_tooth: Optional[int] = None) -
 
         # Extra common glued mis-transcriptions
         extras = [
-            ("reo", "RO"), ("ceo", "CO"), ("seo", "CO"), 
+            ("reo", "RO"), ("ceo", "CO"), ("seo", "CO"), ("cero", "CO"),
             ("cel", "CL"), ("sel", "CL"), ("veo", "BO"), ("beo", "BO"),
-            ("reve", "RV"), ("reeve", "RV"), ("rebe", "RV"), ("reebe", "RV")
+            ("reve", "RV"), ("reeve", "RV"), ("rebe", "RV"), ("reebe", "RV"),
+            ("have", "AV"), ("habe", "AV"), ("ave", "AV"), ("abe", "AV")
         ]
         for word, acr in extras:
             reps.append((fr"\b{word}\b", f"ACRONYM_{acr}"))

@@ -60,6 +60,7 @@ class SpeechReport(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     transcript = Column(String)
     expected_meaning = Column(String, nullable=True) # What the user actually wanted
+    comment = Column(String, nullable=True)
     is_correct = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     

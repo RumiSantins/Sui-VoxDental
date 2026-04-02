@@ -70,6 +70,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
     const [corrTooth, setCorrTooth] = useState("");
     const [corrSurface, setCorrSurface] = useState("");
     const [corrCondition, setCorrCondition] = useState("");
+    const [corrComment, setCorrComment] = useState("");
 
     // Wire external context for speech hook
     useEffect(() => {
@@ -137,10 +138,12 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                 body: JSON.stringify({
                     transcript: lastTranscript,
                     is_correct: false,
-                    expected_meaning: expected
+                    expected_meaning: expected,
+                    comment: corrComment.trim() || null
                 })
             });
             setIsCorrecting(false);
+            setCorrComment("");
             playFeedbackSound('success');
         } catch (error) {
             console.error("Error sending correction report:", error);
@@ -154,14 +157,20 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
     // 2. Effects
     useEffect(() => {
+        let isActive = true;
+
         setFindings([]);
         setNotes({});
         setLastTranscript("");
         setWarnings([]);
         setHasManuallyStopped(false);
+        setTeethWithMedia(new Set());
 
         const fetchLastRecord = async () => {
-            if (!patient) return;
+            if (!patient) {
+                if (isActive) isInitialLoad.current = false;
+                return;
+            }
             try {
                 // Fetch Findings
                 const response = await fetch(`http://localhost:8000/api/v1/patients/${patient.id}/records`, {
@@ -169,31 +178,39 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                 });
                 if (response.ok) {
                     const records = await response.json();
+                    if (!isActive) return;
                     if (records.length > 0) {
                         const latest = records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
                         setFindings(latest.findings || []);
                     }
                 }
 
+                if (!isActive) return;
+
                 // Fetch Media Indicators
                 const mediaResp = await fetch(`http://localhost:8000/api/v1/patients/${patient.id}/media/all`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                // Note: I need to add this 'all' endpoint or just fetch per tooth? 
-                // Let's assume I add a 'all' endpoint for efficiency.
                 if (mediaResp.ok) {
                     const mediaTeeth = await mediaResp.json();
+                    if (!isActive) return;
                     setTeethWithMedia(new Set(mediaTeeth));
                 }
             } catch (error) {
                 console.error("Error fetching records/media:", error);
             } finally {
-                setTimeout(() => { isInitialLoad.current = false; }, 500);
+                if (isActive) {
+                    setTimeout(() => { if (isActive) isInitialLoad.current = false; }, 500);
+                }
             }
         };
 
         isInitialLoad.current = true;
         fetchLastRecord();
+
+        return () => {
+            isActive = false;
+        };
     }, [patient?.id, token]);
 
     // Auto-save effect
@@ -251,7 +268,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
     const playFeedbackSound = useCallback((type) => {
         if (localStorage.getItem('playSound') === 'false') return;
-        
+
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (!AudioContext) return;
@@ -661,12 +678,22 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                     </div>
                                 </div>
 
+                                <div>
+                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">4. Comentario Específico <span className="text-[8px] text-gray-400 opacity-70">(Opcional)</span></label>
+                                    <textarea
+                                        placeholder="Ej: Quise borrar solo la caries pero se borró todo el diente..."
+                                        value={corrComment}
+                                        onChange={(e) => setCorrComment(e.target.value)}
+                                        className="w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg px-3 py-2 text-[10px] outline-none focus:ring-2 focus:ring-blue-500 resize-none h-16 shadow-inner"
+                                    />
+                                </div>
+
                                 <button
                                     onClick={sendCorrectionReport}
                                     disabled={!corrTooth || !corrCondition}
                                     className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Enviar Corrección ✨
+                                    Enviar Corrección
                                 </button>
                             </div>
                         </div>

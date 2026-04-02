@@ -226,32 +226,31 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                             >
                                                 <span className="font-medium truncate mr-2">{p.name}</span>
                                                 <div className="flex items-center gap-1">
-                                                    {selectedPatient?.id === p.id ? (
-                                                        <Check size={14} className="flex-shrink-0" />
-                                                    ) : (
-                                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setEditingId(p.id);
-                                                                    setEditName(p.name);
-                                                                }}
-                                                                className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-500 rounded-md transition-colors"
-                                                                title="Editar"
-                                                            >
-                                                                <Edit2 size={12} />
-                                                            </button>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setDeletingId(p.id);
-                                                                }}
-                                                                className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded-md transition-colors"
-                                                                title="Eliminar"
-                                                            >
-                                                                <Trash2 size={12} />
-                                                            </button>
-                                                        </div>
+                                                    <div className={`flex items-center gap-1 transition-opacity ${selectedPatient?.id === p.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setEditingId(p.id);
+                                                                setEditName(p.name);
+                                                            }}
+                                                            className={`p-1 rounded-md transition-colors ${selectedPatient?.id === p.id ? 'hover:bg-blue-700 text-blue-100 hover:text-white' : 'hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-500'}`}
+                                                            title="Editar"
+                                                        >
+                                                            <Edit2 size={12} />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setDeletingId(p.id);
+                                                            }}
+                                                            className={`p-1 rounded-md transition-colors ${selectedPatient?.id === p.id ? 'hover:bg-blue-700 text-red-200 hover:text-red-100' : 'hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500'}`}
+                                                            title="Eliminar"
+                                                        >
+                                                            <Trash2 size={12} />
+                                                        </button>
+                                                    </div>
+                                                    {selectedPatient?.id === p.id && (
+                                                        <Check size={14} className="flex-shrink-0 ml-1" />
                                                     )}
                                                 </div>
                                             </div>
