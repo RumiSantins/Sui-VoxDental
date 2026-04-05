@@ -23,7 +23,7 @@ const COLORS = {
     'cat': 'from-rose-400 to-rose-300',
 }
 
-export const WelcomeScreen = ({ user, onFinished }) => {
+export const WelcomeScreen = ({ user, darkMode, onFinished }) => {
     const userName = user?.name;
     const userAvatar = user?.avatar;
     const userGender = user?.gender;
@@ -48,33 +48,33 @@ export const WelcomeScreen = ({ user, onFinished }) => {
     const gradientClass = (userAvatar?.startsWith('http') || userAvatar?.startsWith('data:')) ? 'from-blue-600 to-purple-600' : (COLORS[userAvatar] || 'from-blue-600 to-purple-600');
 
     return (
-        <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-950 transition-all duration-1000 ease-in-out ${isLeaving ? 'opacity-0 scale-110' : 'opacity-100'}`}>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full animate-pulse pointer-events-none" />
+        <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-1000 ease-in-out ${darkMode ? 'bg-zinc-950' : 'bg-slate-50'} ${isLeaving ? 'opacity-0 scale-105 blur-lg' : 'opacity-100'}`}>
+            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] blur-[120px] rounded-full animate-pulse pointer-events-none ${darkMode ? 'bg-blue-600/20' : 'bg-blue-400/10'}`} />
             
             <div className={`flex flex-col items-center transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <div className={`w-24 h-24 bg-gradient-to-br ${gradientClass} rounded-3xl flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(37,99,235,0.4)] border border-white/10 relative overflow-hidden group`}>
+                <div className={`w-24 h-24 bg-gradient-to-br ${gradientClass} rounded-3xl flex items-center justify-center mb-8 shadow-xl border border-white/10 relative overflow-hidden group`}>
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                     {renderAvatarIcon()}
                 </div>
 
                 <div className="text-center">
-                    <h2 className="text-blue-400 font-bold tracking-[0.2em] uppercase text-sm mb-4 animate-pulse">Acceso Concedido</h2>
-                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-2 px-4">
+                    <h2 className="text-blue-600 dark:text-blue-500 font-bold tracking-[0.25em] uppercase text-[10px] mb-4">Acceso Concedido</h2>
+                    <h1 className={`text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-2 px-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                         {userGender === 'male' ? 'Bienvenido, ' : userGender === 'female' ? 'Bienvenida, ' : 'Bienvenido/a, '}
-                        <span className="block sm:inline bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent">
+                        <span className={`block sm:inline bg-gradient-to-r bg-clip-text text-transparent ${darkMode ? 'from-white via-blue-50 to-blue-200' : 'from-blue-700 via-blue-600 to-slate-900'}`}>
                             {userGender === 'male' ? 'Dr. ' : userGender === 'female' ? 'Dra. ' : ''}{userName || 'Usuario'}
                         </span>
                     </h1>
                     <div className="flex items-center justify-center gap-2 mt-6">
-                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.3s]" />
-                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce [animation-delay:-0.15s]" />
-                        <div className="w-2 h-2 rounded-full bg-blue-300 animate-bounce" />
+                        <div className="w-2 h-2 rounded-full bg-blue-600 animate-bounce [animation-delay:-0.3s]" />
+                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:-0.15s]" />
+                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" />
                     </div>
                 </div>
             </div>
 
-            <div className="absolute bottom-12 text-slate-500 font-medium tracking-widest text-xs uppercase opacity-50">
-                VoxDental • Sistema Odontológico Inteligente
+            <div className={`absolute bottom-12 font-bold tracking-[0.3em] text-[10px] uppercase opacity-40 ${darkMode ? 'text-zinc-600' : 'text-slate-400'}`}>
+                SuiVoxDental • Sistema Odontológico Inteligente
             </div>
         </div>
     );

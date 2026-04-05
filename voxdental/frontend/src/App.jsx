@@ -133,25 +133,23 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-slate-950 transition-colors duration-300 text-gray-900 dark:text-gray-100 relative overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 relative overflow-x-hidden">
       <Suspense fallback={<LoadingFallback />}>
       {showWelcome && (
         <WelcomeScreen 
           user={user} 
+          darkMode={darkMode}
           onFinished={() => setShowWelcome(false)} 
         />
       )}
-      {/* Background Glows for Dark Mode */}
-      <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-1000" />
-      <div className="absolute bottom-0 left-0 w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-1000" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 relative z-50 print:hidden">
         <div className="flex items-center justify-between gap-3 sm:gap-4 w-full sm:w-auto">
           <div className="flex items-center gap-3 sm:gap-4">
             {renderAvatar(user)}
             <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">SuiVoxDental</h2>
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tighter">SuiVoxDental</h1>
                 <button 
                   onClick={() => setShowProfile(true)}
                   className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all"
@@ -160,7 +158,7 @@ function AppContent() {
                   <Settings size={14} />
                 </button>
               </div>
-              <p className="text-[10px] sm:text-xs text-gray-500 font-medium tracking-tight truncate max-w-[150px] sm:max-w-none">
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold tracking-tight truncate max-w-[150px] sm:max-w-none">
                 {user.gender === 'male' ? 'Dr. ' : user.gender === 'female' ? 'Dra. ' : ''}{user.name || user.email}
               </p>
             </div>
@@ -199,6 +197,16 @@ function AppContent() {
           patient={selectedPatient}
         />
       </div>
+
+      <footer className="mt-8 pb-12 text-center border-t border-gray-100 dark:border-zinc-800/50">
+        <p className="mt-8 text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400 dark:text-zinc-600">
+          SuiVoxDental • Sistema Odontológico Inteligente
+        </p>
+        <p className="mt-2 text-[10px] font-medium text-slate-400 dark:text-zinc-600">
+          Hecho por <span className="text-slate-500 dark:text-zinc-400">Felipe Santillan</span> • 
+          <a href="https://fausto.app/" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">Fausto</a>
+        </p>
+      </footer>
       </Suspense>
     </div>
   )

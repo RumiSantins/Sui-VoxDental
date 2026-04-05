@@ -13,20 +13,21 @@ html, body {
 
 @layer utilities {
   .glow-blue {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    /* More subtle glowing for active items only */
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
   }
   .glow-border-blue {
-    border-color: rgba(59, 130, 246, 0.6) !important;
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 0 4px rgba(59, 130, 246, 0.1);
   }
   .glow-text-blue {
-    text-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+    text-shadow: 0 0 4px rgba(59, 130, 246, 0.3);
   }
   .glow-card {
-    background: rgba(15, 23, 42, 0.8) !important;
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(59, 130, 246, 0.3) !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.2);
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
@@ -38,12 +39,12 @@ html, body {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.8; transform: scale(1); box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
-  50% { opacity: 1; transform: scale(1.02); box-shadow: 0 0 25px rgba(59, 130, 246, 0.7); }
+  0%, 100% { opacity: 0.9; transform: scale(1); box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); }
+  50% { opacity: 1; transform: scale(1.01); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
 }
 
 .animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+  animation: pulse-glow 4s ease-in-out infinite;
 }
 
 @layer components {
@@ -54,6 +55,6 @@ html, body {
     @apply bg-blue-500 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)];
   }
   .surface-toggle-inactive {
-    @apply bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:border-blue-300;
+    @apply bg-slate-50 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-zinc-700 hover:border-blue-400;
   }
 }

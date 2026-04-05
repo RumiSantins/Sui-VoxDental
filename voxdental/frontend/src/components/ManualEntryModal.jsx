@@ -103,18 +103,18 @@ export const ManualEntryModal = React.memo(({
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/70 p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-blue-900/30 flex flex-col max-h-[90vh]">
+            <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-3xl shadow-xl border border-slate-200 dark:border-zinc-800 flex flex-col max-h-[90vh]">
                 {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-blue-900/20 bg-gray-50/50 dark:bg-slate-900">
+                <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900">
                     <div>
-                        <h3 className="font-black text-2xl text-gray-900 dark:text-white dark:glow-text-blue">
+                        <h3 className="font-bold text-2xl text-slate-900 dark:text-white">
                             Pieza {useDottedMode ? String(toothNumber).split('').join('.') : toothNumber}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-slate-400">Edición Manual de Hallazgos</p>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Edición Manual de Hallazgos</p>
                     </div>
                     <button 
                         onClick={onClose} 
-                        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 transition-colors"
+                        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-400 hover:text-slate-600 transition-colors"
                     >
                         <span className="text-3xl leading-none">&times;</span>
                     </button>
@@ -123,7 +123,7 @@ export const ManualEntryModal = React.memo(({
                 <div className="flex-1 overflow-y-auto p-8 space-y-8">
                     {/* Surface Selection */}
                     <section>
-                        <h4 className="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">1. Seleccionar Superficie</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">1. Seleccionar Superficie</h4>
                         <div className="flex flex-wrap gap-3">
                             {[
                                 { id: 'vestibular', label: 'V - Vestibular' },
@@ -146,7 +146,7 @@ export const ManualEntryModal = React.memo(({
 
                     {/* Condition Selection */}
                     <section className={!selectedSurface ? 'opacity-30 pointer-events-none grayscale transition-all' : 'transition-all'}>
-                        <h4 className="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">2. Marcar Hallazgo</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">2. Marcar Hallazgo</h4>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             {legendItems.map(item => {
                                 const isWholeTooth = ['ausente', 'corona', 'endodoncia', 'extraer'].includes(item.id);
@@ -181,13 +181,13 @@ export const ManualEntryModal = React.memo(({
                                                 }
                                             });
                                         }}
-                                        className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 group ${isDisabled ? 'opacity-20 cursor-not-allowed' : ''} ${isApplied ? 'bg-blue-50 dark:bg-blue-900/40 border-blue-400 dark:shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'bg-gray-50/50 dark:bg-slate-800/50 border-transparent hover:border-gray-200'}`}
+                                        className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 group ${isDisabled ? 'opacity-20 cursor-not-allowed' : ''} ${isApplied ? 'bg-blue-50 dark:bg-blue-900/40 border-blue-400 dark:shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'bg-slate-50 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-800 hover:border-slate-300'}`}
                                     >
                                         <div 
                                             className="w-full h-4 rounded-full shadow-sm"
                                             style={{ backgroundColor: item.color }}
                                         />
-                                        <span className={`text-[10px] font-black tracking-widest ${isApplied ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`}>{item.label}</span>
+                                        <span className={`text-[10px] font-bold tracking-widest ${isApplied ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500'}`}>{item.label}</span>
                                     </button>
                                 );
                             })}
@@ -196,14 +196,14 @@ export const ManualEntryModal = React.memo(({
 
                     {/* Notes */}
                     <section>
-                        <h4 className="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">3. Observaciones</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">3. Observaciones</h4>
                         <div className="relative group">
-                            <MessageSquare size={18} className="absolute top-4 left-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                            <MessageSquare size={18} className="absolute top-4 left-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                             <textarea
                                 value={tempNoteText}
                                 onChange={(e) => setTempNoteText(e.target.value)}
-                                className="w-full h-32 p-4 pl-12 bg-gray-50 dark:bg-slate-950/50 border border-gray-100 dark:border-blue-900/20 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-slate-600 resize-none"
-                                placeholder="Detalles adicionales sobre esta pieza..."
+                                className="w-full h-32 p-4 pl-12 bg-slate-50 dark:bg-zinc-950/50 border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none focus:border-blue-500 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 resize-none text-sm"
+                                placeholder="Observaciones adicionales sobre esta pieza..."
                             />
                         </div>
                     </section>
@@ -211,7 +211,7 @@ export const ManualEntryModal = React.memo(({
                     {/* Multimedia Gallery */}
                     <section>
                         <div className="flex justify-between items-center mb-4">
-                            <h4 className="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">4. Galería Multimedia</h4>
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">4. Galería Multimedia</h4>
                             <label className={`flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all shadow-md active:scale-95 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                                 {isUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
                                 {isUploading ? 'Subiendo...' : 'Subir Imagen/Video'}
@@ -316,18 +316,18 @@ export const ManualEntryModal = React.memo(({
                 )}
 
                 {/* Footer Actions */}
-                <div className="p-6 bg-gray-50/80 dark:bg-slate-900/80 border-t border-gray-100 dark:border-blue-900/20 flex justify-end gap-3 backdrop-blur-sm">
+                <div className="p-6 bg-slate-50 dark:bg-zinc-900 border-t border-slate-100 dark:border-zinc-800 flex justify-end gap-3">
                     <button 
                         onClick={onClose} 
-                        className="px-6 py-3 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-2xl transition-all font-bold"
+                        className="px-6 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-2xl transition-all font-bold text-sm"
                     >
                         Cancelar
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black shadow-lg shadow-blue-500/30 active:scale-95 transition-all dark:glow-blue"
+                        className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all"
                     >
-                        Aplicar Cambios
+                        Guardar Cambios
                     </button>
                 </div>
             </div>

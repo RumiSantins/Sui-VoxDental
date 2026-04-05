@@ -26,10 +26,11 @@ const getSurfaceClass = (surf, surfaceConditions) => {
     return condition ? 'finding-glow' : '';
 };
 
-const RenderAnterior = ({ number, surfaceConditions }) => {
+const RenderAnterior = ({ number, surfaceConditions, darkMode }) => {
     const conditions = Object.values(surfaceConditions);
     const hasEndo = conditions.includes('endodoncia');
     const isToExtract = conditions.includes('atraer');
+    const defaultStroke = darkMode ? '#52525b' : '#94a3b8'; // zinc-600 : slate-400
     
     const isRightQuadrant = Math.floor(number / 10) === 1 || Math.floor(number / 10) === 4;
     const leftSurface = isRightQuadrant ? 'distal' : 'mesial';
@@ -40,13 +41,13 @@ const RenderAnterior = ({ number, surfaceConditions }) => {
             {/* Root (Anterior: Single) */}
             <path d="M15,75 Q25,120 35,75" 
                   fill="none" 
-                  stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : '#e2e8f0')} 
+                  stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
                   strokeWidth={hasEndo ? "3" : "1.5"} 
-                  className={`transition-all duration-300 ${hasEndo || isToExtract ? 'finding-glow' : ''} dark:stroke-slate-700`} />
+                  className={`transition-all duration-300 ${hasEndo || isToExtract ? 'finding-glow' : ''}`} />
             
             {/* Crown Outline */}
             <path d="M25,5 Q40,5 45,20 L45,60 Q45,75 25,75 Q5,75 5,60 L5,20 Q10,5 25,5 Z" 
-                  className={`fill-white dark:fill-slate-800 transition-all duration-300 ${conditions.includes('corona') ? 'stroke-[#eab308]' : 'stroke-gray-400 dark:stroke-slate-600'}`} 
+                  className={`fill-white dark:fill-zinc-800 transition-all duration-300 ${conditions.includes('corona') ? 'stroke-[#eab308]' : 'stroke-slate-400 dark:stroke-zinc-600'}`} 
                   strokeWidth={conditions.includes('corona') ? "3" : "1.5"} />
             
             {/* Surfaces */}
@@ -71,11 +72,12 @@ const RenderAnterior = ({ number, surfaceConditions }) => {
     );
 };
 
-const RenderPosterior = ({ number, surfaceConditions }) => {
+const RenderPosterior = ({ number, surfaceConditions, darkMode }) => {
     const conditions = Object.values(surfaceConditions);
     const hasEndo = conditions.includes('endodoncia');
     const isToExtract = conditions.includes('atraer');
     const isMolar = (number % 10 >= 6);
+    const defaultStroke = darkMode ? '#52525b' : '#94a3b8'; // zinc-600 : slate-400
     
     // Mesial and Distal dynamically flip based on quadrant (Left vs Right side of midline)
     const isRightQuadrant = Math.floor(number / 10) === 1 || Math.floor(number / 10) === 4;
@@ -89,40 +91,40 @@ const RenderPosterior = ({ number, surfaceConditions }) => {
                 {isMolar ? (
                     <>
                         <path d="M10,70 Q5,100 15,115 Q20,100 15,70" 
-                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : '#e2e8f0')} 
+                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
                             strokeWidth={hasEndo ? "2" : "1.5"} 
-                            fill="none" className="dark:stroke-slate-700" />
+                            fill="none" className="transition-all duration-300" />
                         <path d="M25,75 Q25,120 25,75" 
-                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : '#e2e8f0')} 
+                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
                             strokeWidth={hasEndo ? "2" : "1.5"} 
-                            fill="none" className="dark:stroke-slate-700" />
+                            fill="none" className="transition-all duration-300" />
                         <path d="M40,70 Q45,100 35,115 Q30,100 35,70" 
-                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : '#e2e8f0')} 
+                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
                             strokeWidth={hasEndo ? "2" : "1.5"} 
-                            fill="none" className="dark:stroke-slate-700" />
+                            fill="none" className="transition-all duration-300" />
                     </>
                 ) : (number === 14 || number === 24) ? (
                     <>
                         <path d="M15,70 Q10,105 18,115 Q25,105 22,70" 
-                            stroke={hasEndo ? '#3b82f6' : (isToExtract ? '#ef4444' : '#e2e8f0')} 
+                            stroke={hasEndo ? '#3b82f6' : (isToExtract ? '#f97316' : defaultStroke)} 
                             strokeWidth={hasEndo ? "2" : "1.5"} 
-                            fill="none" className="dark:stroke-slate-700" />
+                            fill="none" className="transition-all duration-300" />
                         <path d="M35,70 Q40,105 32,115 Q25,105 28,70" 
-                            stroke={hasEndo ? '#3b82f6' : (isToExtract ? '#ef4444' : '#e2e8f0')} 
+                            stroke={hasEndo ? '#3b82f6' : (isToExtract ? '#f97316' : defaultStroke)} 
                             strokeWidth={hasEndo ? "2" : "1.5"} 
                             strokeDasharray="2,2" opacity="0.4"
-                            fill="none" className="dark:stroke-slate-700" />
+                            fill="none" className="transition-all duration-300" />
                     </>
                 ) : (
                     <path d="M18,70 Q25,115 32,70" 
-                        stroke={hasEndo ? '#a855f7' : '#e2e8f0'} 
+                        stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
                         strokeWidth={hasEndo ? "3" : "1.5"} 
-                        fill="none" className={`dark:stroke-slate-700 ${hasEndo ? 'finding-glow' : ''}`} />
+                        fill="none" className={`transition-all duration-300 ${hasEndo ? 'finding-glow' : ''}`} />
                 )}
             </g>
 
             <path d="M10,10 Q25,5 40,10 L45,25 L45,55 L40,70 Q25,75 10,70 L5,55 L5,25 Z" 
-                  className={`fill-white dark:fill-slate-800 transition-all duration-300 ${conditions.includes('corona') ? 'stroke-[#eab308]' : 'stroke-gray-400 dark:stroke-slate-600'}`} 
+                  className={`fill-white dark:fill-zinc-800 transition-all duration-300 ${conditions.includes('corona') ? 'stroke-[#eab308]' : 'stroke-slate-400 dark:stroke-zinc-600'}`} 
                   strokeWidth={conditions.includes('corona') ? "3" : "1.5"} />
             
             <path d="M10,15 Q25,8 40,15 L35,25 Q25,20 15,25 Z" 
@@ -146,7 +148,7 @@ const RenderPosterior = ({ number, surfaceConditions }) => {
     );
 };
 
-const ToothSVG = React.memo(({ number, surfaceConditions = {}, isMissing, onClick, useDottedMode = false, showVerification = false, onVerify, hasMedia = false }) => {
+const ToothSVG = React.memo(({ number, surfaceConditions = {}, isMissing, onClick, useDottedMode = false, showVerification = false, onVerify, hasMedia = false, darkMode }) => {
     const isAnterior = (number % 10 <= 3);
     const displayNum = useDottedMode ? String(number).split('').join('.') : number;
 
@@ -161,9 +163,9 @@ const ToothSVG = React.memo(({ number, surfaceConditions = {}, isMissing, onClic
             <div className={`relative w-14 h-24 transition-all transform group-hover:scale-110 ${isMissing ? 'grayscale opacity-30 scale-90' : ''}`}>
                 <svg viewBox="0 0 50 130" className="w-full h-full drop-shadow-sm">
                     {isAnterior ? (
-                        <RenderAnterior number={number} surfaceConditions={surfaceConditions} />
+                        <RenderAnterior number={number} surfaceConditions={surfaceConditions} darkMode={darkMode} />
                     ) : (
-                        <RenderPosterior number={number} surfaceConditions={surfaceConditions} />
+                        <RenderPosterior number={number} surfaceConditions={surfaceConditions} darkMode={darkMode} />
                     )}
                     
                     {isMissing && (
@@ -185,6 +187,7 @@ const ToothSVG = React.memo(({ number, surfaceConditions = {}, isMissing, onClic
         prevProps.isMissing === nextProps.isMissing &&
         prevProps.useDottedMode === nextProps.useDottedMode &&
         prevProps.showVerification === nextProps.showVerification &&
+        prevProps.darkMode === nextProps.darkMode &&
         JSON.stringify(prevProps.surfaceConditions) === JSON.stringify(nextProps.surfaceConditions)
     );
 });

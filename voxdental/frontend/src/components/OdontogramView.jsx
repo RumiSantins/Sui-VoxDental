@@ -11,20 +11,20 @@ import { SpeechReportModal } from './SpeechReportModal';
 const VolumeMeter = memo(({ volume, isRecording }) => {
     if (!isRecording) return null;
     return (
-        <div className="flex items-center gap-1 h-3 w-32 bg-gray-200 dark:bg-slate-800 rounded-full overflow-hidden border border-gray-100 dark:border-slate-700">
+        <div className="flex items-center gap-1 h-3 w-32 bg-slate-200 dark:bg-zinc-800 rounded-full overflow-hidden border border-slate-100 dark:border-zinc-700">
             <div className="h-full bg-green-500 transition-all duration-75" style={{ width: `${volume}%` }} />
         </div>
     );
 });
 
 // 2. Quadrant moved outside to prevent recreation and allow better memoization
-const Quadrant = memo(({ range, findings, notes, onToothClick, getToothState, useDottedMode, pendingVerification, onVerify }) => {
+const Quadrant = memo(({ range, findings, notes, onToothClick, getToothState, useDottedMode, pendingVerification, onVerify, darkMode }) => {
     return (
-        <div className="flex gap-2 bg-white dark:bg-slate-900/60 p-4 sm:p-6 rounded-[2rem] shadow-xl border border-gray-100 dark:border-blue-900/20 transition-all w-max mx-auto justify-center">
+        <div className="flex gap-2 bg-slate-50/50 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800/60 transition-all w-max mx-auto justify-center">
             {range.map(num => (
-                <div key={num} className="relative flex flex-col items-center">
+                <div key={num} className="relative flex flex-col items-center group">
                     {notes[num] && (
-                        <div className="absolute top-1 -right-0.5 z-10 text-blue-500 bg-blue-50 dark:bg-slate-800 rounded-full p-0.5 shadow-sm border border-blue-200 dark:border-blue-800 pointer-events-none">
+                        <div className="absolute top-1 -right-0.5 z-10 text-blue-500 bg-blue-50 dark:bg-zinc-800 rounded-full p-0.5 shadow-sm border border-blue-200 dark:border-blue-800 pointer-events-none">
                             <MessageSquare size={12} />
                         </div>
                     )}
@@ -35,6 +35,7 @@ const Quadrant = memo(({ range, findings, notes, onToothClick, getToothState, us
                         useDottedMode={useDottedMode}
                         showVerification={pendingVerification.has(num)}
                         onVerify={(isCorrect) => onVerify(num, isCorrect)}
+                        darkMode={darkMode}
                     />
                 </div>
             ))}
@@ -467,7 +468,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                     </button>
                     <button
                         onClick={() => setUseDottedMode(!useDottedMode)}
-                        className="px-4 py-2 rounded-full bg-white dark:bg-slate-900 shadow-md text-blue-600 dark:text-blue-400 font-bold border border-gray-200 dark:border-blue-900/50 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all text-xs tracking-wider whitespace-nowrap dark:glow-border-blue uppercase"
+                        className="px-4 py-2 rounded-full bg-white dark:bg-zinc-900 shadow-md text-blue-600 dark:text-blue-400 font-bold border border-slate-200 dark:border-zinc-800 hover:bg-blue-50 dark:hover:bg-zinc-800 transition-all text-xs tracking-wider whitespace-nowrap uppercase"
                         title="Cambiar numeración de dientes"
                     >
                         Intercalar Nomenclatura
@@ -484,15 +485,15 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
                     <button
                         onClick={onToggleTheme}
-                        className="p-3 rounded-full bg-white dark:bg-slate-900 shadow-md text-gray-600 dark:text-yellow-400 hover:scale-110 transition-all border border-gray-200 dark:border-blue-900/50 dark:glow-border-blue"
+                        className="p-3 rounded-full bg-white dark:bg-zinc-900 shadow-sm text-slate-500 dark:text-amber-400 hover:scale-110 transition-transform border border-slate-200 dark:border-zinc-800"
                     >
                         {darkMode ? <Sun size={20} className="dark:animate-pulse-glow" /> : <Moon size={20} />}
                     </button>
 
                     <div className="h-10 w-[1.5px] bg-gray-200 dark:bg-slate-700/50 mx-2 hidden sm:block" />
 
-                    <div className="flex flex-col items-end mr-4 border-r dark:border-slate-700 pr-4">
-                        <div className="text-sm text-gray-500 dark:text-slate-400 mb-1">
+                    <div className="flex flex-col items-end mr-4 border-r dark:border-zinc-800 pr-4">
+                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1">
                             {isContinuous ? (
                                 <span className="flex items-center gap-1 text-green-600 font-bold">
                                     <span className="relative flex h-3 w-3">
@@ -502,14 +503,14 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                     Listo
                                 </span>
                             ) : (
-                                <span className="text-gray-400">Modo Manual</span>
+                                <span className="text-slate-400 dark:text-zinc-600">Modo Manual</span>
                             )}
                         </div>
                         <VolumeMeter volume={volume} isRecording={isRecording} />
                         <div className="flex items-center gap-1 mt-1 text-[10px] uppercase font-bold tracking-wider">
                             {saveStatus === 'saving' && <span className="text-blue-500 flex items-center gap-1"><div className="w-2 h-2 border-[1.5px] border-blue-500 border-t-transparent rounded-full animate-spin"></div> Guardando...</span>}
                             {saveStatus === 'saved' && <span className="text-green-500 flex items-center gap-1"><Check size={10} /> Guardado</span>}
-                            {saveStatus === 'idle' && findings.length > 0 && <span className="text-gray-400 flex items-center gap-1"><Cloud size={10} /> Nube activa</span>}
+                            {saveStatus === 'idle' && findings.length > 0 && <span className="text-slate-400 dark:text-zinc-600 flex items-center gap-1"><Cloud size={10} /> Nube activa</span>}
                         </div>
                     </div>
 
@@ -519,7 +520,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                 <select
                                     value={timerDelay}
                                     onChange={(e) => e.target.value === 'custom' ? setIsCustomTimer(true) : setTimerDelay(Number(e.target.value))}
-                                    className="text-sm bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 transition-colors cursor-pointer"
+                                    className="text-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-300 rounded-full px-4 py-2 outline-none focus:border-blue-500 transition-colors cursor-pointer"
                                 >
                                     <option value={0}>0s (Sin espera)</option>
                                     <option value={10}>10s (Rápido)</option>
@@ -548,9 +549,9 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
                     <button
                         onClick={toggleRecording}
-                        className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition-all shadow-lg w-full sm:w-auto ${!patient
-                            ? 'bg-gray-300 dark:bg-slate-900 text-gray-500 cursor-not-allowed opacity-60'
-                            : isRecording ? 'bg-red-500 text-white animate-pulse ring-4 ring-red-200 dark:ring-red-900/50 dark:shadow-[0_0_25px_rgba(239,68,68,0.4)]' : countdown !== null ? 'bg-orange-500 text-white animate-pulse ring-4 ring-orange-200' : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 active:scale-95 dark:glow-blue'}`}
+                        className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold transition-all shadow-lg w-full sm:w-auto ${!patient
+                            ? 'bg-slate-200 dark:bg-zinc-800 text-slate-400 cursor-not-allowed opacity-60'
+                            : isRecording ? 'bg-red-500 text-white animate-pulse ring-4 ring-red-200 dark:ring-red-900/30' : countdown !== null ? 'bg-orange-500 text-white animate-pulse ring-4 ring-orange-200' : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all'}`}
                         disabled={isProcessing || !patient}
                     >
                         {isProcessing ? (
@@ -581,12 +582,12 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
             </header>
 
             {!patient && (
-                <div className="mb-6 p-10 bg-blue-50/50 dark:bg-slate-900/40 border-2 border-dashed border-blue-200 dark:border-blue-500/30 rounded-3xl flex flex-col items-center text-center animate-in fade-in zoom-in duration-300 dark:shadow-[0_0_30px_rgba(59,130,246,0.1)]">
-                    <div className="w-20 h-20 bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6 dark:animate-pulse-glow dark:glow-border-blue">
+                <div className="mb-6 p-10 bg-slate-50 dark:bg-zinc-900/40 border-2 border-dashed border-slate-300 dark:border-zinc-800 rounded-3xl flex flex-col items-center text-center animate-in fade-in zoom-in duration-300">
+                    <div className="w-20 h-20 bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6">
                         <Users size={40} />
                     </div>
-                    <h2 className="text-2xl font-black text-gray-800 dark:text-white mb-3 dark:glow-text-blue tracking-tight">Comienza por seleccionar un paciente</h2>
-                    <p className="text-gray-500 dark:text-slate-400 max-w-sm leading-relaxed">
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-3 tracking-tight">Comienza por seleccionar un paciente</h2>
+                    <p className="text-slate-600 font-medium dark:text-slate-400 max-w-sm leading-relaxed">
                         Para registrar un odontograma, primero debes seleccionar un paciente de la lista superior o crear uno nuevo.
                     </p>
                 </div>
@@ -595,13 +596,13 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
             {isProcessing && <div className="mb-4 p-4 bg-blue-50 text-blue-700 rounded-lg animate-pulse text-center">Procesando audio...</div>}
 
             {lastTranscript && (
-                <div className="mb-6 p-5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-sm relative overflow-hidden group/transcript animate-in fade-in slide-in-from-bottom-2">
+                <div className="mb-6 p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl shadow-sm relative overflow-hidden group/transcript animate-in fade-in slide-in-from-bottom-2">
                     <div className="flex justify-between items-start mb-2">
-                        <span className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em]">Última Detección</span>
+                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Última Detección</span>
 
                         {!hasFeedbackBeenSent && !isCorrecting && (
                             <div className="flex items-center gap-2">
-                                <span className="text-[9px] text-gray-400 dark:text-slate-500 font-bold uppercase tracking-tighter mr-1">¿Fue correcto?</span>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-tighter mr-1">¿Fue correcto?</span>
                                 <button
                                     onClick={() => handleSpeechFeedback(true)}
                                     className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 text-gray-400 hover:text-green-600 transition-colors rounded-lg border border-transparent hover:border-green-100"
@@ -623,13 +624,13 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                         )}
                     </div>
 
-                    <p className="text-xl text-gray-800 dark:text-slate-100 font-medium italic leading-relaxed">
+                    <p className="text-xl text-slate-800 dark:text-slate-100 font-bold italic leading-relaxed">
                         "{lastTranscript}"
                     </p>
 
                     {/* Correction UI Panel */}
                     {isCorrecting && (
-                        <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-700 space-y-4 animate-in zoom-in duration-300">
+                        <div className="mt-4 p-4 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border border-slate-200 shadow-sm dark:border-zinc-800 space-y-4 animate-in zoom-in duration-300">
                             <div className="flex items-center justify-between border-b dark:border-slate-700 pb-2 mb-2">
                                 <h5 className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400">Panel de Corrección Táctica</h5>
                                 <button onClick={() => setIsCorrecting(false)} className="text-gray-400 hover:text-gray-600">&times;</button>
@@ -707,55 +708,54 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-12 w-full">
-                <div className="space-y-3 min-w-0">
-                    <h3 className="text-center font-bold text-gray-400 dark:text-slate-500 text-[10px] uppercase tracking-widest px-2 py-1 bg-gray-50 dark:bg-slate-900/50 rounded-lg inline-block mx-auto mb-2">Sup. Derecho (C1)</h3>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-10 w-full">
+                <div className="space-y-2 min-w-0">
+                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">Sup. Derecho (C1)</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
-                        <Quadrant range={[18, 17, 16, 15, 14, 13, 12, 11]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} />
+                        <Quadrant range={[18, 17, 16, 15, 14, 13, 12, 11]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
-                <div className="space-y-3 min-w-0">
-                    <h3 className="text-center font-bold text-gray-400 dark:text-slate-500 text-[10px] uppercase tracking-widest px-2 py-1 bg-gray-50 dark:bg-slate-900/50 rounded-lg inline-block mx-auto mb-2">Sup. Izquierdo (C2)</h3>
+                <div className="space-y-2 min-w-0">
+                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">Sup. Izquierdo (C2)</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
-                        <Quadrant range={[21, 22, 23, 24, 25, 26, 27, 28]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} />
+                        <Quadrant range={[21, 22, 23, 24, 25, 26, 27, 28]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
-                <div className="space-y-3 min-w-0">
-                    <h3 className="text-center font-bold text-gray-400 dark:text-slate-500 text-[10px] uppercase tracking-widest px-2 py-1 bg-gray-50 dark:bg-slate-900/50 rounded-lg inline-block mx-auto mb-2">Inf. Derecho (C4)</h3>
+                <div className="space-y-2 min-w-0">
+                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">Inf. Derecho (C4)</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
-                        <Quadrant range={[48, 47, 46, 45, 44, 43, 42, 41]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} />
+                        <Quadrant range={[48, 47, 46, 45, 44, 43, 42, 41]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
-                <div className="space-y-3 min-w-0">
-                    <h3 className="text-center font-bold text-gray-400 dark:text-slate-500 text-[10px] uppercase tracking-widest px-2 py-1 bg-gray-50 dark:bg-slate-900/50 rounded-lg inline-block mx-auto mb-2">Inf. Izquierdo (C3)</h3>
+                <div className="space-y-2 min-w-0">
+                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">Inf. Izquierdo (C3)</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
-                        <Quadrant range={[31, 32, 33, 34, 35, 36, 37, 38]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} />
+                        <Quadrant range={[31, 32, 33, 34, 35, 36, 37, 38]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
             </div>
 
-            <div className="mt-12 p-4 sm:p-8 bg-white dark:bg-slate-900/60 dark:backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-blue-900/30 relative overflow-hidden group/legend dark:shadow-[0_0_50px_rgba(0,0,0,0.3)]">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 dark:group-hover/legend:opacity-100 transition-opacity duration-1000" />
-                <div className="flex items-center justify-between mb-8">
+            <div className="mt-12 p-4 sm:p-8 bg-white dark:bg-zinc-900/40 dark:backdrop-blur-xl rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800/60 relative overflow-hidden group/legend text-slate-800 dark:text-slate-200">
+                <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-8 bg-blue-500 rounded-full dark:shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
-                        <h4 className="text-xl font-black text-gray-800 dark:text-white dark:glow-text-blue tracking-tight">Guía de Colores y Símbolos</h4>
+                        <div className="w-1.5 h-6 bg-blue-500/80 rounded-full" />
+                        <h4 className="text-lg font-semibold tracking-tight text-slate-800 dark:text-slate-100">Guía de Colores y Símbolos</h4>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {legendItems.map((item) => (
                         <button
                             key={item.id}
                             onClick={() => setActiveHelp(activeHelp === item.id ? null : item.id)}
-                            className={`group p-4 sm:p-6 rounded-[2rem] border transition-all duration-300 transform hover:scale-105 flex flex-col items-center gap-4 ${activeHelp === item.id
-                                ? 'bg-blue-50 dark:bg-blue-600/20 border-blue-200 dark:border-blue-500/50 dark:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                                : 'bg-gray-50/50 dark:bg-slate-950/40 border-transparent dark:border-blue-900/10 hover:bg-white dark:hover:bg-slate-800/60 hover:border-gray-200 dark:hover:border-blue-500/30'}`}
+                            className={`group p-4 rounded-xl border transition-all duration-300 flex flex-col items-center gap-3 ${activeHelp === item.id
+                                ? 'bg-blue-50 dark:bg-zinc-800/80 border-blue-200 dark:border-blue-500/30'
+                                : 'bg-slate-50 dark:bg-zinc-900/40 border-transparent dark:border-zinc-800/40 hover:bg-white hover:border-slate-300 hover:shadow-sm dark:hover:bg-zinc-800/80 dark:hover:border-slate-700'}`}
                         >
-                            <div className="w-full h-10 rounded-xl shadow-sm flex items-center justify-center text-white text-[10px] font-black tracking-tighter transition-all"
-                                style={{ backgroundColor: item.isSymbol ? 'transparent' : item.color, border: item.isSymbol || item.id === 'borrar' ? `2px dashed ${item.id === 'borrar' ? '#475569' : '#3b82f6'}` : 'none' }}>
-                                {item.isSymbol ? <span className="text-blue-500 text-xl font-bold">✕</span> : item.label}
+                            <div className="w-full h-8 rounded-lg flex items-center justify-center text-white text-xs font-semibold tracking-wide transition-all shadow-sm"
+                                style={{ backgroundColor: item.isSymbol ? 'transparent' : item.color, border: item.isSymbol || item.id === 'borrar' ? `1px solid ${item.id === 'borrar' ? '#475569' : '#3b82f6'}` : 'none' }}>
+                                {item.isSymbol ? <span className="text-blue-500 text-lg font-bold">✕</span> : item.label}
                             </div>
-                            <div className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-slate-500">{item.category}</div>
+                            <div className="text-center text-xs font-semibold text-slate-600 dark:text-slate-400">{item.category}</div>
                         </button>
                     ))}
                 </div>

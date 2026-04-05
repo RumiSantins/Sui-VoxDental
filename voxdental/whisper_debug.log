@@ -2715,3 +2715,28 @@
 [2026-04-02 14:58:40] FFMPEG Detectado: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg.EXE
 [2026-04-02 14:58:40] Cargando modelo Whisper 'base' (más preciso para odontología)...
 [2026-04-02 14:58:41] Modelo Whisper cargado en 0.52s.
+[2026-04-02 17:57:25] --- INICIANDO WHISPERSERVICE (Tiny Model Override) ---
+[2026-04-02 17:57:25] FFMPEG Source path: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v7.1.exe
+[2026-04-02 17:57:25] FFMPEG Detectado: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg.EXE
+[2026-04-02 17:57:25] Cargando modelo Whisper 'base' (más preciso para odontología)...
+[2026-04-02 17:57:25] Modelo Whisper cargado en 0.51s.
+[2026-04-02 21:54:27] --- INICIANDO WHISPERSERVICE (Tiny Model Override) ---
+[2026-04-02 21:54:27] FFMPEG Source path: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v7.1.exe
+[2026-04-02 21:54:27] FFMPEG Detectado: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg.EXE
+[2026-04-02 21:54:27] Cargando modelo Whisper 'base' (más preciso para odontología)...
+[2026-04-02 21:54:28] Modelo Whisper cargado en 0.88s.
+[2026-04-02 22:18:01] --- INICIANDO WHISPERSERVICE (Tiny Model Override) ---
+[2026-04-02 22:18:01] FFMPEG Source path: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v7.1.exe
+[2026-04-02 22:18:01] FFMPEG Detectado: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg.EXE
+[2026-04-02 22:18:01] Cargando modelo Whisper 'base' (más preciso para odontología)...
+[2026-04-02 22:18:02] Modelo Whisper cargado en 0.75s.
+[2026-04-02 22:31:23] --- INICIANDO WHISPERSERVICE (Tiny Model Override) ---
+[2026-04-02 22:31:23] FFMPEG Source path: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v7.1.exe
+[2026-04-02 22:31:23] FFMPEG Detectado: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg.EXE
+[2026-04-02 22:31:23] Cargando modelo Whisper 'base' (más preciso para odontología)...
+[2026-04-02 22:31:24] Modelo Whisper cargado en 0.94s.
+[2026-04-02 22:38:30] --- INICIANDO WHISPERSERVICE (Tiny Model Override) ---
+[2026-04-02 22:38:30] FFMPEG Source path: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v7.1.exe
+[2026-04-02 22:38:30] FFMPEG Detectado: C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg.EXE
+[2026-04-02 22:38:30] Cargando modelo Whisper 'base' (más preciso para odontología)...
+[2026-04-02 22:38:30] Modelo Whisper cargado en 0.77s.

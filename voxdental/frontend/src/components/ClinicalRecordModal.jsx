@@ -62,24 +62,24 @@ export const ClinicalRecordModal = React.memo(({
 
     return (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-950/70 p-4 sm:p-6 print:p-0 print:bg-white animate-in fade-in duration-200 print:static print:block print:inset-auto">
-            <div className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] print:h-auto print:max-w-none print:w-full print:rounded-none print:shadow-none print:block print:overflow-visible">
+            <div className="bg-white dark:bg-zinc-900 w-full max-w-4xl rounded-3xl shadow-xl border border-slate-200 dark:border-zinc-800 flex flex-col h-[90vh] print:h-auto print:max-w-none print:w-full print:rounded-none print:shadow-none print:block print:overflow-visible">
                 
                 {/* Header (Non printable actions) */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-blue-900/20 bg-gray-50/50 dark:bg-slate-900 print:hidden shrink-0">
+                <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 print:hidden shrink-0">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
-                            <FileText size={24} className="dark:glow-icon-blue" />
+                        <div className="w-12 h-12 bg-blue-50 dark:bg-zinc-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <FileText size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black text-2xl text-gray-900 dark:text-white dark:glow-text-blue leading-tight">Historia Clínica Formateada</h3>
-                            <p className="text-sm text-gray-500 dark:text-slate-400">Resumen y estado odontológico del paciente</p>
+                            <h3 className="font-bold text-2xl text-slate-900 dark:text-white leading-tight">Historia Clínica Formateada</h3>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Resumen y estado odontológico del paciente</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-sm text-sm">
+                        <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md text-sm">
                             <Printer size={18} /> <span className="hidden sm:inline">Imprimir Expediente</span>
                         </button>
-                        <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 transition-colors">
+                        <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-400 hover:text-slate-600 transition-colors">
                             <X size={24} />
                         </button>
                     </div>
@@ -90,25 +90,25 @@ export const ClinicalRecordModal = React.memo(({
                     <div className="max-w-5xl mx-auto print:max-w-full">
                         
                         {/* Clinical Header for Print */}
-                        <div className="border-b-2 border-black pb-4 mb-8 mt-4 print:mt-0 flex justify-between items-end">
+                        <div className="border-b-2 border-slate-900 dark:border-zinc-700 pb-4 mb-8 mt-4 print:mt-0 flex justify-between items-end">
                             <div>
-                                <h1 className="text-3xl font-black text-gray-900 dark:text-white print:text-black leading-none mb-3 tracking-tight">REGISTRO CLÍNICO</h1>
-                                <p className="text-base text-gray-700 dark:text-gray-300 print:text-black font-semibold flex items-center gap-2 mt-1">
-                                    <span className="text-gray-400 dark:text-gray-500 print:text-gray-500 font-bold uppercase text-[10px] tracking-widest">Paciente:</span>
+                                <h1 className="text-3xl font-bold text-slate-950 dark:text-white print:text-black leading-none mb-3 tracking-tight">REGISTRO CLÍNICO</h1>
+                                <p className="text-base text-slate-700 dark:text-zinc-200 print:text-black font-semibold flex items-center gap-2 mt-1">
+                                    <span className="text-slate-500 dark:text-slate-400 print:text-gray-500 font-bold uppercase text-[10px] tracking-widest leading-none">Paciente:</span>
                                     {patient?.name}
                                 </p>
-                                <p className="text-xs text-gray-600 dark:text-gray-400 print:text-black mt-1 flex items-center gap-2">
-                                    <span className="text-gray-400 dark:text-gray-500 print:text-gray-500 font-bold uppercase text-[10px] tracking-widest">Atendido por:</span>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 print:text-black mt-1 flex items-center gap-2">
+                                    <span className="text-slate-500 dark:text-slate-400 print:text-gray-500 font-bold uppercase text-[10px] tracking-widest leading-none">Atendido por:</span>
                                     {doctorDisplay}
                                 </p>
-                                <p className="text-xs text-gray-600 dark:text-gray-400 print:text-black mt-1 flex items-center gap-2">
-                                    <span className="text-gray-400 dark:text-gray-500 print:text-gray-500 font-bold uppercase text-[10px] tracking-widest">Fecha:</span>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 print:text-black mt-1 flex items-center gap-2">
+                                    <span className="text-slate-500 dark:text-slate-400 print:text-gray-500 font-bold uppercase text-[10px] tracking-widest leading-none">Fecha:</span>
                                     {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                                 </p>
                             </div>
                             <div className="text-right flex flex-col justify-end">
-                                <p className="text-xl font-black text-gray-800 dark:text-gray-200 print:text-black leading-none tracking-tight">VoxDental</p>
-                                <p className="text-[10px] text-blue-500 dark:text-blue-400 print:text-gray-500 font-bold mt-1 uppercase tracking-[0.2em]">Expediente Digital</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-zinc-100 print:text-black leading-none tracking-tight">VoxDental</p>
+                                <p className="text-[10px] text-blue-600 dark:text-blue-400 print:text-gray-500 font-bold mt-1 uppercase tracking-[0.2em]">Expediente Digital</p>
                             </div>
                         </div>
 
@@ -135,7 +135,7 @@ export const ClinicalRecordModal = React.memo(({
                                     const surfaceFindings = findings.filter(f => !['ausente', 'extraer', 'endodoncia', 'corona'].includes(f.condition));
 
                                     return (
-                                        <div key={tooth_number} className="bg-white dark:bg-slate-800/40 border border-gray-100 dark:border-slate-700/50 rounded-2xl p-5 print:bg-transparent print:border print:border-gray-200 print:p-4 print:rounded-xl shadow-sm print:shadow-none transition-colors hover:shadow-md print:break-inside-avoid">
+                                        <div key={tooth_number} className="bg-white dark:bg-zinc-800/40 border border-slate-200 dark:border-zinc-700/50 rounded-2xl p-5 print:bg-transparent print:border print:border-gray-200 print:p-4 print:rounded-xl shadow-sm print:shadow-none transition-colors hover:shadow-md print:break-inside-avoid">
                                             
                                             {/* Minimalist Medical Heading */}
                                             <div className="border-b-2 border-slate-100 dark:border-slate-700/50 print:border-gray-300 pb-2 mb-3 flex items-baseline gap-2">

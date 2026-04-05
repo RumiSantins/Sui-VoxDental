@@ -124,20 +124,20 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
             <div className="flex items-center gap-2 w-full sm:w-auto">
                 <button
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className={`flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-blue-900/50 rounded-xl shadow-sm hover:border-blue-400 dark:hover:border-blue-400 transition-all min-w-0 flex-1 sm:min-w-[200px] justify-between ${showDropdown ? 'ring-2 ring-blue-500/20 dark:glow-border-blue' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-sm hover:border-blue-400 dark:hover:border-zinc-700 transition-all min-w-0 flex-1 sm:min-w-[200px] justify-between ${showDropdown ? 'ring-2 ring-slate-100 dark:ring-zinc-800/50' : ''}`}
                 >
                     <div className="flex items-center gap-2 overflow-hidden">
-                        <Users size={18} className="text-blue-500 flex-shrink-0 dark:animate-pulse-glow" />
-                        <span className="truncate font-medium text-gray-700 dark:text-gray-200 text-sm">
+                        <Users size={18} className="text-slate-500 dark:text-slate-400 flex-shrink-0" />
+                        <span className="truncate font-semibold text-slate-700 dark:text-zinc-200 text-sm">
                             {selectedPatient ? selectedPatient.name : "Seleccionar Paciente"}
                         </span>
                     </div>
-                    <ChevronDown size={14} className={`text-gray-400 flex-shrink-0 transition-transform ${showDropdown ? 'rotate-180 text-blue-500' : ''}`} />
+                    <ChevronDown size={14} className={`text-slate-400 flex-shrink-0 transition-transform ${showDropdown ? 'rotate-180 text-blue-600' : ''}`} />
                 </button>
 
                 <button
                     onClick={() => { setIsCreating(true); setShowDropdown(true); }}
-                    className="p-2.5 bg-blue-50 dark:bg-blue-600/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-600/30 transition-all border border-blue-100 dark:border-blue-600/30 dark:shadow-[0_0_10px_rgba(59,130,246,0.2)] flex-shrink-0"
+                    className="p-2.5 bg-white dark:bg-zinc-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all border border-slate-300 dark:border-zinc-700 shadow-sm flex-shrink-0"
                     title="Nuevo Paciente"
                 >
                     <UserPlus size={18} />
@@ -145,10 +145,10 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
             </div>
 
             {showDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-full sm:min-w-[280px] bg-white dark:bg-slate-900 border border-gray-100 dark:border-blue-900/30 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 dark:shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                <div className="absolute top-full left-0 mt-2 w-full sm:min-w-[280px] bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     {isCreating ? (
-                        <form onSubmit={handleCreatePatient} className="p-4 bg-blue-50/50 dark:bg-blue-900/10">
-                            <label className="block text-xs font-bold text-blue-600 dark:text-blue-400 uppercase mb-2">Nuevo Paciente</label>
+                        <form onSubmit={handleCreatePatient} className="p-4 bg-slate-50/50 dark:bg-zinc-800/20">
+                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">Nuevo Paciente</label>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -165,7 +165,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                             <button
                                 type="button"
                                 onClick={() => setIsCreating(false)}
-                                className="mt-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                             >
                                 Cancelar
                             </button>
@@ -188,11 +188,11 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                 patients.map(p => (
                                     <div key={p.id} className="group relative">
                                         {deletingId === p.id ? (
-                                            <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/30 animate-in fade-in zoom-in duration-200">
-                                                <span className="text-xs font-bold text-red-600 dark:text-red-400">¿Eliminar?</span>
+                                            <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-900/30 animate-in fade-in zoom-in duration-200">
+                                                <span className="text-xs font-bold text-red-700 dark:text-red-400">¿Eliminar?</span>
                                                 <div className="flex gap-1">
                                                     <button onClick={(e) => handleDeletePatient(e, p.id)} className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm text-xs font-bold px-2">SÍ</button>
-                                                    <button onClick={(e) => { e.stopPropagation(); setDeletingId(null); }} className="p-1.5 bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-300 transition-colors text-xs font-bold px-2">NO</button>
+                                                    <button onClick={(e) => { e.stopPropagation(); setDeletingId(null); }} className="p-1.5 bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 rounded-lg hover:bg-slate-300 dark:hover:bg-zinc-700 transition-colors text-xs font-bold px-2">NO</button>
                                                 </div>
                                             </div>
                                         ) : editingId === p.id ? (
@@ -209,7 +209,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                                     <button type="submit" className="p-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm">
                                                         <Check size={14} />
                                                     </button>
-                                                    <button type="button" onClick={(e) => { e.stopPropagation(); setEditingId(null); }} className="p-1.5 bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-300">
+                                                    <button type="button" onClick={(e) => { e.stopPropagation(); setEditingId(null); }} className="p-1.5 bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 rounded-md hover:bg-slate-300 dark:hover:bg-zinc-700">
                                                         <X size={14} />
                                                     </button>
                                                 </div>
@@ -222,9 +222,9 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                                 }}
                                                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all text-sm cursor-pointer group ${selectedPatient?.id === p.id
                                                     ? 'bg-blue-600 text-white shadow-md'
-                                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800'}`}
+                                                    : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'}`}
                                             >
-                                                <span className="font-medium truncate mr-2">{p.name}</span>
+                                                <span className="font-semibold truncate mr-2">{p.name}</span>
                                                 <div className="flex items-center gap-1">
                                                     <div className={`flex items-center gap-1 transition-opacity ${selectedPatient?.id === p.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                                                         <button
