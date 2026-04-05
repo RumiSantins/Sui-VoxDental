@@ -96,7 +96,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
         }
 
         try {
-            await fetch(`http://localhost:8000/api/v1/speech-reports`, {
+            await fetch(`/api/v1/speech-reports`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
         const expected = `${conditionCode} ${surfaceCode} ${corrTooth}`.replace(/\s+/g, ' ').trim();
 
         try {
-            await fetch(`http://localhost:8000/api/v1/speech-reports`, {
+            await fetch(`/api/v1/speech-reports`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
             }
             try {
                 // Fetch Findings
-                const response = await fetch(`http://localhost:8000/api/v1/patients/${patient.id}/records`, {
+                const response = await fetch(`/api/v1/patients/${patient.id}/records`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.ok) {
@@ -190,7 +190,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                 if (!isActive) return;
 
                 // Fetch Media Indicators
-                const mediaResp = await fetch(`http://localhost:8000/api/v1/patients/${patient.id}/media/all`, {
+                const mediaResp = await fetch(`/api/v1/patients/${patient.id}/media/all`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (mediaResp.ok) {
@@ -226,7 +226,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
         saveTimeoutRef.current = setTimeout(async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/patients/${patient.id}/records`, {
+                const response = await fetch(`/api/v1/patients/${patient.id}/records`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -410,7 +410,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
         // Log to backend
         try {
-            await fetch('http://localhost:8000/api/v1/reports', {
+            await fetch('/api/v1/reports', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

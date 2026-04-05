@@ -5,3 +5,8 @@ pydantic>=2.6.0
 python-multipart>=0.0.7
 openai-whisper
 imageio-ffmpeg
+python-jose[cryptography]
+passlib[bcrypt]
+google-auth
+requests
+vosk

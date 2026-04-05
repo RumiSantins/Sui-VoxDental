@@ -29,7 +29,7 @@ export const ManualEntryModal = React.memo(({
             return;
         }
         try {
-            const resp = await fetch(`http://localhost:8000/api/v1/patients/${patientId}/media/${toothNumber}`, {
+            const resp = await fetch(`/api/v1/patients/${patientId}/media/${toothNumber}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (resp.ok) {
@@ -60,7 +60,7 @@ export const ManualEntryModal = React.memo(({
         formData.append('file', file);
 
         try {
-            const resp = await fetch(`http://localhost:8000/api/v1/patients/${patientId}/media/${toothNumber}`, {
+            const resp = await fetch(`/api/v1/patients/${patientId}/media/${toothNumber}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -84,7 +84,7 @@ export const ManualEntryModal = React.memo(({
     const handleDeleteMedia = async (id) => {
         if (!window.confirm("¿Eliminar este archivo?")) return;
         try {
-            const resp = await fetch(`http://localhost:8000/api/v1/media/${id}`, {
+            const resp = await fetch(`/api/v1/media/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -235,7 +235,7 @@ export const ManualEntryModal = React.memo(({
                                         {m.file_type === 'image' || m.thumbnail_url ? (
                                             <div className="w-full h-full relative">
                                                 <img 
-                                                    src={`http://localhost:8000${m.thumbnail_url || m.file_url}`} 
+                                                    src={`${m.thumbnail_url || m.file_url}`} 
                                                     alt="Tooth Media" 
                                                     className="w-full h-full object-cover group-hover/media:scale-110 transition-transform duration-500"
                                                     loading="lazy"
@@ -283,7 +283,7 @@ export const ManualEntryModal = React.memo(({
                             <div className="relative max-w-7xl max-h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
                                 {selectedMedia.file_type === 'image' ? (
                                     <img 
-                                        src={`http://localhost:8000${selectedMedia.file_url}`} 
+                                        src={`${selectedMedia.file_url}`} 
                                         alt="Fullscreen view" 
                                         className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl"
                                     />
@@ -298,7 +298,7 @@ export const ManualEntryModal = React.memo(({
                                             preload="auto"
                                             playsInline
                                             className="w-full h-full relative z-10"
-                                            src={`http://localhost:8000${selectedMedia.file_url}`}
+                                            src={`${selectedMedia.file_url}`}
                                             onLoadedData={(e) => e.target.style.opacity = 1}
                                             style={{ opacity: 0, transition: 'opacity 0.3s' }}
                                         />

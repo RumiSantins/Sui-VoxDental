@@ -9,7 +9,7 @@ export const SpeechReportModal = ({ transcript, onClose, token }) => {
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            const response = await fetch('http://localhost:8000/api/v1/speech-reports', {
+            const response = await fetch('/api/v1/speech-reports', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

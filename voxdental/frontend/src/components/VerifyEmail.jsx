@@ -17,7 +17,7 @@ export const VerifyEmail = ({ onBackToLogin }) => {
 
         const verify = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/auth/verify?token=${token}`);
+                const response = await fetch(`/api/v1/auth/verify?token=${token}`);
                 const data = await response.json();
                 if (response.ok) {
                     setStatus('success');

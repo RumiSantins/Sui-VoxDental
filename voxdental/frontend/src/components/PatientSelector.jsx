@@ -19,7 +19,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
     const fetchPatients = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('http://localhost:8000/api/v1/patients', {
+            const response = await fetch('/api/v1/patients', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -47,7 +47,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
         if (!newPatientName.trim()) return;
 
         try {
-            const response = await fetch('http://localhost:8000/api/v1/patients', {
+            const response = await fetch('/api/v1/patients', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
         if (!editName.trim()) return;
 
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/patients/${id}`, {
+            const response = await fetch(`/api/v1/patients/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
     const handleDeletePatient = async (e, id) => {
         e.stopPropagation();
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/patients/${id}`, {
+            const response = await fetch(`/api/v1/patients/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

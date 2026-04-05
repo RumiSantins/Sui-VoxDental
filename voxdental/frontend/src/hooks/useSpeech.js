@@ -204,7 +204,7 @@ export const useSpeech = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:8000/api/v1/clinical/voice-entry', {
+            const response = await fetch('/api/v1/clinical/voice-entry', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`

@@ -59,7 +59,7 @@ export const ProfileModal = ({ onClose }) => {
             const body = { full_name: name, profile_image: avatar, gender: gender };
             if (password) body.password = password;
 
-            const resp = await fetch('http://localhost:8000/api/v1/auth/me', {
+            const resp = await fetch('/api/v1/auth/me', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

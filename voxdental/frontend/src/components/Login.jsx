@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Lock, Mail, ArrowRight, Loader2 } from 'lucide-react';
+import { User, Lock, Mail, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 
 export const Login = ({ onSwitch, onAdminAccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [adminKey, setAdminKey] = useState('');
     const [adminCounter, setAdminCounter] = useState(0);
     const [showAdminEntry, setShowAdminEntry] = useState(false);
@@ -46,7 +47,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
         formData.append('password', password);
 
         try {
-            const resp = await fetch('http://localhost:8000/api/v1/auth/login', {
+            const resp = await fetch('/api/v1/auth/login', {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -70,7 +71,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
         setLoading(true);
         setError(null);
         try {
-            const resp = await fetch('http://localhost:8000/api/v1/auth/google-login', {
+            const resp = await fetch('/api/v1/auth/google-login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -150,13 +151,20 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                     <input 
-                                        type="password" 
+                                        type={showPassword ? "text" : "password"} 
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-blue-500 outline-none transition-all dark:text-white text-sm"
+                                        className="w-full pl-10 pr-12 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-blue-500 outline-none transition-all dark:text-white text-sm"
                                         placeholder="••••••••"
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 outline-none transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </button>
                                 </div>
                             </div>
 

@@ -200,7 +200,7 @@ function AppContent() {
 
       <footer className="mt-8 pb-12 text-center border-t border-gray-100 dark:border-zinc-800/50">
         <p className="mt-8 text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400 dark:text-zinc-600">
-          SuiVoxDental • Sistema Odontológico Inteligente
+          SuiVoxDental • Sistema Odontológico Inteligente • v1.0.0
         </p>
         <p className="mt-2 text-[10px] font-medium text-slate-400 dark:text-zinc-600">
           Hecho por <span className="text-slate-500 dark:text-zinc-400">Felipe Santillan</span> • 

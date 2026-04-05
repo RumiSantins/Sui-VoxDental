@@ -10,7 +10,7 @@ export const AdminPanel = ({ token, onBack }) => {
     const fetchReports = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:8000/api/v1/admin/reports', {
+            const response = await fetch('/api/v1/admin/reports', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
