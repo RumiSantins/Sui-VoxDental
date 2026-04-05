@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
-import { Mic, MicOff, AlertCircle, Sun, Moon, MessageSquare, Users, FileText, Check, Cloud, Trash2, AlertOctagon } from 'lucide-react';
+import { Mic, MicOff, AlertCircle, Sun, Moon, MessageSquare, Users, FileText, Check, Cloud, Trash2, AlertOctagon, Eye, EyeOff } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
 import { useAuth } from '../context/AuthContext';
 import ToothSVG from './ToothSVG';
@@ -65,6 +65,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
     const [showErrorReport, setShowErrorReport] = useState(false);
     const [pendingVerification, setPendingVerification] = useState(new Set());
     const [teethWithMedia, setTeethWithMedia] = useState(new Set());
+    const [showLegend, setShowLegend] = useState(true);
 
     const [hasFeedbackBeenSent, setHasFeedbackBeenSent] = useState(false);
     const [isCorrecting, setIsCorrecting] = useState(false);
@@ -736,39 +737,50 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
             </div>
 
             <div className="mt-12 p-4 sm:p-8 bg-white dark:bg-zinc-900/40 dark:backdrop-blur-xl rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800/60 relative overflow-hidden group/legend text-slate-800 dark:text-slate-200">
-                <div className="flex items-center justify-between mb-6">
+                <div className={`flex items-center justify-between ${showLegend ? 'mb-6' : ''}`}>
                     <div className="flex items-center gap-3">
                         <div className="w-1.5 h-6 bg-blue-500/80 rounded-full" />
                         <h4 className="text-lg font-semibold tracking-tight text-slate-800 dark:text-slate-100">Guía de Colores y Símbolos</h4>
                     </div>
+                    <button
+                        onClick={() => setShowLegend(!showLegend)}
+                        className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1.5 transition-colors p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800/80"
+                        title={showLegend ? "Ocultar Guía" : "Mostrar Guía"}
+                    >
+                        {showLegend ? <><EyeOff size={16} /> <span className="hidden sm:inline">Ocultar</span></> : <><Eye size={16} /> <span className="hidden sm:inline">Mostrar</span></>}
+                    </button>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    {legendItems.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveHelp(activeHelp === item.id ? null : item.id)}
-                            className={`group p-4 rounded-xl border transition-all duration-300 flex flex-col items-center gap-3 ${activeHelp === item.id
-                                ? 'bg-blue-50 dark:bg-zinc-800/80 border-blue-200 dark:border-blue-500/30'
-                                : 'bg-slate-50 dark:bg-zinc-900/40 border-transparent dark:border-zinc-800/40 hover:bg-white hover:border-slate-300 hover:shadow-sm dark:hover:bg-zinc-800/80 dark:hover:border-slate-700'}`}
-                        >
-                            <div className="w-full h-8 rounded-lg flex items-center justify-center text-white text-xs font-semibold tracking-wide transition-all shadow-sm"
-                                style={{ backgroundColor: item.isSymbol ? 'transparent' : item.color, border: item.isSymbol || item.id === 'borrar' ? `1px solid ${item.id === 'borrar' ? '#475569' : '#3b82f6'}` : 'none' }}>
-                                {item.isSymbol ? <span className="text-blue-500 text-lg font-bold">✕</span> : item.label}
-                            </div>
-                            <div className="text-center text-xs font-semibold text-slate-600 dark:text-slate-400">{item.category}</div>
-                        </button>
-                    ))}
-                </div>
-                {activeHelp && activeItem && (
-                    <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">💬</div>
-                            <div>
-                                <p className="text-xs text-blue-800 dark:text-blue-300 font-bold uppercase">Pruébalo diciendo:</p>
-                                <p className="text-sm text-blue-600 dark:text-blue-400 italic">{activeItem.example}</p>
-                            </div>
+                {showLegend && (
+                    <>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                            {legendItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveHelp(activeHelp === item.id ? null : item.id)}
+                                    className={`group p-4 rounded-xl border transition-all duration-300 flex flex-col items-center gap-3 ${activeHelp === item.id
+                                        ? 'bg-blue-50 dark:bg-zinc-800/80 border-blue-200 dark:border-blue-500/30'
+                                        : 'bg-slate-50 dark:bg-zinc-900/40 border-transparent dark:border-zinc-800/40 hover:bg-white hover:border-slate-300 hover:shadow-sm dark:hover:bg-zinc-800/80 dark:hover:border-slate-700'}`}
+                                >
+                                    <div className="w-full h-8 rounded-lg flex items-center justify-center text-white text-xs font-semibold tracking-wide transition-all shadow-sm"
+                                        style={{ backgroundColor: item.isSymbol ? 'transparent' : item.color, border: item.isSymbol || item.id === 'borrar' ? `1px solid ${item.id === 'borrar' ? '#475569' : '#3b82f6'}` : 'none' }}>
+                                        {item.isSymbol ? <span className="text-blue-500 text-lg font-bold">✕</span> : item.label}
+                                    </div>
+                                    <div className="text-center text-xs font-semibold text-slate-600 dark:text-slate-400">{item.category}</div>
+                                </button>
+                            ))}
                         </div>
-                    </div>
+                        {activeHelp && activeItem && (
+                            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">💬</div>
+                                    <div>
+                                        <p className="text-xs text-blue-800 dark:text-blue-300 font-bold uppercase">Pruébalo diciendo:</p>
+                                        <p className="text-sm text-blue-600 dark:text-blue-400 italic">{activeItem.example}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 
