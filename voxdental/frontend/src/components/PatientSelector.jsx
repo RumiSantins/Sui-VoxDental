@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Users, Check, ChevronDown, Edit2, Trash2, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const PatientSelector = ({ onSelect, selectedPatient }) => {
     const [patients, setPatients] = useState([]);
@@ -8,6 +9,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
     const [isCreating, setIsCreating] = useState(false);
     const [newPatientName, setNewPatientName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const { t } = useLanguage();
 
     // Edit/Delete state
     const [editingId, setEditingId] = useState(null);
@@ -129,7 +131,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                     <div className="flex items-center gap-2 overflow-hidden">
                         <Users size={18} className="text-slate-500 dark:text-slate-400 flex-shrink-0" />
                         <span className="truncate font-semibold text-slate-700 dark:text-zinc-200 text-sm">
-                            {selectedPatient ? selectedPatient.name : "Seleccionar Paciente"}
+                            {selectedPatient ? selectedPatient.name : t('patient.select_placeholder')}
                         </span>
                     </div>
                     <ChevronDown size={14} className={`text-slate-400 flex-shrink-0 transition-transform ${showDropdown ? 'rotate-180 text-blue-600' : ''}`} />
@@ -138,7 +140,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                 <button
                     onClick={() => { setIsCreating(true); setShowDropdown(true); }}
                     className="p-2.5 bg-white dark:bg-zinc-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all border border-slate-300 dark:border-zinc-700 shadow-sm flex-shrink-0"
-                    title="Nuevo Paciente"
+                    title={t('patient.new_patient')}
                 >
                     <UserPlus size={18} />
                 </button>
@@ -148,12 +150,12 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                 <div className="absolute top-full left-0 mt-2 w-full sm:min-w-[280px] bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     {isCreating ? (
                         <form onSubmit={handleCreatePatient} className="p-4 bg-slate-50/50 dark:bg-zinc-800/20">
-                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">Nuevo Paciente</label>
+                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">{t('patient.new_patient')}</label>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
                                     autoFocus
-                                    placeholder="Nombre completo"
+                                    placeholder={t('patient.full_name')}
                                     value={newPatientName}
                                     onChange={(e) => setNewPatientName(e.target.value)}
                                     className="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -167,21 +169,21 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                 onClick={() => setIsCreating(false)}
                                 className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                             >
-                                Cancelar
+                                {t('common.cancel')}
                             </button>
                         </form>
                     ) : (
                         <div className="max-h-[300px] overflow-y-auto p-2">
                             {isLoading ? (
-                                <div className="p-4 text-center text-sm text-gray-400">Cargando...</div>
+                                <div className="p-4 text-center text-sm text-gray-400">{t('common.loading')}</div>
                             ) : patients.length === 0 ? (
                                 <div className="p-4 text-center">
-                                    <p className="text-sm text-gray-500 mb-2">No hay pacientes registrados</p>
+                                    <p className="text-sm text-gray-500 mb-2">{t('patient.no_patients')}</p>
                                     <button
                                         onClick={() => setIsCreating(true)}
                                         className="text-xs font-bold text-blue-500 hover:underline"
                                     >
-                                        + REGISTRAR PRIMER PACIENTE
+                                        {t('patient.register_first')}
                                     </button>
                                 </div>
                             ) : (
@@ -189,10 +191,10 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                     <div key={p.id} className="group relative">
                                         {deletingId === p.id ? (
                                             <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-900/30 animate-in fade-in zoom-in duration-200">
-                                                <span className="text-xs font-bold text-red-700 dark:text-red-400">¿Eliminar?</span>
+                                                <span className="text-xs font-bold text-red-700 dark:text-red-400">{t('common.delete_confirm_short')}</span>
                                                 <div className="flex gap-1">
-                                                    <button onClick={(e) => handleDeletePatient(e, p.id)} className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm text-xs font-bold px-2">SÍ</button>
-                                                    <button onClick={(e) => { e.stopPropagation(); setDeletingId(null); }} className="p-1.5 bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 rounded-lg hover:bg-slate-300 dark:hover:bg-zinc-700 transition-colors text-xs font-bold px-2">NO</button>
+                                                    <button onClick={(e) => handleDeletePatient(e, p.id)} className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm text-xs font-bold px-2">{t('common.yes')}</button>
+                                                    <button onClick={(e) => { e.stopPropagation(); setDeletingId(null); }} className="p-1.5 bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 rounded-lg hover:bg-slate-300 dark:hover:bg-zinc-700 transition-colors text-xs font-bold px-2">{t('common.no')}</button>
                                                 </div>
                                             </div>
                                         ) : editingId === p.id ? (

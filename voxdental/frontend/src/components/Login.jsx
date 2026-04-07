@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { User, Lock, Mail, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
+import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { useState } from 'react';
 
 export const Login = ({ onSwitch, onAdminAccess }) => {
     const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { login } = useAuth();
+    const { t } = useLanguage();
     const MASTER_KEY = "voxadmin2024";
 
     const handleLogoClick = () => {
@@ -108,8 +110,8 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                     >
                         <User className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                     </button>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4 tracking-tight">Bienvenido de nuevo</h1>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">Ingresa a tu cuenta de VoxDental</p>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4 tracking-tight">{t('auth.login_title')}</h1>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">{t('auth.login_subtitle')}</p>
                 </div>
 
                 {showAdminEntry ? (
@@ -132,7 +134,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                     <>
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 leading-none">Usuario</label>
+                                <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 leading-none">{t('auth.email')}</label>
                                 <div className="relative">
                                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                     <input 
@@ -141,13 +143,13 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-blue-500 outline-none transition-all dark:text-white text-sm"
-                                        placeholder="Tu nombre de usuario"
+                                        placeholder={t('auth.name_placeholder')}
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 leading-none">Contraseña</label>
+                                <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ml-1 leading-none">{t('auth.password')}</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                     <input 
@@ -183,7 +185,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                                     <Loader2 className="w-5 h-5 animate-spin" />
                                 ) : (
                                     <>
-                                        Iniciar Sesión
+                                        {t('auth.login_btn')}
                                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </>
                                 )}
@@ -194,7 +196,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                                     <span className="w-full border-t border-slate-100 dark:border-zinc-800"></span>
                                 </div>
                                 <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-white dark:bg-zinc-900 px-4 text-slate-500 dark:text-slate-500 font-bold tracking-widest">O continúa con</span>
+                                    <span className="bg-white dark:bg-zinc-900 px-4 text-slate-500 dark:text-slate-500 font-bold tracking-widest">{t('auth.or_continue')}</span>
                                 </div>
                             </div>
 
@@ -211,12 +213,12 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
 
                         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-zinc-800 text-center">
                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                                ¿No tienes una cuenta? {' '}
+                                {t('auth.no_account')} {' '}
                                 <button 
                                     onClick={onSwitch}
                                     className="text-blue-600 dark:text-blue-400 font-bold hover:underline"
                                 >
-                                    Regístrate aquí
+                                    {t('auth.register_here')}
                                 </button>
                             </p>
                         </div>

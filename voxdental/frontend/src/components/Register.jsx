@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { UserPlus, User, Lock, Mail, ArrowRight, Loader2, CheckCircle2, Camera, Upload, Trash2, Eye, EyeOff } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Register = ({ onSwitch }) => {
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export const Register = ({ onSwitch }) => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const { login } = useAuth();
+    const { t } = useLanguage();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -54,13 +56,13 @@ export const Register = ({ onSwitch }) => {
                     <div className="w-16 h-16 bg-purple-50 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-purple-200 dark:border-zinc-700">
                         <UserPlus className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4 tracking-tight">Crear cuenta</h1>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">Únete a la red de odontólogos de VoxDental</p>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4 tracking-tight">{t('auth.register_title')}</h1>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">{t('auth.register_subtitle')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wider leading-none">Nombre de Usuario</label>
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wider leading-none">{t('auth.email')}</label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <input 
@@ -69,13 +71,13 @@ export const Register = ({ onSwitch }) => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-purple-500 outline-none transition-all dark:text-white text-sm"
-                                placeholder="ej. dr_tomas"
+                                placeholder={t('auth.name_placeholder_eg')}
                             />
                         </div>
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wider leading-none">Contraseña</label>
+                        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wider leading-none">{t('auth.password')}</label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <input 
@@ -84,7 +86,7 @@ export const Register = ({ onSwitch }) => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full pl-10 pr-12 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-purple-500 outline-none transition-all dark:text-white text-sm"
-                                placeholder="Mínimo 8 caracteres"
+                                placeholder={t('auth.password_placeholder')}
                             />
                             <button
                                 type="button"
@@ -111,7 +113,7 @@ export const Register = ({ onSwitch }) => {
                             <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
                             <>
-                                Crear cuenta
+                                {t('auth.register_btn')}
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </>
                         )}
@@ -120,12 +122,12 @@ export const Register = ({ onSwitch }) => {
 
                 <div className="mt-8 pt-6 border-t border-slate-100 dark:border-zinc-800 text-center">
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                        ¿Ya tienes una cuenta? {' '}
+                        {t('auth.have_account')} {' '}
                         <button 
                             onClick={onSwitch}
                             className="text-purple-600 dark:text-purple-400 font-bold hover:underline"
                         >
-                            Inicia Sesión
+                            {t('auth.back_login')}
                         </button>
                     </p>
                 </div>

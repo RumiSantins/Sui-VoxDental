@@ -59,12 +59,32 @@ def normalize_text(text: str) -> str:
         # Use regex to replace only whole words
         text = re.sub(fr'\b{w}\b', d, text)
         
-    # 2. Handle 'punto' (decimal format)
-    # Case: "1 punto 4" -> "14"
-    text = re.sub(r'\b([1-4])\s*(?:\.|punto|ponto|punt|pe)\s*([1-8])\b', r'\1\2', text)
+    # 2. Handle 'punto'/'puntos' (decimal format for tooth notation like "2.6" → "26")
+    # Handles: "1 punto 4", "1 puntos 4", "1 coma 4", "1 guión 4", "1 a 4"
+    text = re.sub(r'\b([1-4])\s*(?:\.|puntos?|pontos?|punts?|pe|coma|guión|guion)\s*([1-8])\b', r'\1\2', text)
     
-    # Case: "1 . 4" (already done above)
-    
+    # 3. Context-aware rescue for dangerous_glued acronyms followed by tooth numbers.
+    # e.g. Whisper merges "a l 33" → "al treinta y tres" → after digit replacement → "al 33"
+    # Map: (glued_word) → ACRONYM token
+    glued_rescues = [
+        (r'\bal\b', 'ACRONYM_AL'),
+        (r'\bad\b', 'ACRONYM_AD'),
+        (r'\bam\b', 'ACRONYM_AM'),
+        (r'\bap\b', 'ACRONYM_AP'),
+        (r'\bco\b', 'ACRONYM_CO'),
+        (r'\bcd\b', 'ACRONYM_CD'),
+        (r'\bcl\b', 'ACRONYM_CL'),
+        (r'\bsl\b', 'ACRONYM_CL'),  # s→c phonetic
+        (r'\bsd\b', 'ACRONYM_CD'),  # s→c phonetic
+    ]
+    for pattern, replacement in glued_rescues:
+        # Only rescue if followed (within a few tokens) by a valid tooth number [11-48]
+        rescue_pattern = pattern[:-3] + r'(?=\s+(?:[1-4][1-8]|' \
+            r'treinta|cuarenta|veinti|veinticuatro|veinticinco|veintiseis|veintisiete|veintiocho|veintiuno|' \
+            r'once|doce|trece|catorce|quince|diecis|diecio' \
+            r'))\b'
+        text = re.sub(rescue_pattern, replacement, text)
+
     return text
 
 def decode_acronym(acronym: str) -> tuple:

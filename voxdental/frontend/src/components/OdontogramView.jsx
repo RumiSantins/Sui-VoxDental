@@ -6,6 +6,7 @@ import ToothSVG from './ToothSVG';
 import { ManualEntryModal } from './ManualEntryModal';
 import { ClinicalRecordModal } from './ClinicalRecordModal';
 import { SpeechReportModal } from './SpeechReportModal';
+import { useLanguage } from '../context/LanguageContext';
 
 // 1. VolumeMeter isolated to prevent high-frequency re-renders of the whole view
 const VolumeMeter = memo(({ volume, isRecording }) => {
@@ -47,6 +48,7 @@ const isIncisal = (num) => (num % 10 <= 3);
 
 export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
     const { token, user, logout } = useAuth();
+    const { t } = useLanguage();
     const { isRecording, isProcessing, isContinuous, volume, startRecording, stopRecording, setExternalContext } = useSpeech();
 
     // 1. All States
@@ -254,15 +256,15 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
     }, [findings, patient?.id, token]);
 
     const legendItems = useMemo(() => [
-        { id: 'caries', label: 'CARIES (C)', color: '#ef4444', category: 'Patología', example: 'Menciona "C" + Cara. Ej: "C O 16" o "C M 21"' },
-        { id: 'extraer', label: 'EXTRAER (EX)', color: '#f97316', category: 'Necesidad', example: 'Menciona "EX". Ej: "E X 48"' },
-        { id: 'resina', label: 'RESINA (R)', color: '#3b82f6', category: 'Restauración', example: 'Menciona "R" + Cara. Ej: "R M 21" o "R V 14"' },
-        { id: 'amalgama', label: 'AMALGAMA (A)', color: '#64748b', category: 'Metálico', example: 'Menciona "A" + Cara. Ej: "A D 46" o "A O 15"' },
-        { id: 'corona', label: 'CORONA (CR)', color: '#eab308', category: 'Prótesis', example: 'Menciona "CR". Ej: "C R 11"' },
-        { id: 'endodoncia', label: 'ENDODONCIA (E)', color: '#a855f7', category: 'Raíz', example: 'Menciona "E". Ej: "E 12"' },
-        { id: 'ausente', label: 'AUSENTE (X)', color: '#3b82f6', category: 'Estado', example: 'Menciona "X". Ej: "X 18"', isSymbol: true },
-        { id: 'borrar', label: 'BORRAR (B)', color: '#334155', category: 'Corrección', example: 'Menciona "B" + Cara para selectivo (Ej: "B O 16") o solo "B" para toda la pieza (Ej: "B 11")' }
-    ], []);
+        { id: 'caries', label: t('legend.caries'), color: '#ef4444', category: t('legend.cat_pathology'), example: t('legend.ex_caries') },
+        { id: 'extraer', label: t('legend.extract'), color: '#f97316', category: t('legend.cat_need'), example: t('legend.ex_extract') },
+        { id: 'resina', label: t('legend.resin'), color: '#3b82f6', category: t('legend.cat_restoration'), example: t('legend.ex_resin') },
+        { id: 'amalgama', label: t('legend.amalgam'), color: '#64748b', category: t('legend.cat_metallic'), example: t('legend.ex_amalgam') },
+        { id: 'corona', label: t('legend.crown'), color: '#eab308', category: t('legend.cat_prosthesis'), example: t('legend.ex_crown') },
+        { id: 'endodoncia', label: t('legend.endo'), color: '#a855f7', category: t('legend.cat_root'), example: t('legend.ex_endo') },
+        { id: 'ausente', label: t('legend.missing'), color: '#3b82f6', category: t('legend.cat_state'), example: t('legend.ex_missing'), isSymbol: true },
+        { id: 'borrar', label: t('legend.delete'), color: '#334155', category: t('legend.cat_correction'), example: t('legend.ex_delete') }
+    ], [t]);
 
     const modalFindings = useMemo(() =>
         selectedToothForManual ? findings.filter(f => f.tooth_number === selectedToothForManual) : [],
@@ -347,14 +349,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
         }
     }, [playFeedbackSound, stopRecording]);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (!isRecording && countdown === null && timerDelay === 0 && patient && !hasManuallyStopped) {
-                try { startRecording(patient.id, true, handleSpeechResult); } catch (e) { console.log("Auto-start blocked by browser."); }
-            }
-        }, 1000);
-        return () => clearTimeout(timer);
-    }, [patient?.id, isRecording, countdown, timerDelay, startRecording, handleSpeechResult, hasManuallyStopped]);
+    // Note: timerDelay=0 means "start immediately when button is pressed" (no auto-start)
 
     useEffect(() => {
         if (countdown === null) return;
@@ -446,12 +441,12 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
     }, [selectedToothForManual, playFeedbackSound]);
 
     const handleClearAll = useCallback(() => {
-        if (window.confirm("¿Estás seguro de que deseas limpiar todo el odontograma? Esta acción no se puede deshacer.")) {
+        if (window.confirm(t('odontogram.clear_confirm'))) {
             setFindings([]);
             setNotes({});
             playFeedbackSound('success');
         }
-    }, [playFeedbackSound]);
+    }, [playFeedbackSound, t]);
 
     const activeItem = useMemo(() => legendItems.find(i => i.id === activeHelp), [legendItems, activeHelp]);
 
@@ -462,26 +457,26 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                     <button
                         onClick={() => setShowClinicalRecord(true)}
                         className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm font-bold border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-all text-xs tracking-wider uppercase disabled:opacity-50"
-                        title="Ver Historia Clínica Detallada"
+                        title={t('odontogram.clinical_record')}
                         disabled={!patient}
                     >
-                        <FileText size={16} /> <span className="hidden xl:inline">Registro Clínico</span>
+                        <FileText size={16} /> <span className="hidden xl:inline">{t('odontogram.clinical_record')}</span>
                     </button>
                     <button
                         onClick={() => setUseDottedMode(!useDottedMode)}
                         className="px-4 py-2 rounded-full bg-white dark:bg-zinc-900 shadow-md text-blue-600 dark:text-blue-400 font-bold border border-slate-200 dark:border-zinc-800 hover:bg-blue-50 dark:hover:bg-zinc-800 transition-all text-xs tracking-wider whitespace-nowrap uppercase"
-                        title="Cambiar numeración de dientes"
+                        title={t('odontogram.toggle_nomenclature')}
                     >
-                        Intercalar Nomenclatura
+                        {t('odontogram.toggle_nomenclature')}
                     </button>
                     <button
                         onClick={handleClearAll}
                         disabled={!patient}
                         className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/10 dark:hover:bg-red-900/20 dark:text-red-400 rounded-full text-[10px] font-black transition-all border border-red-100 dark:border-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-[0.2em] shadow-lg group/trash"
-                        title="Limpiar todo el odontograma"
+                        title={t('odontogram.clear_all')}
                     >
                         <Trash2 size={16} className="group-hover/trash:animate-bounce" />
-                        <span className="hidden xl:inline">Limpiar Todo</span>
+                        <span className="hidden xl:inline">{t('odontogram.clear_all')}</span>
                     </button>
 
                     <button
@@ -501,17 +496,17 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                                     </span>
-                                    Listo
+                                    {t('odontogram.ready')}
                                 </span>
                             ) : (
-                                <span className="text-slate-400 dark:text-zinc-600">Modo Manual</span>
+                                <span className="text-slate-400 dark:text-zinc-600">{t('odontogram.manual_mode')}</span>
                             )}
                         </div>
                         <VolumeMeter volume={volume} isRecording={isRecording} />
                         <div className="flex items-center gap-1 mt-1 text-[10px] uppercase font-bold tracking-wider">
-                            {saveStatus === 'saving' && <span className="text-blue-500 flex items-center gap-1"><div className="w-2 h-2 border-[1.5px] border-blue-500 border-t-transparent rounded-full animate-spin"></div> Guardando...</span>}
-                            {saveStatus === 'saved' && <span className="text-green-500 flex items-center gap-1"><Check size={10} /> Guardado</span>}
-                            {saveStatus === 'idle' && findings.length > 0 && <span className="text-slate-400 dark:text-zinc-600 flex items-center gap-1"><Cloud size={10} /> Nube activa</span>}
+                            {saveStatus === 'saving' && <span className="text-blue-500 flex items-center gap-1"><div className="w-2 h-2 border-[1.5px] border-blue-500 border-t-transparent rounded-full animate-spin"></div> {t('odontogram.saving')}</span>}
+                            {saveStatus === 'saved' && <span className="text-green-500 flex items-center gap-1"><Check size={10} /> {t('odontogram.saved')}</span>}
+                            {saveStatus === 'idle' && findings.length > 0 && <span className="text-slate-400 dark:text-zinc-600 flex items-center gap-1"><Cloud size={10} /> {t('odontogram.cloud_active')}</span>}
                         </div>
                     </div>
 
@@ -523,12 +518,12 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                     onChange={(e) => e.target.value === 'custom' ? setIsCustomTimer(true) : setTimerDelay(Number(e.target.value))}
                                     className="text-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-300 rounded-full px-4 py-2 outline-none focus:border-blue-500 transition-colors cursor-pointer"
                                 >
-                                    <option value={0}>0s (Sin espera)</option>
-                                    <option value={10}>10s (Rápido)</option>
-                                    <option value={20}>20s (Medio)</option>
-                                    <option value={30}>30s (Lento)</option>
+                                    <option value={0}>{t('odontogram.timer_0s')}</option>
+                                    <option value={10}>{t('odontogram.timer_10s')}</option>
+                                    <option value={20}>{t('odontogram.timer_20s')}</option>
+                                    <option value={30}>{t('odontogram.timer_30s')}</option>
                                     {!([0, 10, 20, 30].includes(timerDelay)) && <option value={timerDelay}>{timerDelay}s</option>}
-                                    <option value="custom">Personalizar...</option>
+                                    <option value="custom">{t('odontogram.timer_custom')}</option>
                                 </select>
                             ) : (
                                 <div className="flex items-center gap-1 border border-blue-400 bg-blue-50 dark:bg-slate-800/80 rounded-full pl-3 pr-1 py-1 transition-all shadow-sm ring-1 ring-blue-500/20">
@@ -558,24 +553,24 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                         {isProcessing ? (
                             <>
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                <span>Procesando...</span>
+                                <span>{t('odontogram.processing')}</span>
                             </>
                         ) : !patient ? (
                             <>
                                 <Users size={20} />
-                                <span>Selecciona un Paciente</span>
+                                <span>{t('odontogram.select_patient_prompt')}</span>
                             </>
                         ) : countdown !== null ? (
-                            <span>Iniciando en {countdown}s...</span>
+                            <span>{t('odontogram.starting_in').replace('{s}', countdown)}</span>
                         ) : isRecording ? (
                             <>
                                 <MicOff size={20} />
-                                <span>Detener</span>
+                                <span>{t('odontogram.stop')}</span>
                             </>
                         ) : (
                             <>
                                 <Mic size={20} />
-                                <span>Iniciar "Manos Libres"</span>
+                                <span>{t('odontogram.start_voice')}</span>
                             </>
                         )}
                     </button>
@@ -587,23 +582,23 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                     <div className="w-20 h-20 bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6">
                         <Users size={40} />
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-3 tracking-tight">Comienza por seleccionar un paciente</h2>
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-3 tracking-tight">{t('odontogram.welcome_patient')}</h2>
                     <p className="text-slate-600 font-medium dark:text-slate-400 max-w-sm leading-relaxed">
-                        Para registrar un odontograma, primero debes seleccionar un paciente de la lista superior o crear uno nuevo.
+                        {t('odontogram.welcome_desc')}
                     </p>
                 </div>
             )}
 
-            {isProcessing && <div className="mb-4 p-4 bg-blue-50 text-blue-700 rounded-lg animate-pulse text-center">Procesando audio...</div>}
+            {isProcessing && <div className="mb-4 p-4 bg-blue-50 text-blue-700 rounded-lg animate-pulse text-center">{t('odontogram.processing')}</div>}
 
             {lastTranscript && (
                 <div className="mb-6 p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl shadow-sm relative overflow-hidden group/transcript animate-in fade-in slide-in-from-bottom-2">
                     <div className="flex justify-between items-start mb-2">
-                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Última Detección</span>
+                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{t('odontogram.last_detection')}</span>
 
                         {!hasFeedbackBeenSent && !isCorrecting && (
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-tighter mr-1">¿Fue correcto?</span>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-tighter mr-1">{t('odontogram.was_correct')}</span>
                                 <button
                                     onClick={() => handleSpeechFeedback(true)}
                                     className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/20 text-gray-400 hover:text-green-600 transition-colors rounded-lg border border-transparent hover:border-green-100"
@@ -620,7 +615,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                         )}
                         {hasFeedbackBeenSent && !isCorrecting && (
                             <span className="text-[9px] font-black text-green-500 uppercase tracking-widest animate-pulse">
-                                ¡Gracias por tu reporte!
+                                {t('odontogram.feedback_thanks')}
                             </span>
                         )}
                     </div>
@@ -633,13 +628,13 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                     {isCorrecting && (
                         <div className="mt-4 p-4 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border border-slate-200 shadow-sm dark:border-zinc-800 space-y-4 animate-in zoom-in duration-300">
                             <div className="flex items-center justify-between border-b dark:border-slate-700 pb-2 mb-2">
-                                <h5 className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400">Panel de Corrección Táctica</h5>
+                                <h5 className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400">{t('odontogram.correction_panel')}</h5>
                                 <button onClick={() => setIsCorrecting(false)} className="text-gray-400 hover:text-gray-600">&times;</button>
                             </div>
 
                             <div className="space-y-3">
                                 <div>
-                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">1. Pieza Dental</label>
+                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">{t('odontogram.corr_tooth')}</label>
                                     <input
                                         type="number"
                                         placeholder="Ej: 16"
@@ -650,7 +645,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                 </div>
 
                                 <div>
-                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">2. Superficie</label>
+                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">{t('odontogram.corr_surface')}</label>
                                     <div className="grid grid-cols-3 gap-1">
                                         {['V', 'O', 'M', 'D', 'P', 'toda'].map(s => (
                                             <button
@@ -658,14 +653,14 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                                 onClick={() => setCorrSurface(s)}
                                                 className={`py-1.5 rounded text-[10px] font-bold uppercase transition-all ${corrSurface === s ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-gray-500 border dark:border-slate-700'}`}
                                             >
-                                                {s === 'toda' ? 'Toda' : s}
+                                                {s === 'toda' ? t('odontogram.corr_whole') : s}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">3. Hallazgo Real</label>
+                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">{t('odontogram.corr_finding')}</label>
                                     <div className="grid grid-cols-2 gap-1">
                                         {legendItems.map(item => (
                                             <button
@@ -681,9 +676,9 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                 </div>
 
                                 <div>
-                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">4. Comentario Específico <span className="text-[8px] text-gray-400 opacity-70">(Opcional)</span></label>
+                                    <label className="text-[9px] font-bold text-gray-400 uppercase block mb-1">{t('odontogram.corr_comment')} <span className="text-[8px] text-gray-400 opacity-70">({t('common.optional') || 'Opcional'})</span></label>
                                     <textarea
-                                        placeholder="Ej: Quise borrar solo la caries pero se borró todo el diente..."
+                                        placeholder={t('odontogram.corr_comment_placeholder') || 'Ej: Quise borrar solo la caries...'}
                                         value={corrComment}
                                         onChange={(e) => setCorrComment(e.target.value)}
                                         className="w-full bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg px-3 py-2 text-[10px] outline-none focus:ring-2 focus:ring-blue-500 resize-none h-16 shadow-inner"
@@ -695,7 +690,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                     disabled={!corrTooth || !corrCondition}
                                     className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Enviar Corrección
+                                    {t('odontogram.send_correction')}
                                 </button>
                             </div>
                         </div>
@@ -703,7 +698,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
                     <div className="mt-3 pt-3 border-t border-gray-50 dark:border-slate-700/50">
                         <span className="text-[10px] flex items-center gap-1.5 text-orange-500/80 dark:text-orange-400/80 font-bold uppercase tracking-tight">
-                            <AlertCircle size={12} /> Referencial: La IA puede cometer errores en entornos ruidosos
+                            <AlertCircle size={12} /> {t('odontogram.ai_warning')}
                         </span>
                     </div>
                 </div>
@@ -711,25 +706,25 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-10 w-full">
                 <div className="space-y-2 min-w-0">
-                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">Sup. Derecho (C1)</h3>
+                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">{t('odontogram.quad_upper_right')}</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
                         <Quadrant range={[18, 17, 16, 15, 14, 13, 12, 11]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
                 <div className="space-y-2 min-w-0">
-                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">Sup. Izquierdo (C2)</h3>
+                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">{t('odontogram.quad_upper_left')}</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
                         <Quadrant range={[21, 22, 23, 24, 25, 26, 27, 28]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
                 <div className="space-y-2 min-w-0">
-                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">Inf. Derecho (C4)</h3>
+                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">{t('odontogram.quad_lower_right')}</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
                         <Quadrant range={[48, 47, 46, 45, 44, 43, 42, 41]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
                 <div className="space-y-2 min-w-0">
-                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">Inf. Izquierdo (C3)</h3>
+                    <h3 className="text-center font-semibold text-slate-500 dark:text-slate-400 text-xs px-2 py-1 mb-1 block">{t('odontogram.quad_lower_left')}</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
                         <Quadrant range={[31, 32, 33, 34, 35, 36, 37, 38]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
@@ -740,14 +735,14 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                 <div className={`flex items-center justify-between ${showLegend ? 'mb-6' : ''}`}>
                     <div className="flex items-center gap-3">
                         <div className="w-1.5 h-6 bg-blue-500/80 rounded-full" />
-                        <h4 className="text-lg font-semibold tracking-tight text-slate-800 dark:text-slate-100">Guía de Colores y Símbolos</h4>
+                        <h4 className="text-lg font-semibold tracking-tight text-slate-800 dark:text-slate-100">{t('odontogram.legend_title')}</h4>
                     </div>
                     <button
                         onClick={() => setShowLegend(!showLegend)}
                         className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1.5 transition-colors p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800/80"
-                        title={showLegend ? "Ocultar Guía" : "Mostrar Guía"}
+                        title={showLegend ? t('odontogram.hide_legend') : t('odontogram.show_legend')}
                     >
-                        {showLegend ? <><EyeOff size={16} /> <span className="hidden sm:inline">Ocultar</span></> : <><Eye size={16} /> <span className="hidden sm:inline">Mostrar</span></>}
+                        {showLegend ? <><EyeOff size={16} /> <span className="hidden sm:inline">{t('odontogram.hide_legend')}</span></> : <><Eye size={16} /> <span className="hidden sm:inline">{t('odontogram.show_legend')}</span></>}
                     </button>
                 </div>
                 {showLegend && (
@@ -774,7 +769,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">💬</div>
                                     <div>
-                                        <p className="text-xs text-blue-800 dark:text-blue-300 font-bold uppercase">Pruébalo diciendo:</p>
+                                        <p className="text-xs text-blue-800 dark:text-blue-300 font-bold uppercase">{t('odontogram.try_saying')}</p>
                                         <p className="text-sm text-blue-600 dark:text-blue-400 italic">{activeItem.example}</p>
                                     </div>
                                 </div>

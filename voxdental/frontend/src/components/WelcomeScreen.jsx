@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { User, Heart, Activity, Stethoscope, Shield, Award, Briefcase, Cat } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const AVATAR_MAP = {
     'user': User,
@@ -29,6 +30,7 @@ export const WelcomeScreen = ({ user, darkMode, onFinished }) => {
     const userGender = user?.gender;
     const [isVisible, setIsVisible] = useState(false);
     const [isLeaving, setIsLeaving] = useState(false);
+    const { t } = useLanguage();
 
     useEffect(() => {
         const entryTimer = setTimeout(() => setIsVisible(true), 100);
@@ -58,11 +60,11 @@ export const WelcomeScreen = ({ user, darkMode, onFinished }) => {
                 </div>
 
                 <div className="text-center">
-                    <h2 className="text-blue-600 dark:text-blue-500 font-bold tracking-[0.25em] uppercase text-[10px] mb-4">Acceso Concedido</h2>
+                    <h2 className="text-blue-600 dark:text-blue-500 font-bold tracking-[0.25em] uppercase text-[10px] mb-4">{t('welcome.access_granted')}</h2>
                     <h1 className={`text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-2 px-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                        {userGender === 'male' ? 'Bienvenido, ' : userGender === 'female' ? 'Bienvenida, ' : 'Bienvenido/a, '}
+                        {userGender === 'male' ? t('welcome.welcome_male') : userGender === 'female' ? t('welcome.welcome_female') : t('welcome.welcome_generic')}
                         <span className={`block sm:inline bg-gradient-to-r bg-clip-text text-transparent ${darkMode ? 'from-white via-blue-50 to-blue-200' : 'from-blue-700 via-blue-600 to-slate-900'}`}>
-                            {userGender === 'male' ? 'Dr. ' : userGender === 'female' ? 'Dra. ' : ''}{userName || 'Usuario'}
+                            {userGender === 'male' ? t('welcome.dr_male') : userGender === 'female' ? t('welcome.dr_female') : t('welcome.dr_generic')}{userName || 'Usuario'}
                         </span>
                     </h1>
                     <div className="flex items-center justify-center gap-2 mt-6">
@@ -74,7 +76,7 @@ export const WelcomeScreen = ({ user, darkMode, onFinished }) => {
             </div>
 
             <div className={`absolute bottom-12 font-bold tracking-[0.3em] text-[10px] uppercase opacity-40 ${darkMode ? 'text-zinc-600' : 'text-slate-400'}`}>
-                SuiVoxDental • Sistema Odontológico Inteligente
+                {t('welcome.footer')}
             </div>
         </div>
     );

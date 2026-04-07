@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Camera, Upload, Trash2, Loader2, Play } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const ManualEntryModal = React.memo(({ 
     toothNumber, 
@@ -14,6 +15,7 @@ export const ManualEntryModal = React.memo(({
     patientId 
 }) => {
     const { token } = useAuth();
+    const { t } = useLanguage();
     const [selectedSurface, setSelectedSurface] = useState(null);
     const [localFindings, setLocalFindings] = useState([]);
     const [tempNoteText, setTempNoteText] = useState("");
@@ -108,9 +110,9 @@ export const ManualEntryModal = React.memo(({
                 <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900">
                     <div>
                         <h3 className="font-bold text-2xl text-slate-900 dark:text-white">
-                            Pieza {useDottedMode ? String(toothNumber).split('').join('.') : toothNumber}
+                            {t('manual.piece')} {useDottedMode ? String(toothNumber).split('').join('.') : toothNumber}
                         </h3>
-                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Edición Manual de Hallazgos</p>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('manual.subtitle')}</p>
                     </div>
                     <button 
                         onClick={onClose} 
@@ -123,15 +125,15 @@ export const ManualEntryModal = React.memo(({
                 <div className="flex-1 overflow-y-auto p-8 space-y-8">
                     {/* Surface Selection */}
                     <section>
-                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">1. Seleccionar Superficie</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">{t('manual.step_1')}</h4>
                         <div className="flex flex-wrap gap-3">
                             {[
-                                { id: 'vestibular', label: 'V - Vestibular' },
-                                { id: isIncisal(toothNumber) ? 'incisal' : 'oclusal', label: isIncisal(toothNumber) ? 'I - Incisal' : 'O - Oclusal' },
-                                { id: 'mesial', label: 'M - Mesial' },
-                                { id: 'distal', label: 'D - Distal' },
-                                { id: toothNumber < 30 ? 'palatina' : 'lingual', label: toothNumber < 30 ? 'P - Palatina' : 'L - Lingual' },
-                                { id: 'pieza', label: 'Toda la Pieza' }
+                                { id: 'vestibular', label: t('surface.vestibular') },
+                                { id: isIncisal(toothNumber) ? 'incisal' : 'oclusal', label: isIncisal(toothNumber) ? t('surface.incisal') : t('surface.oclusal') },
+                                { id: 'mesial', label: t('surface.mesial') },
+                                { id: 'distal', label: t('surface.distal') },
+                                { id: toothNumber < 30 ? 'palatina' : 'lingual', label: toothNumber < 30 ? t('surface.palatina') : t('surface.lingual') },
+                                { id: 'pieza', label: t('surface.whole') }
                             ].map(surf => (
                                 <button
                                     key={surf.id}
@@ -146,7 +148,7 @@ export const ManualEntryModal = React.memo(({
 
                     {/* Condition Selection */}
                     <section className={!selectedSurface ? 'opacity-30 pointer-events-none grayscale transition-all' : 'transition-all'}>
-                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">2. Marcar Hallazgo</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">{t('manual.step_2')}</h4>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             {legendItems.map(item => {
                                 const isWholeTooth = ['ausente', 'corona', 'endodoncia', 'extraer'].includes(item.id);
@@ -196,14 +198,14 @@ export const ManualEntryModal = React.memo(({
 
                     {/* Notes */}
                     <section>
-                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">3. Observaciones</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-4">{t('manual.step_3')}</h4>
                         <div className="relative group">
                             <MessageSquare size={18} className="absolute top-4 left-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                             <textarea
                                 value={tempNoteText}
                                 onChange={(e) => setTempNoteText(e.target.value)}
                                 className="w-full h-32 p-4 pl-12 bg-slate-50 dark:bg-zinc-950/50 border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none focus:border-blue-500 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 resize-none text-sm"
-                                placeholder="Observaciones adicionales sobre esta pieza..."
+                                placeholder={t('manual.notes_placeholder')}
                             />
                         </div>
                     </section>
@@ -211,10 +213,10 @@ export const ManualEntryModal = React.memo(({
                     {/* Multimedia Gallery */}
                     <section>
                         <div className="flex justify-between items-center mb-4">
-                            <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">4. Galería Multimedia</h4>
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">{t('manual.step_4')}</h4>
                             <label className={`flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all shadow-md active:scale-95 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                                 {isUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                                {isUploading ? 'Subiendo...' : 'Subir Imagen/Video'}
+                                {isUploading ? t('manual.uploading') : t('manual.upload_btn')}
                                 <input type="file" className="hidden" accept="image/*,video/*" onChange={handleFileUpload} disabled={isUploading} />
                             </label>
                         </div>
@@ -222,23 +224,27 @@ export const ManualEntryModal = React.memo(({
                         {media.length === 0 ? (
                             <div className="p-8 border-2 border-dashed border-gray-100 dark:border-blue-900/20 rounded-2xl flex flex-col items-center justify-center text-gray-400">
                                 <Camera size={32} className="mb-2 opacity-20" />
-                                <p className="text-xs font-bold uppercase tracking-tight">Sin archivos multimedia</p>
+                                <p className="text-xs font-bold uppercase tracking-tight">{t('manual.no_media')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                                {media.map((m) => (
-                                    <div 
-                                        key={m.id} 
-                                        onClick={() => setSelectedMedia(m)}
-                                        className="relative aspect-square rounded-xl overflow-hidden group/media border border-gray-100 dark:border-blue-900/30 bg-black cursor-pointer ring-offset-2 ring-offset-white dark:ring-offset-slate-900 hover:ring-2 hover:ring-blue-500 transition-all"
-                                    >
-                                        {m.file_type === 'image' || m.thumbnail_url ? (
+                                {media.map((m) => {
+                                    const thumbSrc = m.thumbnail_url
+                                        ? `/api/v1/stream/${m.thumbnail_url.split('/').pop()}`
+                                        : `/api/v1/stream/${m.file_url.split('/').pop()}`;
+                                    return (
+                                        <div 
+                                            key={m.id} 
+                                            onClick={() => setSelectedMedia(m)}
+                                            className="relative aspect-square rounded-xl overflow-hidden group/media border border-gray-100 dark:border-blue-900/30 bg-black cursor-pointer ring-offset-2 ring-offset-white dark:ring-offset-slate-900 hover:ring-2 hover:ring-blue-500 transition-all"
+                                        >
                                             <div className="w-full h-full relative">
                                                 <img 
-                                                    src={`${m.thumbnail_url || m.file_url}`} 
+                                                    src={thumbSrc}
                                                     alt="Tooth Media" 
                                                     className="w-full h-full object-cover group-hover/media:scale-110 transition-transform duration-500"
                                                     loading="lazy"
+                                                    onError={(e) => { e.target.style.display = 'none'; }}
                                                 />
                                                 {m.file_type === 'video' && (
                                                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover/media:bg-black/0 transition-colors">
@@ -248,22 +254,18 @@ export const ManualEntryModal = React.memo(({
                                                     </div>
                                                 )}
                                             </div>
-                                        ) : (
-                                            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-slate-500 group-hover/media:bg-slate-800 transition-colors">
-                                                <Loader2 size={18} className="animate-spin opacity-20" />
-                                            </div>
-                                        )}
-                                        <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteMedia(m.id);
-                                            }}
-                                            className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-lg opacity-0 group-hover/media:opacity-100 transition-opacity z-20 backdrop-blur-sm"
-                                        >
-                                            <Trash2 size={12} />
-                                        </button>
-                                    </div>
-                                ))}
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteMedia(m.id);
+                                                }}
+                                                className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-lg opacity-0 group-hover/media:opacity-100 transition-opacity z-20 backdrop-blur-sm"
+                                            >
+                                                <Trash2 size={12} />
+                                            </button>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </section>
@@ -283,7 +285,7 @@ export const ManualEntryModal = React.memo(({
                             <div className="relative max-w-7xl max-h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
                                 {selectedMedia.file_type === 'image' ? (
                                     <img 
-                                        src={`${selectedMedia.file_url}`} 
+                                        src={`/api/v1/stream/${selectedMedia.file_url.split('/').pop()}`}
                                         alt="Fullscreen view" 
                                         className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl"
                                     />
@@ -295,11 +297,12 @@ export const ManualEntryModal = React.memo(({
                                         <video 
                                             controls 
                                             autoPlay 
-                                            preload="auto"
+                                            preload="metadata"
                                             playsInline
                                             className="w-full h-full relative z-10"
-                                            src={`${selectedMedia.file_url}`}
+                                            src={`/api/v1/stream/${selectedMedia.file_url.split('/').pop()}`}
                                             onLoadedData={(e) => e.target.style.opacity = 1}
+                                            onError={(e) => console.error('Video error:', e)}
                                             style={{ opacity: 0, transition: 'opacity 0.3s' }}
                                         />
                                     </div>
@@ -307,7 +310,7 @@ export const ManualEntryModal = React.memo(({
                                 
                                 <div className="absolute -bottom-12 left-0 right-0 text-center">
                                     <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">
-                                        Evidencia Clínica • Pieza {toothNumber}
+                                        {t('manual.clinical_evidence')} • {t('manual.piece')} {toothNumber}
                                     </span>
                                 </div>
                             </div>
@@ -321,13 +324,13 @@ export const ManualEntryModal = React.memo(({
                         onClick={onClose} 
                         className="px-6 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-2xl transition-all font-bold text-sm"
                     >
-                        Cancelar
+                        {t('manual.cancel')}
                     </button>
                     <button
                         onClick={handleSave}
                         className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all"
                     >
-                        Guardar Cambios
+                        {t('manual.save')}
                     </button>
                 </div>
             </div>

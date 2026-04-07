@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FileText, Printer, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const ClinicalRecordModal = React.memo(({
     doctor,
@@ -11,6 +12,7 @@ export const ClinicalRecordModal = React.memo(({
     useDottedMode,
     onClose
 }) => {
+    const { t, language } = useLanguage();
     const handlePrint = () => {
         window.print();
     };
@@ -22,8 +24,8 @@ export const ClinicalRecordModal = React.memo(({
         return item ? item.label : conditionId;
     };
 
-    const doctorTitle = doctor?.gender === 'male' ? 'Dr. ' : doctor?.gender === 'female' ? 'Dra. ' : '';
-    const doctorDisplay = doctor ? `${doctorTitle}${doctor.name || doctor.email}` : 'Especialista';
+    const doctorTitle = doctor?.gender === 'male' ? t('welcome.dr_male') : doctor?.gender === 'female' ? t('welcome.dr_female') : t('welcome.dr_generic');
+    const doctorDisplay = doctor ? `${doctorTitle}${doctor.name || doctor.email}` : t('record.specialist_default');
 
     const groupedData = useMemo(() => {
         const groups = {};
@@ -69,7 +71,7 @@ export const ClinicalRecordModal = React.memo(({
         age: patient?.age || '',
         document: patient?.document || '',
         doctor: doctorDisplay,
-        date: new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        date: new Date().toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
     });
 
     useEffect(() => {
@@ -89,13 +91,13 @@ export const ClinicalRecordModal = React.memo(({
                             <FileText size={24} />
                         </div>
                         <div>
-                            <h3 className="font-bold text-2xl text-slate-900 dark:text-white leading-tight">Historia Clínica Formateada</h3>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Resumen y estado odontológico del paciente</p>
+                            <h3 className="font-bold text-2xl text-slate-900 dark:text-white leading-tight">{t('record.title')}</h3>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('record.subtitle')}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md text-sm">
-                            <Printer size={18} /> <span className="hidden sm:inline">Imprimir Expediente</span>
+                            <Printer size={18} /> <span className="hidden sm:inline">{t('record.print_btn')}</span>
                         </button>
                         <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-400 hover:text-slate-600 transition-colors">
                             <X size={24} />
@@ -110,37 +112,37 @@ export const ClinicalRecordModal = React.memo(({
                         {/* Clinical Header for Print */}
                         <div className="border-b-2 border-slate-900 dark:border-zinc-700 pb-4 mb-8 mt-4 print-force-border flex justify-between items-end">
                             <div className="flex-1 mr-4">
-                                <h1 className="text-3xl font-bold text-slate-950 dark:text-white print-force-black leading-none mb-3 tracking-tight">REGISTRO CLÍNICO</h1>
+                                <h1 className="text-3xl font-bold text-slate-950 dark:text-white print-force-black leading-none mb-3 tracking-tight">{t('record.clinical_header')}</h1>
                                 
                                 <div className="space-y-1.5 mt-4">
                                     <div className="text-base text-slate-700 dark:text-zinc-200 print-force-black font-semibold flex items-center gap-2">
-                                        <span className="w-20 shrink-0 text-slate-500 dark:text-slate-400 print-force-gray font-bold uppercase text-[10px] tracking-widest leading-none">Paciente:</span>
+                                        <span className="w-20 shrink-0 text-slate-500 dark:text-slate-400 print-force-gray font-bold uppercase text-[10px] tracking-widest leading-none">{t('record.patient_label')}</span>
                                         <input 
                                             value={editableRecord.name}
                                             onChange={(e) => setEditableRecord({...editableRecord, name: e.target.value})}
                                             className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-blue-500 outline-none print-input flex-1 min-w-0 px-1 py-0.5 text-base hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
-                                            placeholder="Nombre completo..."
+                                            placeholder={t('record.name_placeholder')}
                                         />
                                     </div>
                                     <div className="text-xs text-slate-700 dark:text-zinc-200 print-force-black font-semibold flex flex-wrap gap-2 items-center">
                                         <div className="flex items-center gap-2 flex-1 min-w-[150px]">
-                                            <span className="w-20 shrink-0 text-slate-500 dark:text-slate-400 print-force-gray font-bold uppercase text-[10px] tracking-widest leading-none">Edad/Doc:</span>
+                                            <span className="w-20 shrink-0 text-slate-500 dark:text-slate-400 print-force-gray font-bold uppercase text-[10px] tracking-widest leading-none">{t('record.age_doc_label')}</span>
                                             <input 
                                                 value={editableRecord.age}
                                                 onChange={(e) => setEditableRecord({...editableRecord, age: e.target.value})}
                                                 className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-blue-500 outline-none print-input w-24 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
-                                                placeholder="Ej. 34 años"
+                                                placeholder={t('record.age_placeholder')}
                                             />
                                             <input 
                                                 value={editableRecord.document}
                                                 onChange={(e) => setEditableRecord({...editableRecord, document: e.target.value})}
                                                 className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-blue-500 outline-none print-input flex-1 min-w-0 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
-                                                placeholder="DNI / ID"
+                                                placeholder={t('record.doc_placeholder')}
                                             />
                                         </div>
                                     </div>
                                     <div className="text-xs text-slate-600 dark:text-slate-400 print-force-black flex items-center gap-2">
-                                        <span className="w-20 shrink-0 text-slate-500 dark:text-slate-400 print-force-gray font-bold uppercase text-[10px] tracking-widest leading-none">Atiende:</span>
+                                        <span className="w-20 shrink-0 text-slate-500 dark:text-slate-400 print-force-gray font-bold uppercase text-[10px] tracking-widest leading-none">{t('record.doctor_label')}</span>
                                         <input 
                                             value={editableRecord.doctor}
                                             onChange={(e) => setEditableRecord({...editableRecord, doctor: e.target.value})}
@@ -148,7 +150,7 @@ export const ClinicalRecordModal = React.memo(({
                                         />
                                     </div>
                                     <div className="text-xs text-slate-600 dark:text-slate-400 print-force-black flex items-center gap-2">
-                                        <span className="w-20 shrink-0 text-slate-500 dark:text-slate-400 print-force-gray font-bold uppercase text-[10px] tracking-widest leading-none">Fecha:</span>
+                                        <span className="w-20 shrink-0 text-slate-500 dark:text-slate-400 print-force-gray font-bold uppercase text-[10px] tracking-widest leading-none">{t('record.date_label')}</span>
                                         <input 
                                             value={editableRecord.date}
                                             onChange={(e) => setEditableRecord({...editableRecord, date: e.target.value})}
@@ -159,15 +161,15 @@ export const ClinicalRecordModal = React.memo(({
                             </div>
                             <div className="text-right flex flex-col justify-end mt-4 sm:mt-0 shrink-0">
                                 <p className="text-xl font-bold text-slate-900 dark:text-zinc-100 print-force-black leading-none tracking-tight">VoxDental</p>
-                                <p className="text-[10px] text-blue-600 dark:text-blue-400 print-force-gray font-bold mt-1 uppercase tracking-[0.2em]">Expediente Digital</p>
+                                <p className="text-[10px] text-blue-600 dark:text-blue-400 print-force-gray font-bold mt-1 uppercase tracking-[0.2em]">{t('record.digital_file')}</p>
                             </div>
                         </div>
 
                         {/* Findings Table */}
                         {groupedData.length === 0 ? (
                             <div className="text-center py-20 text-gray-400 dark:text-slate-500 print-force-black">
-                                <p className="text-xl font-medium">No hay hallazgos registrados para este paciente.</p>
-                                <p className="text-sm mt-2">Agregue condiciones al odontograma para visualizar el reporte.</p>
+                                <p className="text-xl font-medium">{t('record.no_findings')}</p>
+                                <p className="text-sm mt-2">{t('record.no_findings_desc')}</p>
                             </div>
                         ) : (
                             <div className="space-y-6 print-grid">
@@ -178,10 +180,10 @@ export const ClinicalRecordModal = React.memo(({
                                     const isCrown = findings.some(f => f.condition === 'corona');
 
                                     const entireToothLabels = [];
-                                    if (isMissing) entireToothLabels.push('Ausente');
-                                    if (isExtracted) entireToothLabels.push('A Extraer');
-                                    if (isEndodontic) entireToothLabels.push('Endodoncia');
-                                    if (isCrown) entireToothLabels.push('Corona');
+                                    if (isMissing) entireToothLabels.push(t('legend.missing'));
+                                    if (isExtracted) entireToothLabels.push(t('legend.extract'));
+                                    if (isEndodontic) entireToothLabels.push(t('legend.endo'));
+                                    if (isCrown) entireToothLabels.push(t('legend.crown'));
 
                                     const surfaceFindings = findings.filter(f => !['ausente', 'extraer', 'endodoncia', 'corona'].includes(f.condition));
 
@@ -190,7 +192,7 @@ export const ClinicalRecordModal = React.memo(({
                                             
                                             {/* Minimalist Medical Heading */}
                                             <div className="border-b-2 border-slate-100 dark:border-slate-700/50 print-force-border pb-2 mb-3 flex items-baseline gap-2">
-                                                <span className="text-[10px] font-bold text-slate-400 print-force-gray uppercase tracking-widest">Pieza</span>
+                                                <span className="text-[10px] font-bold text-slate-400 print-force-gray uppercase tracking-widest">{t('record.tooth_piece')}</span>
                                                 <span className="text-xl font-black text-blue-600 dark:text-blue-400 print-force-black leading-none">{displayNum(tooth_number)}</span>
                                             </div>
                                             
@@ -211,7 +213,7 @@ export const ClinicalRecordModal = React.memo(({
                                                             <li key={idx} className="flex items-center gap-2 text-gray-700 dark:text-gray-200 text-sm print-force-black">
                                                                 <span className="w-1 h-1 bg-blue-300 dark:bg-blue-600 rounded-full shrink-0 print-dot" />
                                                                 <span>
-                                                                    <span className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs print-force-gray">{formatSurface(f.surface) || 'General'}:</span> <span className="font-medium capitalize text-[13px]">{findLabel(f.condition).toLowerCase()}</span>
+                                                                    <span className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs print-force-gray">{formatSurface(f.surface) || t('common.general')}:</span> <span className="font-medium capitalize text-[13px]">{findLabel(f.condition).toLowerCase()}</span>
                                                                 </span>
                                                             </li>
                                                         ))}
@@ -234,7 +236,7 @@ export const ClinicalRecordModal = React.memo(({
                         <div className="mt-20 text-center print:block hidden pb-12 break-inside-avoid text-black print-force-black print-signature">
                             <div className="inline-block w-64 border-t border-black print-force-border pt-2">
                                 <p className="text-sm font-bold uppercase tracking-widest truncate px-4">{editableRecord.doctor}</p>
-                                <p className="text-[10px] font-bold text-gray-500 print-force-gray uppercase tracking-[0.25em] mt-1">Firma y Sello del Especialista</p>
+                                <p className="text-[10px] font-bold text-gray-500 print-force-gray uppercase tracking-[0.25em] mt-1">{t('record.signature_label')}</p>
                             </div>
                         </div>
 

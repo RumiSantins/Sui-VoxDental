@@ -19,9 +19,11 @@ from .api.routes import router
 app = FastAPI(title="Sui VoxDental API", version="0.1.0")
 
 # Enable CORS for frontend
+# En producción, configurar ALLOWED_ORIGINS=https://tu-dominio.com
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, status, Request
+from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
@@ -555,6 +556,73 @@ def delete_media(
     db.delete(db_media)
     db.commit()
     return {"message": "Archivo eliminado"}
+
+# --- VIDEO STREAMING WITH RANGE SUPPORT ---
+
+@router.get("/stream/{filename}")
+async def stream_video(filename: str, request: Request):
+    """Serve video files with proper Range request support for browser playback."""
+    file_path = Path("static/media") / filename
+    
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Archivo no encontrado")
+    
+    file_size = file_path.stat().st_size
+    range_header = request.headers.get("Range")
+    
+    # Determine content type
+    ext = filename.split(".")[-1].lower()
+    content_type_map = {
+        "mp4": "video/mp4",
+        "webm": "video/webm",
+        "mov": "video/quicktime",
+        "avi": "video/x-msvideo",
+        "mkv": "video/x-matroska",
+    }
+    content_type = content_type_map.get(ext, "video/mp4")
+    
+    def iterate_file(start: int, end: int, chunk_size: int = 1024 * 1024):
+        with open(file_path, "rb") as f:
+            f.seek(start)
+            remaining = end - start + 1
+            while remaining > 0:
+                read_size = min(chunk_size, remaining)
+                data = f.read(read_size)
+                if not data:
+                    break
+                remaining -= len(data)
+                yield data
+    
+    if range_header:
+        # Parse Range header: "bytes=start-end"
+        range_val = range_header.replace("bytes=", "")
+        parts = range_val.split("-")
+        start = int(parts[0]) if parts[0] else 0
+        end = int(parts[1]) if parts[1] else file_size - 1
+        end = min(end, file_size - 1)
+        
+        headers = {
+            "Content-Range": f"bytes {start}-{end}/{file_size}",
+            "Accept-Ranges": "bytes",
+            "Content-Length": str(end - start + 1),
+            "Content-Type": content_type,
+        }
+        return StreamingResponse(
+            iterate_file(start, end),
+            status_code=206,
+            headers=headers,
+            media_type=content_type
+        )
+    else:
+        headers = {
+            "Accept-Ranges": "bytes",
+            "Content-Length": str(file_size),
+        }
+        return StreamingResponse(
+            iterate_file(0, file_size - 1),
+            headers=headers,
+            media_type=content_type
+        )
 
 @router.post("/speech-reports", response_model=SpeechReportSchema)
 def create_speech_report(

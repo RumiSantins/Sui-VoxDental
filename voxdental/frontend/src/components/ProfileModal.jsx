@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { User, Lock, X, Check, Loader2, AlertCircle, Heart, Activity, Stethoscope, Shield, Award, Briefcase, Camera, Image as ImageIcon, Cat } from 'lucide-react';
+import React, { useState, useRef, useMemo } from 'react';
+import { User, Lock, X, Check, Loader2, AlertCircle, Heart, Activity, Stethoscope, Shield, Award, Briefcase, Camera, Image as ImageIcon, Cat, Languages } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const DEFAULT_AVATARS = [
     { id: 'user', icon: User, color: 'bg-blue-500' },
@@ -15,6 +16,7 @@ const DEFAULT_AVATARS = [
 
 export const ProfileModal = ({ onClose }) => {
     const { user, token, login } = useAuth();
+    const { language, setLanguage, t } = useLanguage();
     const fileInputRef = useRef(null);
     const [name, setName] = useState(user?.name || "");
     const [password, setPassword] = useState("");
@@ -33,7 +35,7 @@ export const ProfileModal = ({ onClose }) => {
         if (!file) return;
 
         if (file.size > 2 * 1024 * 1024) {
-            setError("La imagen es demasiado grande (máx 2MB)");
+            setError(t('profile.error_image_size'));
             return;
         }
 
@@ -50,7 +52,7 @@ export const ProfileModal = ({ onClose }) => {
         setSuccess(false);
 
         if (password && password !== confirmPassword) {
-            setError("Las contraseñas no coinciden");
+            setError(t('profile.error_passwords_mismatch'));
             return;
         }
 
@@ -77,10 +79,10 @@ export const ProfileModal = ({ onClose }) => {
                 setSuccess(true);
                 setTimeout(() => onClose(), 1500);
             } else {
-                setError(data.detail || "Error al actualizar perfil");
+                setError(data.detail || t('profile.error_update'));
             }
         } catch (err) {
-            setError("Error de conexión con el servidor");
+            setError(t('verify.connection_error'));
         } finally {
             setLoading(false);
         }
@@ -118,7 +120,7 @@ export const ProfileModal = ({ onClose }) => {
                 
                 <div className="p-6 sm:p-8 pb-4">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white uppercase tracking-tight">Mi Perfil</h3>
+                        <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white uppercase tracking-tight">{t('profile.title')}</h3>
                         <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
                             <X size={18} />
                         </button>
@@ -127,7 +129,7 @@ export const ProfileModal = ({ onClose }) => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Avatar Picker */}
                         <div className="space-y-3">
-                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1 block mb-1">Avatar de Perfil</label>
+                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1 block mb-1">{t('profile.avatar_label')}</label>
                             
                             <div className="flex flex-col items-center gap-4 mb-4">
                                 <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
@@ -163,12 +165,12 @@ export const ProfileModal = ({ onClose }) => {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1 block mb-1">Especialidad</label>
+                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1 block mb-1">{t('profile.specialties')}</label>
                             <div className="flex gap-2">
                                 {[
-                                    { id: 'male', label: 'Dr.', full: 'Hombre' },
-                                    { id: 'female', label: 'Dra.', full: 'Mujer' },
-                                    { id: 'other', label: '---', full: 'Otro' }
+                                    { id: 'male', label: t('profile.specialties_dr'), full: 'Hombre' },
+                                    { id: 'female', label: t('profile.specialties_dra'), full: 'Mujer' },
+                                    { id: 'other', label: t('profile.specialties_other'), full: 'Otro' }
                                 ].map((opt) => (
                                     <button
                                         key={opt.id}
@@ -185,7 +187,7 @@ export const ProfileModal = ({ onClose }) => {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1 block mb-1">Nombre</label>
+                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 ml-1 block mb-1">{t('profile.name_label')}</label>
                             <div className="relative">
                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input 
@@ -194,13 +196,34 @@ export const ProfileModal = ({ onClose }) => {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     className="w-full pl-9 pr-4 py-2.5 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 focus:border-blue-500 dark:border-zinc-800 rounded-xl outline-none text-sm dark:text-white transition-colors"
-                                    placeholder="Tu nombre"
+                                    placeholder={t('profile.name_placeholder')}
                                 />
                             </div>
                         </div>
 
                         <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
-                            <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 leading-none">Motor de Voz</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-4 leading-none">{t('profile.language')}</p>
+                            
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setLanguage('es')}
+                                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${language === 'es' ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-900'}`}
+                                >
+                                    <span>🇪🇸</span> {t('profile.lang_es')}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setLanguage('en')}
+                                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${language === 'en' ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-900'}`}
+                                >
+                                    <span>🇺🇸</span> {t('profile.lang_en')}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
+                            <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 leading-none">{t('profile.voice_engine')}</p>
                             
                             <div className="space-y-3 mb-4">
                                 <div className="flex gap-2">
@@ -231,8 +254,8 @@ export const ProfileModal = ({ onClose }) => {
                                         onChange={(e) => setSpeechModel(e.target.value)}
                                         className="w-full px-4 py-3 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 dark:border-zinc-800 focus:border-blue-500 rounded-xl outline-none text-xs dark:text-white"
                                     >
-                                        <option value="vosk-model-small-es-0.42">Vosk Small (Recomendado - Súper Rápido, 40MB)</option>
-                                        <option value="vosk-model-es-0.42">Vosk Full ES (Lento pero Preciso, 1.4GB)</option>
+                                        <option value="vosk-model-small-es-0.42">{t('profile.vosk_desc')}</option>
+                                        <option value="vosk-model-es-0.42">{t('profile.vosk_full')}</option>
                                     </select>
                                 )}
                                 {speechEngine === 'whisper' && (
@@ -241,11 +264,11 @@ export const ProfileModal = ({ onClose }) => {
                                         onChange={(e) => setSpeechModel(e.target.value)}
                                         className="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-950/50 border border-transparent focus:border-blue-500 rounded-xl outline-none text-xs dark:text-white"
                                     >
-                                        <option value="base">Whisper Base (Recomendado - Rápido, muy equilibrado)</option>
-                                        <option value="tiny">Whisper Tiny (Instántaneo, menos preciso pero ligero)</option>
-                                        <option value="small">Whisper Small (Preciso, velocidad moderada)</option>
-                                        <option value="medium">Whisper Medium (Súper Preciso, mayor carga de memoria)</option>
-                                        <option value="large">Whisper Large (Claridad Total, pero muy lento)</option>
+                                        <option value="base">{t('profile.whisper_base')}</option>
+                                        <option value="tiny">{t('profile.whisper_tiny')}</option>
+                                        <option value="small">{t('profile.whisper_small')}</option>
+                                        <option value="medium">{t('profile.whisper_medium')}</option>
+                                        <option value="large">{t('profile.whisper_large')}</option>
                                     </select>
                                 )}
                             </div>
@@ -253,7 +276,7 @@ export const ProfileModal = ({ onClose }) => {
 
                         {!user?.is_google && (
                             <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
-                                <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 leading-none">Seguridad</p>
+                                <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 leading-none">{t('profile.security')}</p>
                                 
                                 <div className="space-y-2">
                                     <div className="relative">
@@ -263,7 +286,7 @@ export const ProfileModal = ({ onClose }) => {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-zinc-950/50 border border-transparent focus:border-blue-500 rounded-xl outline-none text-xs dark:text-white"
-                                            placeholder="Nueva clave"
+                                            placeholder={t('profile.new_password')}
                                         />
                                     </div>
                                 </div>
@@ -271,10 +294,10 @@ export const ProfileModal = ({ onClose }) => {
                         )}
 
                         <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
-                            <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-4 leading-none">Interfaz y Sonido</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-4 leading-none">{t('profile.interface_sound')}</p>
                             
                             <label className="flex items-center justify-between cursor-pointer group">
-                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-blue-500 transition-colors">Sonido de Acción (Aciertos/Errores)</span>
+                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-blue-500 transition-colors">{t('profile.sound_action')}</span>
                                 <div className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out ${playSound ? 'bg-blue-600' : 'bg-slate-200 dark:bg-zinc-800'}`}>
                                     <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${playSound ? 'translate-x-6' : 'translate-x-1'}`} />
                                     <input type="checkbox" className="sr-only" checked={playSound} onChange={(e) => setPlaySound(e.target.checked)} />
@@ -293,7 +316,7 @@ export const ProfileModal = ({ onClose }) => {
                             disabled={loading || success}
                             className={`w-full py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${success ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white active:scale-95 disabled:opacity-50'}`}
                         >
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : success ? <Check className="w-4 h-4" /> : "GUARDAR"}
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : success ? <Check className="w-4 h-4" /> : t('profile.save')}
                         </button>
                     </form>
                 </div>

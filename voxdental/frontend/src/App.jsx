@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, memo, lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { useLanguage } from './context/LanguageContext'
 import { Login } from './components/Login'
 import { PatientSelector } from './components/PatientSelector'
 import { Settings, Heart, Activity, Stethoscope, Shield, Award, Briefcase, User as UserIcon, Cat, Loader2 } from 'lucide-react'
@@ -12,14 +13,17 @@ const WelcomeScreen = lazy(() => import('./components/WelcomeScreen').then(m => 
 const ProfileModal = lazy(() => import('./components/ProfileModal').then(m => ({ default: m.ProfileModal })));
 const AdminPanel = lazy(() => import('./components/AdminPanel').then(m => ({ default: m.AdminPanel })));
 
-const LoadingFallback = () => (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950">
-        <div className="flex flex-col items-center gap-4">
-            <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-            <p className="text-sm font-black uppercase tracking-widest text-blue-600/60 animate-pulse">Cargando VoxDental...</p>
+const LoadingFallback = () => {
+    const { t } = useLanguage();
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950">
+            <div className="flex flex-col items-center gap-4">
+                <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                <p className="text-sm font-black uppercase tracking-widest text-blue-600/60 animate-pulse">{t('app.loading')}</p>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const AVATAR_MAP = {
   'user': UserIcon,
@@ -34,6 +38,7 @@ const AVATAR_MAP = {
 
 function AppContent() {
   const { user, token, logout } = useAuth()
+  const { t } = useLanguage()
   const [showWelcome, setShowWelcome] = useState(false)
   const [hasShownWelcome, setHasShownWelcome] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -149,17 +154,17 @@ function AppContent() {
             {renderAvatar(user)}
             <div className="flex flex-col">
               <div className="flex items-center gap-3">
-                <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tighter">SuiVoxDental</h1>
+                <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tighter">{t('app.title')}</h1>
                 <button 
                   onClick={() => setShowProfile(true)}
                   className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all"
-                  title="Ajustes de Perfil"
+                  title={t('app.profile_settings')}
                 >
                   <Settings size={14} />
                 </button>
               </div>
               <p className="text-[10px] sm:text-xs text-slate-500 font-semibold tracking-tight truncate max-w-[150px] sm:max-w-none">
-                {user.gender === 'male' ? 'Dr. ' : user.gender === 'female' ? 'Dra. ' : ''}{user.name || user.email}
+                {user.gender === 'male' ? t('app.dr_male') : user.gender === 'female' ? t('app.dr_female') : ''}{user.name || user.email}
               </p>
             </div>
           </div>
@@ -168,7 +173,7 @@ function AppContent() {
               onClick={logout}
               className="sm:hidden px-3 py-1.5 text-[10px] font-bold text-red-500 hover:bg-red-500/10 rounded-xl transition-colors border border-transparent hover:border-red-500/20 whitespace-nowrap uppercase tracking-wider"
           >
-              Salir
+              {t('app.logout')}
           </button>
         </div>
         
@@ -183,7 +188,7 @@ function AppContent() {
                 onClick={logout}
                 className="hidden sm:block px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-500/10 rounded-xl transition-colors border border-transparent hover:border-red-500/20 whitespace-nowrap uppercase tracking-wider"
             >
-                Salir
+                {t('app.logout')}
             </button>
         </div>
       </div>
@@ -200,10 +205,10 @@ function AppContent() {
 
       <footer className="mt-8 pb-12 text-center border-t border-gray-100 dark:border-zinc-800/50">
         <p className="mt-8 text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400 dark:text-zinc-600">
-          SuiVoxDental • Sistema Odontológico Inteligente • v1.0.0
+           {t('app.title')} {t('app.system_info')}
         </p>
         <p className="mt-2 text-[10px] font-medium text-slate-400 dark:text-zinc-600">
-          Hecho por <span className="text-slate-500 dark:text-zinc-400">Felipe Santillan</span> • 
+          {t('app.made_by')} <span className="text-slate-500 dark:text-zinc-400">Felipe Santillan</span> • 
           <a href="https://fausto.app/" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">Fausto</a>
         </p>
       </footer>
