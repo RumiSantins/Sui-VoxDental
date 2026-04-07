@@ -32,7 +32,7 @@
 *   **Tailwind CSS**: Estilizado moderno y responsivo.
 *   **React Router**: Navegación SPA fluida.
 
----
+----
 
 ## Estructura del Proyecto
 
