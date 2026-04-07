@@ -6,18 +6,18 @@
 
 ---
 
-## ✨ Características Principales
+## Características Principales
 
-*   🎙️ **Registro por Voz**: Integración con **Vosk** (local) y **OpenAI Whisper** para transcripción ultra-precisa.
-*   🦷 **Odontograma Interactivo**: Representación visual de cada pieza dental con estados clínicos parametrizados (patologías en rojo, tratamientos en azul).
-*   🔐 **Autenticación con Google**: Inicio de sesión seguro integrado con Google OAuth 2.0.
-*   👤 **Gestión de Pacientes**: Historias clínicas electrónicas persistentes con SQLite.
-*   📊 **Dashboard de Control**: Vista rápida de la actividad clínica y métricas clave.
-*   ☁️ **Despliegue Listos para la Nube**: Configuración completa de Docker para GCP (Google Cloud Platform).
+*   **Registro por Voz**: Integración con **Vosk** (local) y **OpenAI Whisper** para transcripción ultra-precisa.
+*   **Odontograma Interactivo**: Representación visual de cada pieza dental con estados clínicos parametrizados (patologías en rojo, tratamientos en azul).
+*   **Autenticación con Google**: Inicio de sesión seguro integrado con Google OAuth 2.0.
+*   **Gestión de Pacientes**: Historias clínicas electrónicas persistentes con SQLite.
+*   **Dashboard de Control**: Vista rápida de la actividad clínica y métricas clave.
+*   **Despliegue Listos para la Nube**: Configuración completa de Docker para GCP (Google Cloud Platform).
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 ### Backend
 *   **FastAPI** (Python 3.10+): API de alto rendimiento.
@@ -34,7 +34,7 @@
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 voxdental/
@@ -57,7 +57,7 @@ voxdental/
 
 ---
 
-## 🚀 Configuración Local
+## Configuración Local
 
 ### 1. Variables de Entorno
 
@@ -111,7 +111,7 @@ npm run dev
 
 ---
 
-## 🐳 Docker y Despliegue
+## Docker y Despliegue
 
 ### Docker Compose (Local/Staging)
 Para levantar todo el stack (Backend + Frontend + Nginx):
@@ -128,7 +128,7 @@ El proyecto incluye un script automatizado para desplegar en una instancia de Co
 
 ---
 
-## 📋 Desarrollo y Guía Técnica
+## Desarrollo y Guía Técnica
 
 - **Lógica de Voz**: Revisa `src/services/vosk_service.py` y `src/services/whisper.py`.
 - **Componente Dental**: El núcleo de la interfaz está en `frontend/src/components/OdontogramView.jsx`.
@@ -136,7 +136,7 @@ El proyecto incluye un script automatizado para desplegar en una instancia de Co
 
 ---
 
-## 🤝 Contribución
+## Contribución
 
 1. Crea una rama para tu feature: `git checkout -b feature/nueva-funcionalidad`
 2. Realiza tus cambios y haz commit: `git commit -m "feat: descripción del cambio"`
@@ -144,4 +144,4 @@ El proyecto incluye un script automatizado para desplegar en una instancia de Co
 
 ---
 
-¡Diseñado con ❤️ por el equipo de Sui-VoxDental!
+¡Diseñado por el equipo de Sui-VoxDental!
