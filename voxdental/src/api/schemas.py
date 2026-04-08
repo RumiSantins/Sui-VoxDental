@@ -69,12 +69,14 @@ class ClinicalRecordSchema(BaseModel):
     patient_id: int
     timestamp: datetime
     findings: List[FindingSchema]
+    notes: Optional[dict] = None
 
     class Config:
         orm_mode = True
 
 class ClinicalRecordCreate(BaseModel):
     findings: List[FindingSchema]
+    notes: Optional[dict] = None
 
 class SpeechReportBase(BaseModel):
     transcript: str

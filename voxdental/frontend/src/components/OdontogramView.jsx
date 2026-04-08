@@ -186,6 +186,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                     if (records.length > 0) {
                         const latest = records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
                         setFindings(latest.findings || []);
+                        setNotes(latest.notes || {});
                     }
                 }
 
@@ -234,7 +235,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ findings })
+                    body: JSON.stringify({ findings, notes })
                 });
 
                 if (response.ok) {

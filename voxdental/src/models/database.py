@@ -38,6 +38,7 @@ class ClinicalRecord(Base):
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     timestamp = Column(DateTime, default=datetime.utcnow)
+    notes = Column(String, nullable=True) # Stores a JSON string of tooth notes: {"16": "notes...", ...}
     
     patient = relationship("Patient", back_populates="records")
     findings = relationship("ToothFinding", back_populates="record", cascade="all, delete-orphan")
