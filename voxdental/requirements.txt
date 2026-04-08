@@ -10,3 +10,5 @@ passlib[bcrypt]
 google-auth
 requests
 vosk
+python-dotenv
+aiofiles
