@@ -332,7 +332,15 @@ def get_patient_records(
     if not patient:
          raise HTTPException(status_code=404, detail="Paciente no encontrado")
          
-    return db.query(ClinicalRecord).filter(ClinicalRecord.patient_id == patient_id).all()
+    import json
+    records = db.query(ClinicalRecord).filter(ClinicalRecord.patient_id == patient_id).all()
+    for r in records:
+        if r.notes:
+            try:
+                r.notes = json.loads(r.notes)
+            except:
+                r.notes = None
+    return records
 
 @router.post("/patients/{patient_id}/records", response_model=ClinicalRecordSchema)
 def save_full_record(
@@ -341,13 +349,17 @@ def save_full_record(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    import json
     patient = db.query(Patient).filter(Patient.id == patient_id, Patient.user_id == current_user.id).first()
     if not patient:
          raise HTTPException(status_code=404, detail="Paciente no encontrado")
          
     # Optional logic: Delete previous records from today before saving?
     # For now, create a new snapshot history track
-    db_record = ClinicalRecord(patient_id=patient_id)
+    db_record = ClinicalRecord(
+        patient_id=patient_id,
+        notes=json.dumps(record_data.notes) if record_data.notes else None
+    )
     db.add(db_record)
     db.flush() 
     
