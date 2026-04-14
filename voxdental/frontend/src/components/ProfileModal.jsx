@@ -29,6 +29,7 @@ export const ProfileModal = ({ onClose }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [showPasswordFields, setShowPasswordFields] = useState(false);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -51,7 +52,7 @@ export const ProfileModal = ({ onClose }) => {
         setError(null);
         setSuccess(false);
 
-        if (password && password !== confirmPassword) {
+        if (showPasswordFields && password && password !== confirmPassword) {
             setError(t('profile.error_passwords_mismatch'));
             return;
         }
@@ -59,7 +60,7 @@ export const ProfileModal = ({ onClose }) => {
         setLoading(true);
         try {
             const body = { full_name: name, profile_image: avatar, gender: gender };
-            if (password) body.password = password;
+            if (showPasswordFields && password) body.password = password;
 
             const resp = await fetch('/api/v1/auth/me', {
                 method: 'PUT',
@@ -225,7 +226,7 @@ export const ProfileModal = ({ onClose }) => {
                         <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
                             <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 leading-none">{t('profile.voice_engine')}</p>
                             
-                            <div className="space-y-3 mb-4">
+                            <div className="space-y-3 mb-4 mt-3">
                                 <div className="flex gap-2">
                                     <button
                                         type="button"
@@ -233,7 +234,9 @@ export const ProfileModal = ({ onClose }) => {
                                             setSpeechEngine('vosk');
                                             setSpeechModel('vosk-model-small-es-0.42');
                                         }}
-                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-colors border ${speechEngine === 'vosk' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 hover:bg-slate-200 dark:hover:bg-zinc-900'}`}
+                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border ${speechEngine === 'vosk' 
+                                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                                            : 'bg-slate-100 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600'}`}
                                     >
                                         Vosk
                                     </button>
@@ -243,7 +246,9 @@ export const ProfileModal = ({ onClose }) => {
                                             setSpeechEngine('whisper');
                                             setSpeechModel('base');
                                         }}
-                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-colors border ${speechEngine === 'whisper' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 hover:bg-slate-200 dark:hover:bg-zinc-900'}`}
+                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border ${speechEngine === 'whisper' 
+                                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                                            : 'bg-slate-100 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600'}`}
                                     >
                                         Whisper
                                     </button>
@@ -276,20 +281,43 @@ export const ProfileModal = ({ onClose }) => {
 
                         {!user?.is_google && (
                             <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
-                                <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 leading-none">{t('profile.security')}</p>
-                                
-                                <div className="space-y-2">
-                                    <div className="relative">
-                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                        <input 
-                                            type="password" 
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-zinc-950/50 border border-transparent focus:border-blue-500 rounded-xl outline-none text-xs dark:text-white"
-                                            placeholder={t('profile.new_password')}
-                                        />
-                                    </div>
+                                <div className="flex items-center justify-between mb-3">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-blue-600 leading-none">{t('profile.security')}</p>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPasswordFields(!showPasswordFields)}
+                                        className="text-[10px] font-bold text-slate-400 hover:text-blue-500 transition-colors uppercase tracking-tight"
+                                    >
+                                        {showPasswordFields ? t('common.cancel') : t('auth.password')}?
+                                    </button>
                                 </div>
+                                
+                                {showPasswordFields && (
+                                    <div className="space-y-3 animate-in slide-in-from-top-1 duration-200">
+                                        <div className="relative">
+                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                            <input 
+                                                type="password" 
+                                                value={password}
+                                                autoComplete="new-password"
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                className="w-full pl-9 pr-4 py-2.5 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 focus:border-blue-500 dark:border-zinc-800 rounded-xl outline-none text-xs dark:text-white transition-colors"
+                                                placeholder={t('profile.new_password')}
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                            <input 
+                                                type="password" 
+                                                value={confirmPassword}
+                                                autoComplete="new-password"
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                className="w-full pl-9 pr-4 py-2.5 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 focus:border-blue-500 dark:border-zinc-800 rounded-xl outline-none text-xs dark:text-white transition-colors"
+                                                placeholder={t('profile.confirm_password')}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
