@@ -126,24 +126,45 @@ class WhisperService:
         if not model:
             return None
 
+        # Speed optimization: Use beam_size=1 on CPU for near-instant results
+        # Use beam_size=5 only on GPU for maximum precision
         is_gpu = self.device == "cuda"
+        
         segments, info = model.transcribe(
             tmp_path,
-            beam_size=1 if (is_gpu or "distil" in model_name.lower()) else 5,
+            beam_size=1 if (not is_gpu or "distil" in model_name.lower()) else 3,
             language="es",
             initial_prompt=prompt,
             vad_filter=True, 
-            vad_parameters=dict(min_silence_duration_ms=500),
+            vad_parameters=dict(min_silence_duration_ms=600), # Increased for dental pauses
             best_of=1
         )
-        return " ".join([seg.text for seg in segments]).strip()
+        
+        text = " ".join([seg.text for seg in segments]).strip()
+        
+        # Cleanup: Remove common "instructional" hallucinations
+        forbidden_phrases = [
+            "POR FAVOR TRANSCRIBE EN ESPAÑOL",
+            "Contexto: Odontología",
+            "Dientes:",
+            "Términos:",
+            "Habla en Español:"
+        ]
+        
+        for phrase in forbidden_phrases:
+            if phrase.lower() in text.lower():
+                # If the text is JUST the forbidden phrase or a variation, clear it
+                import re
+                text = re.sub(re.escape(phrase), "", text, flags=re.IGNORECASE).strip()
+        
+        return text
 
     async def transcribe(self, audio_file: BinaryIO, requested_model: str = None) -> str:
         """
         Transcribes audio to text using the user-requested model.
         """
         try:
-            model_to_use = requested_model or os.getenv("WHISPER_MODEL_DEFAULT", "large")
+            model_to_use = requested_model or os.getenv("WHISPER_MODEL_DEFAULT", "small")
             self._log(f"--- Nueva petición ({'API' if self.use_api else 'Local'}) - Modelo: {model_to_use} ---")
             
             content = await audio_file.read()
@@ -154,11 +175,10 @@ class WhisperService:
                 tmp_path = tmp.name
             
             dental_prompt = (
-                "POR FAVOR TRANSCRIBE EN ESPAÑOL. "
-                "Contexto: Odontología clínica. "
-                "Dientes: 11-18, 21-28, 31-38, 41-48. "
-                "Términos: caries, resina, amalgama, corona, endodoncia, conducto, ausencia, ausente, oclusal, mesial, distal. "
-                "Ejemplo: 'Caries mesial en el 14'."
+                "Transcripción dental clínica en español. "
+                "Piezas: 11, 12, 13, 14, 15, 16, 17, 18. "
+                "Hallazgos: caries, resina, amalgama, corona, endodoncia, ausencia, oclusal, mesial, distal. "
+                "Ejemplo: paciente presenta caries en cara oclusal del diente 14."
             )
 
             start_t = time.time()
