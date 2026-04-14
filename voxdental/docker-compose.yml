@@ -11,9 +11,17 @@ services:
     volumes:
       - ./voxdental.db:/app/voxdental.db
       - ./models:/app/models
+      - ./src:/app/src
     # Se recomienda .env solo para credenciales, pero docker-compose inyecta las variables también
     env_file:
       - .env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   frontend:
     build:

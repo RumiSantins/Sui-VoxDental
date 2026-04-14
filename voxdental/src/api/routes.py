@@ -243,7 +243,7 @@ async def process_voice_entry(
         raise HTTPException(status_code=404, detail="Paciente no encontrado")
     # 1. Transcribe
     if engine.lower() == "whisper":
-        transcription = await whisper_service.transcribe(file)
+        transcription = await whisper_service.transcribe(file, requested_model=model_name)
     else:
         transcription = await vosk_service.transcribe(file, model_name)
     
@@ -438,41 +438,46 @@ async def upload_tooth_media(
     thumbnail_path = None
     thumbnail_path = None
     
-    ffmpeg_exe = r"C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg.EXE"
+    ffmpeg_exe = "ffmpeg"
+    try:
+        import imageio_ffmpeg
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        # Fallback to system ffmpeg
+        pass
     
     if file_type == "video":
         thumb_name = f"thumb_{final_name.split('.')[0]}.jpg"
         thumb_dest = media_dir / thumb_name
         
-        if os.path.exists(ffmpeg_exe):
-            try:
-                # INSTANT REMUX: Move metadata to front (+faststart) without re-encoding (-c copy)
-                # This makes 300MB videos play instantly in the browser without quality loss.
-                subprocess.run([
-                    ffmpeg_exe, "-y", "-i", str(raw_path), 
-                    "-c", "copy", "-movflags", "+faststart", 
-                    str(final_path)
-                ], capture_output=True, check=False)
+        # Check if ffmpeg exists or just try (in Linux/Docker 'ffmpeg' is in PATH)
+        try:
+            # INSTANT REMUX: Move metadata to front (+faststart) without re-encoding (-c copy)
+            # This makes 300MB videos play instantly in the browser without quality loss.
+            subprocess.run([
+                ffmpeg_exe, "-y", "-i", str(raw_path), 
+                "-c", "copy", "-movflags", "+faststart", 
+                str(final_path)
+            ], capture_output=True, check=False)
+            
+            # STEP 2: CREATE THUMBNAIL (Ultra fast seek)
+            subprocess.run([
+                ffmpeg_exe, "-ss", "00:00:01", "-y", "-i", str(final_path if final_path.exists() else raw_path), 
+                "-vframes", "1", "-q:v", "4", str(thumb_dest)
+            ], capture_output=True, check=False)
+            
+            if thumb_dest.exists():
+                thumbnail_path = f"/api/v1/media/stream/{thumb_name}"
                 
-                # STEP 2: CREATE THUMBNAIL (Ultra fast seek)
-                subprocess.run([
-                    ffmpeg_exe, "-ss", "00:00:01", "-y", "-i", str(final_path if final_path.exists() else raw_path), 
-                    "-vframes", "1", "-q:v", "4", str(thumb_dest)
-                ], capture_output=True, check=False)
+            # Clean up raw if remux worked
+            if final_path.exists():
+                os.remove(raw_path)
+            else:
+                raw_path.rename(final_path)
                 
-                if thumb_dest.exists():
-                    thumbnail_path = f"/static/media/{thumb_name}"
-                    
-                # Clean up raw if remux worked
-                if final_path.exists():
-                    os.remove(raw_path)
-                else:
-                    # If remux failed, use raw as final
-                    raw_path.rename(final_path)
-                    
-            except Exception as e:
-                print(f"Video processing failed: {e}")
-                if not final_path.exists(): raw_path.rename(final_path)
+        except Exception as e:
+            print(f"Video processing failed: {e}")
+            if not final_path.exists(): raw_path.rename(final_path)
     else:
         # It's an image, just rename raw to final
         raw_path.rename(final_path)
@@ -481,7 +486,7 @@ async def upload_tooth_media(
         user_id=current_user.id,
         patient_id=patient_id,
         tooth_number=tooth_number,
-        file_path=f"/static/media/{final_name}",
+        file_path=f"/api/v1/media/stream/{final_name}",
         file_type=file_type,
         thumbnail_path=thumbnail_path
     )
@@ -499,6 +504,86 @@ async def upload_tooth_media(
         created_at=db_media.created_at
     )
 
+@router.get("/media/stream/{filename}")
+async def stream_media(filename: str, request: Request):
+    """
+    Serves images and videos with proper Range Request support (essential for iOS/Safari).
+    """
+    import mimetypes
+    # Use self-referencing path to find project root reliably inside Docker
+    # __file__ is /app/src/api/routes.py -> parents[2] is /app
+    base_dir = Path(__file__).parents[2] / "static" / "media"
+    file_path = base_dir / filename
+    
+    # DEBUG: Print exact path check to server console
+    print(f"DEBUG Media Request: {filename}")
+    print(f"DEBUG Checking path: {file_path.absolute()}")
+    print(f"|-- Exists: {file_path.exists()}")
+
+    # FALLBACK: If the processed file doesn't exist but the 'raw_' version does, serve that.
+    if not file_path.exists() and filename.endswith(".mp4") and not filename.startswith("raw_"):
+        raw_filename = f"raw_{filename}"
+        if (base_dir / raw_filename).exists():
+            file_path = base_dir / raw_filename
+            print(f"|-- Found Raw Fallback: {file_path}")
+
+    if not file_path.exists():
+        print(f"|-- ERROR: 404 Not Found")
+        raise HTTPException(status_code=404, detail=f"File not found on server at: {file_path}")
+    
+    content_type, _ = mimetypes.guess_type(str(file_path))
+    if not content_type:
+        content_type = "application/octet-stream"
+    
+    file_size = file_path.stat().st_size
+    range_header = request.headers.get("range")
+    
+    if not range_header or content_type.startswith("image/"):
+        # Simple serve for images or requests without Range
+        def iterfile():
+            with open(file_path, mode="rb") as file_like:
+                yield from file_like
+        
+        return StreamingResponse(
+            iterfile(), 
+            media_type=content_type,
+            headers={"Content-Length": str(file_size)}
+        )
+    
+    # Handle Video Range Requests
+    try:
+        # Example browser header: "bytes=0-100"
+        bytes_range = range_header.replace("bytes=", "").split("-")
+        start = int(bytes_range[0])
+        end = int(bytes_range[1]) if bytes_range[1] else file_size - 1
+        
+        if start >= file_size:
+            raise HTTPException(status_code=416, detail="Requested Range Not Satisfiable")
+        
+        chunk_size = (end - start) + 1
+        
+        def iter_video_chunk():
+            with open(file_path, mode="rb") as f:
+                f.seek(start)
+                yield f.read(chunk_size)
+        
+        return StreamingResponse(
+            iter_video_chunk(),
+            status_code=206, # Partial Content
+            media_type=content_type,
+            headers={
+                "Content-Range": f"bytes {start}-{end}/{file_size}",
+                "Accept-Ranges": "bytes",
+                "Content-Length": str(chunk_size)
+            }
+        )
+    except Exception:
+        # Fallback to full file if range parsing fails
+        def iterfile():
+            with open(file_path, mode="rb") as file_like:
+                yield from file_like
+        return StreamingResponse(iterfile(), media_type=content_type)
+
 @router.get("/patients/{patient_id}/media/{tooth_number}", response_model=List[ToothMediaSchema])
 def get_tooth_media(
     patient_id: int,
@@ -512,7 +597,13 @@ def get_tooth_media(
         ToothMedia.tooth_number == tooth_number
     ).all()
     
-    ffmpeg_exe = r"C:\Users\rumi0\anaconda3\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg.EXE"
+    # Use dynamic ffmpeg logic for consistency
+    ffmpeg_exe = "ffmpeg"
+    try:
+        import imageio_ffmpeg
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        pass
     
     # Reparador de miniaturas (para videos viejos o fallidos)
     for m in media_list:
@@ -533,6 +624,13 @@ def get_tooth_media(
                         db.commit()
                 except Exception as e:
                     print(f"Shadow thumbnail repair failed for {m.id}: {e}")
+
+    # Ensure all urls use the streaming gateway
+    for m in media_list:
+        if m.file_path.startswith("/static/media/"):
+            m.file_path = m.file_path.replace("/static/media/", "/api/v1/media/stream/")
+        if m.thumbnail_path and m.thumbnail_path.startswith("/static/media/"):
+            m.thumbnail_path = m.thumbnail_path.replace("/static/media/", "/api/v1/media/stream/")
 
     return [ToothMediaSchema(
         id=m.id,

@@ -1,3 +1,6 @@
-
 static/media/
+models/
 *.db
+.env
+node_modules/
+dist/

@@ -230,8 +230,8 @@ export const ManualEntryModal = React.memo(({
                             <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
                                 {media.map((m) => {
                                     const thumbSrc = m.thumbnail_url
-                                        ? `/api/v1/stream/${m.thumbnail_url.split('/').pop()}`
-                                        : `/api/v1/stream/${m.file_url.split('/').pop()}`;
+                                        ? `/api/v1/media/stream/${m.thumbnail_url.split('/').pop()}`
+                                        : `/api/v1/media/stream/${m.file_url.split('/').pop()}`;
                                     return (
                                         <div 
                                             key={m.id} 
@@ -285,7 +285,7 @@ export const ManualEntryModal = React.memo(({
                             <div className="relative max-w-7xl max-h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
                                 {selectedMedia.file_type === 'image' ? (
                                     <img 
-                                        src={`/api/v1/stream/${selectedMedia.file_url.split('/').pop()}`}
+                                        src={`/api/v1/media/stream/${selectedMedia.file_url.split('/').pop()}`}
                                         alt="Fullscreen view" 
                                         className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl"
                                     />
@@ -300,7 +300,7 @@ export const ManualEntryModal = React.memo(({
                                             preload="metadata"
                                             playsInline
                                             className="w-full h-full relative z-10"
-                                            src={`/api/v1/stream/${selectedMedia.file_url.split('/').pop()}`}
+                                            src={`/api/v1/media/stream/${selectedMedia.file_url.split('/').pop()}`}
                                             onLoadedData={(e) => e.target.style.opacity = 1}
                                             onError={(e) => console.error('Video error:', e)}
                                             style={{ opacity: 0, transition: 'opacity 0.3s' }}

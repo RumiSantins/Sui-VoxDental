@@ -13,5 +13,10 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    target: 'es2020',
+    cssTarget: 'chrome80', // Ensures Tailwind 4 compatibility on older browsers
+    minify: 'esbuild'
   }
 })

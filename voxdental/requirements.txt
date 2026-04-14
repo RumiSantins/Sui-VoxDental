@@ -4,6 +4,8 @@ sqlalchemy>=2.0.25
 pydantic>=2.6.0
 python-multipart>=0.0.7
 openai-whisper
+openai
+faster-whisper
 imageio-ffmpeg
 python-jose[cryptography]
 passlib[bcrypt]
@@ -12,3 +14,6 @@ requests
 vosk
 python-dotenv
 aiofiles
+torch --index-url https://download.pytorch.org/whl/cu121
+nvidia-cublas-cu12
+nvidia-cudnn-cu12

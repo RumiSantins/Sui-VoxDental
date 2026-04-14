@@ -1,56 +1,39 @@
-import whisper
 import os
 import tempfile
 import time
+import asyncio
 from typing import BinaryIO
 import warnings
 import shutil
-import sys
+import dotenv
+
+# Load environment variables
+dotenv.load_dotenv()
 
 # Filter harmless warnings
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", category=UserWarning)
 
 class WhisperService:
     def __init__(self):
-        self.model = None
-        self.use_mock = False
-        # Move log file to a more reliable location if needed, but root is fine
         self.log_file = os.path.join(os.getcwd(), "whisper_debug.log")
+        self._log("--- INICIANDO WHISPERSERVICE (V6 Zero-Latency Startup) ---")
         
-        # Ensure log file starts fresh or at least exists
-        self._log("--- INICIANDO WHISPERSERVICE (Tiny Model Override) ---")
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        self.client = None
+        self.models_cache = {} 
+        self.use_api = False
+        self.device = "cpu"
+        self.compute_type = "int8"
+        self._gpu_detected = None # Lazy detection
 
-        # --- FFMPEG ROBUST INJECTION ---
-        try:
-            import imageio_ffmpeg
-            source_exe = imageio_ffmpeg.get_ffmpeg_exe()
-            self._log(f"FFMPEG Source path: {source_exe}")
-            source_dir = os.path.dirname(source_exe)
-            
-            # Add to PATH for this process
-            if source_dir not in os.environ["PATH"]:
-                os.environ["PATH"] += os.pathsep + source_dir
-            
-            if shutil.which("ffmpeg"):
-                self._log(f"FFMPEG Detectado: {shutil.which('ffmpeg')}")
-            else:
-                self._log("FFMPEG ERROR: 'ffmpeg' no encontrado en el PATH después de inyección.")
-
-        except Exception as e:
-            self._log(f"ERROR configurando FFMPEG: {e}")
-
-        # --- WHISPER LOAD ---
-        self._log("Cargando modelo Whisper 'base' (más preciso para odontología)...")
-        try:
-            # Fix OMP error here just in case
-            os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-            
-            start_load = time.time()
-            self.model = whisper.load_model("base")
-            self._log(f"Modelo Whisper cargado en {time.time() - start_load:.2f}s.")
-        except Exception as e:
-            self._log(f"ERROR FATAL cargando modelo: {e}")
-            self.use_mock = True
+        if self.api_key and self.api_key.strip():
+            from openai import AsyncOpenAI
+            try:
+                self.client = AsyncOpenAI(api_key=self.api_key)
+                self.use_api = True
+                self._log("MODO DETECTADO: OpenAI API (Máxima precisión activada)")
+            except Exception as e:
+                self._log(f"Error inicializando OpenAI Client: {e}")
 
     def _log(self, message: str):
         try:
@@ -61,65 +44,164 @@ class WhisperService:
             pass
         print(message)
 
-    async def transcribe(self, audio_file: BinaryIO) -> str:
-        """
-        Transcribes audio to text using Whisper with detailed logging.
-        """
-        if self.use_mock or not self.model:
-            self._log("TRANSCRIPCION ABORTADA: Modelo no cargado.")
-            return "ERROR: El sistema de voz no está activo."
-
-        try:
-            self._log("--- Nueva petición de transcripción recibida ---")
+    def _detect_gpu(self):
+        """Lazy detection of GPU to avoid blocking server startup."""
+        if self._gpu_detected is not None:
+            return self._gpu_detected
             
-            # Read audio content
-            content = await audio_file.read()
-            if not content:
-                self._log("ADVERTENCIA: Audio vacío recibido.")
-                return ""
+        self._log("Detectando aceleración por hardware...")
+        try:
+            import torch
+            if torch.cuda.is_available():
+                self.device = "cuda"
+                self.compute_type = "float16"
+                self._gpu_detected = True
+                self._log("DISPOSITIVO DETECTADO: CUDA (GPU Turbo Activo)")
+            else:
+                self._gpu_detected = False
+                self._log("DISPOSITIVO DETECTADO: CPU")
+        except:
+            self._gpu_detected = False
+            self._log("DISPOSITIVO DETECTADO: CPU (Torch no disponible)")
+        
+        return self._gpu_detected
 
-            # Save to temporary file
+    def _inject_cuda_libs(self):
+        """Allows Python to find CUDA libs installed via pip (Lazy)."""
+        try:
+            import nvidia.cublas.lib
+            import nvidia.cudnn.lib
+            
+            cublas_path = os.path.dirname(nvidia.cublas.lib.__file__)
+            cudnn_path = os.path.dirname(nvidia.cudnn.lib.__file__)
+            
+            # Add to LD_LIBRARY_PATH in the current process
+            paths = [cublas_path, cudnn_path]
+            existing = os.environ.get("LD_LIBRARY_PATH", "")
+            for p in paths:
+                if p not in existing:
+                    existing = f"{p}:{existing}" if existing else p
+            
+            os.environ["LD_LIBRARY_PATH"] = existing
+            return True
+        except:
+            return False
+
+    def _get_local_model(self, model_size: str):
+        """Loads or retrieves a model from cache (Lazy)."""
+        from faster_whisper import WhisperModel
+        
+        # 4060 Optimization: Map standard models to Distilled versions for speed
+        model_map = {
+            "large": "systran/faster-distil-whisper-large-v3",
+            "large-v3": "systran/faster-distil-whisper-large-v3",
+            "medium": "medium", 
+            "small": "small",
+            "base": "base"
+        }
+        
+        target_model = model_map.get(model_size.lower(), model_size)
+        
+        if target_model not in self.models_cache:
+            self._inject_cuda_libs()
+            self._detect_gpu()
+            self._log(f"Cargando modelo '{target_model}' en {self.device}...")
+            try:
+                self.models_cache[target_model] = WhisperModel(
+                    target_model, 
+                    device=self.device, 
+                    compute_type=self.compute_type,
+                    download_root=os.path.join(os.getcwd(), "models", "whisper")
+                )
+                self._log(f"Modelo '{target_model}' listo.")
+            except Exception as e:
+                self._log(f"ERROR cargando '{target_model}': {e}")
+                return None
+        
+        return self.models_cache[target_model]
+
+    def _sync_transcribe_local(self, tmp_path: str, prompt: str, model_name: str):
+        """Synchronous part of transcription optimized for quality and speed."""
+        model = self._get_local_model(model_name)
+        if not model:
+            return None
+
+        is_gpu = self.device == "cuda"
+        segments, info = model.transcribe(
+            tmp_path,
+            beam_size=1 if (is_gpu or "distil" in model_name.lower()) else 5,
+            language="es",
+            initial_prompt=prompt,
+            vad_filter=True, 
+            vad_parameters=dict(min_silence_duration_ms=500),
+            best_of=1
+        )
+        return " ".join([seg.text for seg in segments]).strip()
+
+    async def transcribe(self, audio_file: BinaryIO, requested_model: str = None) -> str:
+        """
+        Transcribes audio to text using the user-requested model.
+        """
+        try:
+            model_to_use = requested_model or os.getenv("WHISPER_MODEL_DEFAULT", "large")
+            self._log(f"--- Nueva petición ({'API' if self.use_api else 'Local'}) - Modelo: {model_to_use} ---")
+            
+            content = await audio_file.read()
+            if not content: return ""
+
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
                 tmp.write(content)
                 tmp_path = tmp.name
             
-            self._log(f"Audio temporal: {tmp_path} ({len(content)} bytes)")
-            
-            # Dental context prompt (Expanded with numbers to bias the model)
             dental_prompt = (
-                "Odontograma dental: 11, 12, 13, 14, 15, 16, 17, 18, "
-                "21, 22, 23, 24, 25, 26, 27, 28, "
-                "31, 32, 33, 34, 35, 36, 37, 38, "
-                "41, 42, 43, 44, 45, 46, 47, 48. "
-                "Comandos: caries, resina, amalgama, corona, endodoncia, conducto, ausencia, ausente, "
-                "borrar, limpiar, oclusal, incisal, vestibular, lingual, palatina, mesial, distal."
+                "POR FAVOR TRANSCRIBE EN ESPAÑOL. "
+                "Contexto: Odontología clínica. "
+                "Dientes: 11-18, 21-28, 31-38, 41-48. "
+                "Términos: caries, resina, amalgama, corona, endodoncia, conducto, ausencia, ausente, oclusal, mesial, distal. "
+                "Ejemplo: 'Caries mesial en el 14'."
             )
-            
-            self._log("Llamando a model.transcribe (esto puede tardar unos segundos)...")
+
             start_t = time.time()
-            
-            # Final transcription call optimized for SPEED
-            result = self.model.transcribe(
-                tmp_path, 
-                language="es", 
-                fp16=False, 
-                initial_prompt=dental_prompt,
-                temperature=0       # Greedy decoding (fastest) with deterministic results
-            )
-            
+            text = ""
+
+            if self.use_api:
+                try:
+                    from openai import AsyncOpenAI
+                    with open(tmp_path, "rb") as audio:
+                        response = await asyncio.wait_for(
+                            self.client.audio.transcriptions.create(
+                                model="whisper-1",
+                                file=audio,
+                                prompt=f"Habla en Español: {dental_prompt}",
+                                language="es",
+                                temperature=0
+                            ),
+                            timeout=1.5
+                        )
+                    text = response.text
+                except Exception as api_err:
+                    err_msg = str(api_err).lower()
+                    if "429" in err_msg or "insufficient_quota" in err_msg:
+                        self.use_api = False
+                        self._log("CIRCUIT BREAKER: Quota OpenAI agotada.")
+                    else:
+                        self._log(f"FALLO API ({api_err}). Reintentando local...")
+                    
+                    text = await asyncio.to_thread(self._sync_transcribe_local, tmp_path, dental_prompt, model_to_use)
+            else:
+                text = await asyncio.to_thread(self._sync_transcribe_local, tmp_path, dental_prompt, model_to_use)
+
             duration = time.time() - start_t
-            text = result.get("text", "").strip()
+            self._log(f"Transcripción ({duration:.2f}s): '{text}'")
             
-            self._log(f"Transcripción exitosa en {duration:.2f}s: '{text}'")
+            if text:
+                text = text.replace("Carries", "Caries").replace("Carri is", "Caries").replace("the 14", "la 14")
+
+            try: os.remove(tmp_path)
+            except: pass
             
-            # Cleanup
-            try:
-                os.remove(tmp_path)
-            except:
-                pass
-            
-            return text
+            return text or ""
             
         except Exception as e:
-            self._log(f"ERROR CRITICO en transcribe: {e}")
-            return f"Error procesando audio: {str(e)}"
+            self._log(f"ERROR: {e}")
+            return f"Error: {str(e)}"
