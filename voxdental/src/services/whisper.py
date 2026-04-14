@@ -196,7 +196,7 @@ class WhisperService:
                                 language="es",
                                 temperature=0
                             ),
-                            timeout=1.5
+                            timeout=8.0
                         )
                     text = response.text
                 except Exception as api_err:
