@@ -175,6 +175,35 @@ def extract_findings_from_text(text: str, context_tooth: Optional[int] = None) -
 
     acronym_replacements = generate_acronyms()
 
+    # --- New: Map Full Keywords to Acronyms for Natural Language Support ---
+    # Conditions
+    cond_words = {
+        "resina": "R", "caries": "C", "amalgama": "A", "endodoncia": "E",
+        "extracción": "EX", "extraer": "EX", "corona": "CR", "ausente": "X",
+        "ausencia": "X", "borrar": "B", "limpiar": "B"
+    }
+    # Surfaces
+    surf_words = {
+        "oclusal": "O", "incisal": "I", "mesial": "M", "distal": "D",
+        "vestibular": "V", "palatina": "P", "lingual": "L"
+    }
+
+    # Use a two-pass approach to handle phrases like "caries mesial" efficiently
+    # First, handle composite phrases (Condition + Surface)
+    for c_word, c_acr in cond_words.items():
+        for s_word, s_acr in surf_words.items():
+            # Match "caries mesial", "resina distal", etc.
+            pattern = fr"\b{c_word}\s+{s_word}\b"
+            normalized_text = re.sub(pattern, f"ACRONYM_{c_acr}{s_acr}", normalized_text)
+            # Match inverse "mesial caries" (less common but possible)
+            pattern_inv = fr"\b{s_word}\s+{c_word}\b"
+            normalized_text = re.sub(pattern_inv, f"ACRONYM_{c_acr}{s_acr}", normalized_text)
+
+    # Second, handle standalone conditions (some imply a default surface later in logic)
+    for word, acr in cond_words.items():
+        # Match only if not already part of an ACRONYM_ token
+        normalized_text = re.sub(fr"\b{word}\b(?!\s*[_])", f"ACRONYM_{acr}", normalized_text)
+
     for pattern, replacement in acronym_replacements:
         normalized_text = re.sub(pattern, replacement, normalized_text)
 
@@ -187,21 +216,29 @@ def extract_findings_from_text(text: str, context_tooth: Optional[int] = None) -
         if not condition_std:
             continue
             
-        start_idx = match.end()
-        end_idx = acronym_matches[i+1].start() if i+1 < len(acronym_matches) else len(normalized_text)
-        segment = normalized_text[start_idx:end_idx]
+        # Segment between this acronym and the next one
+        curr_start = match.start()
+        curr_end = match.end()
+        next_start = acronym_matches[i+1].start() if i+1 < len(acronym_matches) else len(normalized_text)
+        prev_end = acronym_matches[i-1].end() if i > 0 else 0
         
-        teeth_matches = re.findall(r"\b([1-4][1-8])\b", segment)
-        teeth = [m for m in teeth_matches]
+        # Look for teeth in:
+        # A. Segment AFTER acronym (Traditional: "X 26")
+        segment_after = normalized_text[curr_end:next_start]
+        # B. Segment BEFORE acronym (Natural: "26 ausente")
+        segment_before = normalized_text[prev_end:curr_start]
         
-        # Look ahead for teeth if none in current segment
+        teeth_matches = re.findall(r"\b([1-4][1-8])\b", segment_after + " " + segment_before)
+        teeth = list(dict.fromkeys(teeth_matches)) # Unique preserving order
+        
+        # Look even further ahead if still empty
         if not teeth and i + 1 < len(acronym_matches):
-            next_start = acronym_matches[i+1].end()
-            next_end = acronym_matches[i+2].start() if i+2 < len(acronym_matches) else len(normalized_text)
-            next_segment = normalized_text[next_start:next_end]
-            teeth_matches_next = re.findall(r"\b([1-4][1-8])\b", next_segment)
-            if teeth_matches_next:
-                 teeth = teeth_matches_next
+            future_start = acronym_matches[i+1].end()
+            future_end = acronym_matches[i+2].start() if i+2 < len(acronym_matches) else len(normalized_text)
+            segment_future = normalized_text[future_start:future_end]
+            teeth_matches_future = re.findall(r"\b([1-4][1-8])\b", segment_future)
+            if teeth_matches_future:
+                 teeth = teeth_matches_future
                  
         if not teeth and context_tooth:
             teeth = [str(context_tooth)]

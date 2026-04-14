@@ -1,0 +1,10 @@
+swagger: "2.0"
+info:
+  description: "DNS Configuration for VoxDental"
+  title: "VoxDental DNS"
+  version: "1.0.0"
+host: "voxdental.endpoints.sui-production-492623.cloud.goog"
+x-google-endpoints:
+- name: "voxdental.endpoints.sui-production-492623.cloud.goog"
+  target: "35.202.203.240"
+paths: {}
