@@ -8,19 +8,27 @@ Este plan detalla los pasos para subir la aplicación corregida a Google Cloud P
 
 ## Pasos para la Ejecución
 
-### 1. Preparación del Entorno
+### 1. Preparación del Envornon
 Asegúrate de estar en la rama correcta y de que no haya conflictos:
 ```bash
-git checkout main
-git pull origin main
+git checkout master
+git pull origin master
 ```
 
 ### 2. Ejecución del Script de Despliegue
-Navega a la carpeta del backend/raíz y ejecuta el script automatizado:
+Navega a la carpeta del backend/raíz y ejecuta el script automatizado.
+
+**Si estás en Linux/Mac/Git Bash:**
 ```bash
 cd voxdental
 chmod +x deploy-gcp.sh
 ./deploy-gcp.sh
+```
+
+**Si estás en Windows (PowerShell):**
+```powershell
+cd voxdental
+sh deploy-gcp.sh
 ```
 *Este script se encarga de: Construir las imágenes de Docker (Frontend y Backend), subirlas a Artifact Registry y actualizar el servicio en Cloud Run.*
 
