@@ -7,6 +7,7 @@ import { ManualEntryModal } from './ManualEntryModal';
 import { ClinicalRecordModal } from './ClinicalRecordModal';
 import { SpeechReportModal } from './SpeechReportModal';
 import { useLanguage } from '../context/LanguageContext';
+import { isSurfaceValid } from '../utils/toothConfig';
 
 // 1. VolumeMeter isolated to prevent high-frequency re-renders of the whole view
 const VolumeMeter = memo(({ volume, isRecording }) => {
@@ -314,19 +315,38 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
             return;
         }
         if (data.findings && data.findings.length > 0) {
-            setFindings(prev => {
-                let nextFindings = [...prev];
-                data.findings.forEach(newFinding => {
-                    if (newFinding.condition === 'borrar') {
-                        nextFindings = nextFindings.filter(f => f.tooth_number !== newFinding.tooth_number);
-                    } else if (newFinding.condition.startsWith('borrar_')) {
-                        const conditionToTarget = newFinding.condition.replace('borrar_', '');
-                        nextFindings = nextFindings.filter(f => !(f.tooth_number === newFinding.tooth_number && f.condition === conditionToTarget));
-                    } else { nextFindings.push(newFinding); }
-                });
-                return nextFindings;
+            const validFindings = [];
+            let hasInvalidSurface = false;
+            
+            data.findings.forEach(f => {
+                if (f.surface && f.surface !== 'pieza' && !isSurfaceValid(f.tooth_number, f.surface)) {
+                    hasInvalidSurface = true;
+                } else {
+                    validFindings.push(f);
+                }
             });
-            playFeedbackSound('success');
+            
+            if (hasInvalidSurface) {
+                setWarnings(prev => [...(prev || []), "Aviso: Este diente no posee esa cara"]);
+                playFeedbackSound('error');
+                setTimeout(() => setWarnings([]), 3000);
+            }
+
+            if (validFindings.length > 0) {
+                setFindings(prev => {
+                    let nextFindings = [...prev];
+                    validFindings.forEach(newFinding => {
+                        if (newFinding.condition === 'borrar') {
+                            nextFindings = nextFindings.filter(f => f.tooth_number !== newFinding.tooth_number);
+                        } else if (newFinding.condition.startsWith('borrar_')) {
+                            const conditionToTarget = newFinding.condition.replace('borrar_', '');
+                            nextFindings = nextFindings.filter(f => !(f.tooth_number === newFinding.tooth_number && f.condition === conditionToTarget));
+                        } else { nextFindings.push(newFinding); }
+                    });
+                    return nextFindings;
+                });
+                playFeedbackSound('success');
+            }
 
             // Track which teeth were touched to show verification
             if (data.findings && data.findings.length > 0) {
@@ -701,6 +721,11 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                         <span className="text-[10px] flex items-center gap-1.5 text-orange-500/80 dark:text-orange-400/80 font-bold uppercase tracking-tight">
                             <AlertCircle size={12} /> {t('odontogram.ai_warning')}
                         </span>
+                        {warnings && warnings.length > 0 && (
+                            <div className="mt-2 text-red-500 text-xs font-bold bg-red-50 p-2 rounded-lg">
+                                {warnings.map((w, idx) => <p key={idx}>{w}</p>)}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

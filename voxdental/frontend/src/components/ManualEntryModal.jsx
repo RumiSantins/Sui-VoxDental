@@ -4,6 +4,7 @@ import { MessageSquare, Camera, Upload, Trash2, Loader2, Play } from 'lucide-rea
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { isSurfaceValid } from '../utils/toothConfig';
 
 export const ManualEntryModal = React.memo(({ 
     toothNumber, 
@@ -22,6 +23,12 @@ export const ManualEntryModal = React.memo(({
     const [selectedSurface, setSelectedSurface] = useState(null);
     const [localFindings, setLocalFindings] = useState([]);
     const [tempNoteText, setTempNoteText] = useState("");
+    const [toastMsg, setToastMsg] = useState(null);
+    
+    const showWarning = (msg) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(null), 3000);
+    };
     
     // Media States
     const [media, setMedia] = useState([]);
@@ -125,6 +132,13 @@ export const ManualEntryModal = React.memo(({
                     </button>
                 </div>
 
+                {/* Warning Toast */}
+                {toastMsg && (
+                    <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-full font-bold shadow-lg z-50 animate-in fade-in slide-in-from-top-4">
+                        {toastMsg}
+                    </div>
+                )}
+
                 <div className="flex-1 overflow-y-auto p-8 space-y-8">
                     {/* Surface Selection */}
                     <section>
@@ -163,6 +177,13 @@ export const ManualEntryModal = React.memo(({
                                         key={item.id}
                                         disabled={isDisabled}
                                         onClick={() => {
+                                            if (selectedSurface && selectedSurface !== 'pieza') {
+                                                if (!isSurfaceValid(toothNumber, selectedSurface)) {
+                                                    showWarning("Este diente no posee esa cara");
+                                                    return;
+                                                }
+                                            }
+
                                             setLocalFindings(prev => {
                                                 if (item.id === 'borrar') {
                                                     if (selectedSurface === 'pieza') return [];

@@ -183,10 +183,10 @@ export const ClinicalRecordModal = React.memo(({
                                     const isCrown = findings.some(f => f.condition === 'corona');
 
                                     const entireToothLabels = [];
-                                    if (isMissing) entireToothLabels.push(t('legend.missing'));
-                                    if (isExtracted) entireToothLabels.push(t('legend.extract'));
-                                    if (isEndodontic) entireToothLabels.push(t('legend.endo'));
-                                    if (isCrown) entireToothLabels.push(t('legend.crown'));
+                                    if (isMissing) entireToothLabels.push(legendItems.find(i => i.id === 'ausente'));
+                                    if (isExtracted) entireToothLabels.push(legendItems.find(i => i.id === 'extraer'));
+                                    if (isEndodontic) entireToothLabels.push(legendItems.find(i => i.id === 'endodoncia'));
+                                    if (isCrown) entireToothLabels.push(legendItems.find(i => i.id === 'corona'));
 
                                     const surfaceFindings = findings.filter(f => !['ausente', 'extraer', 'endodoncia', 'corona'].includes(f.condition));
 
@@ -203,8 +203,8 @@ export const ClinicalRecordModal = React.memo(({
                                                 {entireToothLabels.length > 0 && (
                                                     <div className="mb-3">
                                                         <div className="flex flex-wrap gap-2">
-                                                            {entireToothLabels.map(lbl => (
-                                                                <span key={lbl} className="px-2 py-0.5 bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300 rounded text-[11px] font-bold uppercase tracking-wider print-badge">{lbl}</span>
+                                                            {entireToothLabels.filter(Boolean).map(item => (
+                                                                <span key={item.id} style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }} className="px-2 py-0.5 border rounded text-[11px] font-bold uppercase tracking-wider print-badge">{item.label}</span>
                                                             ))}
                                                         </div>
                                                     </div>

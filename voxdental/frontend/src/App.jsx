@@ -85,6 +85,18 @@ function AppContent() {
     return localStorage.getItem('theme') === 'dark'
   })
   const [selectedPatient, setSelectedPatient] = useState(null)
+  
+  const [speechEngine, setSpeechEngine] = useState(() => localStorage.getItem('speechEngine') || 'vosk')
+  const [speechModel, setSpeechModel] = useState(() => localStorage.getItem('speechModel') || 'vosk-model-small-es-0.42')
+
+  useEffect(() => {
+    if (!showProfile) {
+      setSpeechEngine(localStorage.getItem('speechEngine') || 'vosk');
+      setSpeechModel(localStorage.getItem('speechModel') || 'vosk-model-small-es-0.42');
+    }
+  }, [showProfile]);
+
+  const showWhisperBadge = !(speechEngine === 'whisper' && speechModel === 'base');
 
   useEffect(() => {
     if (darkMode) {
@@ -162,9 +174,11 @@ function AppContent() {
                   >
                     <Settings size={14} />
                   </button>
-                  <span className="inline-flex px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter rounded-md border border-amber-200 dark:border-amber-800/50 animate-pulse shadow-sm whitespace-nowrap">
-                    Whisper Base recomendado
-                  </span>
+                  {showWhisperBadge && (
+                    <span className="inline-flex px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter rounded-md border border-amber-200 dark:border-amber-800/50 animate-pulse shadow-sm whitespace-nowrap">
+                      Whisper Base recomendado
+                    </span>
+                  )}
 
                 </div>
                 <p className="text-[10px] sm:text-xs text-slate-500 font-semibold tracking-tight truncate max-w-[150px] sm:max-w-none mt-0.5">

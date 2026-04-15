@@ -35,6 +35,19 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         let logoutTimer;
+        let idleTimer;
+        
+        const resetIdleTimer = () => {
+            if (idleTimer) clearTimeout(idleTimer);
+            // 20 minutes inactivity timeout
+            if (token) {
+                idleTimer = setTimeout(() => {
+                    console.log("Session timeout due to inactivity. Logging out...");
+                    logout();
+                }, 20 * 60 * 1000); 
+            }
+        };
+
         if (token) {
             try {
                 const decoded = jwtDecode(token);
@@ -43,21 +56,32 @@ export const AuthProvider = ({ children }) => {
                 
                 if (expirationTime < currentTime) {
                     logout();
+                    return; // Prevent adding listeners if already logged out
                 } else {
-                    // Set a timer to logout automatically when the token expires
                     const timeRemaining = expirationTime - currentTime;
                     logoutTimer = setTimeout(() => {
                         console.log("Token expired. Logging out...");
                         logout();
                     }, timeRemaining);
                 }
+
+                resetIdleTimer();
+
+                const events = ['mousedown', 'keydown', 'touchstart', 'scroll'];
+                // Throttle event logic slightly by letting resetIdleTimer handle simple clears
+                const handleActivity = () => resetIdleTimer();
+                
+                events.forEach(event => window.addEventListener(event, handleActivity, { passive: true }));
+                
+                return () => {
+                    if (logoutTimer) clearTimeout(logoutTimer);
+                    if (idleTimer) clearTimeout(idleTimer);
+                    events.forEach(event => window.removeEventListener(event, handleActivity));
+                };
             } catch (error) {
                 logout();
             }
         }
-        return () => {
-            if (logoutTimer) clearTimeout(logoutTimer);
-        };
     }, [token, logout]);
 
     const login = (newToken) => {
