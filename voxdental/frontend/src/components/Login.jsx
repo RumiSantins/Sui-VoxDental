@@ -101,7 +101,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
             <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 blur-[100px] rounded-full pointer-events-none" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-800/10 blur-[100px] rounded-full pointer-events-none" />
 
-            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-3xl shadow-xl p-8 relative z-10 animate-in fade-in zoom-in-95 duration-300">
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-xl p-8 relative z-10 animate-in fade-in zoom-in-95 duration-300">
                 <div className="text-center mb-8">
                     <button 
                         type="button"

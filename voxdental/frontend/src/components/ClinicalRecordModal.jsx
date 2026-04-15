@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FileText, Printer, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const ClinicalRecordModal = React.memo(({
     doctor,
@@ -13,6 +14,8 @@ export const ClinicalRecordModal = React.memo(({
     onClose
 }) => {
     const { t, language } = useLanguage();
+    useScrollLock();
+
     const handlePrint = () => {
         window.print();
     };
@@ -81,8 +84,8 @@ export const ClinicalRecordModal = React.memo(({
     if (!mounted) return null;
 
     const modalContent = (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-950/70 p-4 sm:p-6 animate-in fade-in duration-200 print-modal-container">
-            <div className="bg-white dark:bg-zinc-900 w-full max-w-4xl rounded-3xl shadow-xl border border-slate-200 dark:border-zinc-800 flex flex-col h-[90vh] print-modal-content">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 sm:p-6 animate-in fade-in duration-200 print-modal-container">
+            <div className="bg-white dark:bg-zinc-900 w-full max-w-4xl rounded-2xl shadow-xl border border-slate-200 dark:border-zinc-800 flex flex-col h-[90vh] print-modal-content">
                 
                 {/* Header (Non printable actions) */}
                 <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 print-hidden shrink-0">

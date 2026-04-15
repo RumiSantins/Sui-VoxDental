@@ -1,7 +1,9 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { User, Lock, X, Check, Loader2, AlertCircle, Heart, Activity, Stethoscope, Shield, Award, Briefcase, Camera, Image as ImageIcon, Cat, Languages } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { User, Lock, X, Check, Loader2, AlertCircle, Heart, Activity, Stethoscope, Shield, Dog, Briefcase, Camera, Image as ImageIcon, Cat, Languages } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const DEFAULT_AVATARS = [
     { id: 'user', icon: User, color: 'bg-blue-500' },
@@ -9,7 +11,7 @@ const DEFAULT_AVATARS = [
     { id: 'activity', icon: Activity, color: 'bg-green-500' },
     { id: 'steth', icon: Stethoscope, color: 'bg-purple-500' },
     { id: 'shield', icon: Shield, color: 'bg-indigo-500' },
-    { id: 'award', icon: Award, color: 'bg-yellow-500' },
+    { id: 'dog', icon: Dog, color: 'bg-yellow-500' },
     { id: 'case', icon: Briefcase, color: 'bg-slate-700' },
     { id: 'cat', icon: Cat, color: 'bg-rose-400' },
 ];
@@ -17,6 +19,7 @@ const DEFAULT_AVATARS = [
 export const ProfileModal = ({ onClose }) => {
     const { user, token, login } = useAuth();
     const { language, setLanguage, t } = useLanguage();
+    useScrollLock();
     const fileInputRef = useRef(null);
     const [name, setName] = useState(user?.name || "");
     const [password, setPassword] = useState("");
@@ -83,6 +86,7 @@ export const ProfileModal = ({ onClose }) => {
                 setError(data.detail || t('profile.error_update'));
             }
         } catch (err) {
+            console.error('Profile save error:', err);
             setError(t('verify.connection_error'));
         } finally {
             setLoading(false);
@@ -111,12 +115,12 @@ export const ProfileModal = ({ onClose }) => {
         </div>
     ), [avatar]);
 
-    return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6">
+    const modalContent = (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
             {/* Simple solid dark background */}
             <div className="absolute inset-0 bg-zinc-950/80" onClick={onClose} />
             
-            <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 overflow-hidden animate-in fade-in duration-150 overflow-y-auto max-h-[92vh] sm:max-h-[90vh]">
+            <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden animate-in fade-in duration-150 overflow-y-auto max-h-[92vh] sm:max-h-[90vh]">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
                 
                 <div className="p-6 sm:p-8 pb-4">
@@ -351,4 +355,6 @@ export const ProfileModal = ({ onClose }) => {
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 };

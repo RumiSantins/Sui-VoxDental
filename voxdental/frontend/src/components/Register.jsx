@@ -51,7 +51,7 @@ export const Register = ({ onSwitch }) => {
             <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-600/10 blur-[140px] rounded-full pointer-events-none" />
             <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 blur-[140px] rounded-full pointer-events-none" />
 
-            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-3xl shadow-xl p-8 relative z-10">
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-xl p-8 relative z-10">
                 <div className="text-center mb-6">
                     <div className="w-16 h-16 bg-purple-50 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-purple-200 dark:border-zinc-700">
                         <UserPlus className="w-8 h-8 text-purple-600 dark:text-purple-400" />

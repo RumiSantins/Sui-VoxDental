@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { User, Heart, Activity, Stethoscope, Shield, Award, Briefcase, Cat } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const AVATAR_MAP = {
     'user': User,
@@ -31,6 +32,7 @@ export const WelcomeScreen = ({ user, darkMode, onFinished }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isLeaving, setIsLeaving] = useState(false);
     const { t } = useLanguage();
+    useScrollLock();
 
     useEffect(() => {
         const entryTimer = setTimeout(() => setIsVisible(true), 100);

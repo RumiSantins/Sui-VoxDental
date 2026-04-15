@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { MessageSquare, Camera, Upload, Trash2, Loader2, Play } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const ManualEntryModal = React.memo(({ 
     toothNumber, 
@@ -16,6 +18,7 @@ export const ManualEntryModal = React.memo(({
 }) => {
     const { token } = useAuth();
     const { t } = useLanguage();
+    useScrollLock();
     const [selectedSurface, setSelectedSurface] = useState(null);
     const [localFindings, setLocalFindings] = useState([]);
     const [tempNoteText, setTempNoteText] = useState("");
@@ -103,9 +106,9 @@ export const ManualEntryModal = React.memo(({
         playFeedbackSound('success');
     };
 
-    return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/70 p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-3xl shadow-xl border border-slate-200 dark:border-zinc-800 flex flex-col max-h-[90vh]">
+    const modalContent = (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-2xl shadow-xl border border-slate-200 dark:border-zinc-800 flex flex-col max-h-[90vh]">
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900">
                     <div>
@@ -273,10 +276,10 @@ export const ManualEntryModal = React.memo(({
 
                 {/* Media Viewer Lightbox (Clean Minimalist Style) */}
                 {selectedMedia && (
-                    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/95 transition-opacity duration-300" onClick={() => setSelectedMedia(null)}>
+                    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/95 transition-opacity duration-300" onClick={() => setSelectedMedia(null)}>
                         <button 
                             onClick={(e) => { e.stopPropagation(); setSelectedMedia(null); }}
-                            className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all z-[2010]"
+                            className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all z-[10010]"
                         >
                             <span className="text-3xl leading-none">&times;</span>
                         </button>
@@ -336,6 +339,8 @@ export const ManualEntryModal = React.memo(({
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }, (prevProps, nextProps) => {
     return (
         prevProps.toothNumber === nextProps.toothNumber &&

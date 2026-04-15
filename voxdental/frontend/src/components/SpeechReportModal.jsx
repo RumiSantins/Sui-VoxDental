@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Send, X, AlertOctagon } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const SpeechReportModal = ({ transcript, onClose, token }) => {
     const [expected, setExpected] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const { t } = useLanguage();
+    useScrollLock();
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -34,9 +37,9 @@ export const SpeechReportModal = ({ transcript, onClose, token }) => {
         }
     };
 
-    return (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-3xl shadow-xl border border-red-200 dark:border-red-900/30 flex flex-col transform animate-in zoom-in duration-300">
+    const modalContent = (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30 flex flex-col transform animate-in zoom-in duration-300">
                 <div className="p-6 border-b border-slate-100 dark:border-red-900/20 bg-red-50 dark:bg-red-950/10 flex justify-between items-center">
                     <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
                         <AlertOctagon size={24} />
@@ -94,4 +97,6 @@ export const SpeechReportModal = ({ transcript, onClose, token }) => {
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 };

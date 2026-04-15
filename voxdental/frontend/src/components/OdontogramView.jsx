@@ -21,7 +21,7 @@ const VolumeMeter = memo(({ volume, isRecording }) => {
 // 2. Quadrant moved outside to prevent recreation and allow better memoization
 const Quadrant = memo(({ range, findings, notes, onToothClick, getToothState, useDottedMode, pendingVerification, onVerify, darkMode }) => {
     return (
-        <div className="flex gap-2 bg-slate-50/50 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800/60 transition-all w-max mx-auto justify-center">
+        <div className="flex gap-2 bg-slate-50/50 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800/60 transition-all w-max mx-auto justify-center">
             {range.map(num => (
                 <div key={num} className="relative flex flex-col items-center group">
                     {notes[num] && (
@@ -457,7 +457,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                 <div className="flex flex-wrap justify-center sm:justify-end items-center gap-3 sm:gap-4 w-full sm:w-auto">
                     <button
                         onClick={() => setShowClinicalRecord(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm font-bold border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-all text-xs tracking-wider uppercase disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm font-bold border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-all text-xs tracking-wider uppercase disabled:opacity-50"
                         title={t('odontogram.clinical_record')}
                         disabled={!patient}
                     >
@@ -465,7 +465,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                     </button>
                     <button
                         onClick={() => setUseDottedMode(!useDottedMode)}
-                        className="px-4 py-2 rounded-full bg-white dark:bg-zinc-900 shadow-md text-blue-600 dark:text-blue-400 font-bold border border-slate-200 dark:border-zinc-800 hover:bg-blue-50 dark:hover:bg-zinc-800 transition-all text-xs tracking-wider whitespace-nowrap uppercase"
+                        className="px-4 py-2 rounded-xl bg-white dark:bg-zinc-900 shadow-md text-blue-600 dark:text-blue-400 font-bold border border-slate-200 dark:border-zinc-800 hover:bg-blue-50 dark:hover:bg-zinc-800 transition-all text-xs tracking-wider whitespace-nowrap uppercase"
                         title={t('odontogram.toggle_nomenclature')}
                     >
                         {t('odontogram.toggle_nomenclature')}
@@ -473,7 +473,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                     <button
                         onClick={handleClearAll}
                         disabled={!patient}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/10 dark:hover:bg-red-900/20 dark:text-red-400 rounded-full text-[10px] font-black transition-all border border-red-100 dark:border-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-[0.2em] shadow-lg group/trash"
+                        className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/10 dark:hover:bg-red-900/20 dark:text-red-400 rounded-xl text-[10px] font-black transition-all border border-red-100 dark:border-red-900/30 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-[0.2em] shadow-lg group/trash"
                         title={t('odontogram.clear_all')}
                     >
                         <Trash2 size={16} className="group-hover/trash:animate-bounce" />
@@ -517,7 +517,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                 <select
                                     value={timerDelay}
                                     onChange={(e) => e.target.value === 'custom' ? setIsCustomTimer(true) : setTimerDelay(Number(e.target.value))}
-                                    className="text-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-300 rounded-full px-4 py-2 outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                                    className="text-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 outline-none focus:border-blue-500 transition-colors cursor-pointer"
                                 >
                                     <option value={0}>{t('odontogram.timer_0s')}</option>
                                     <option value={10}>{t('odontogram.timer_10s')}</option>
@@ -527,7 +527,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                                     <option value="custom">{t('odontogram.timer_custom')}</option>
                                 </select>
                             ) : (
-                                <div className="flex items-center gap-1 border border-blue-400 bg-blue-50 dark:bg-slate-800/80 rounded-full pl-3 pr-1 py-1 transition-all shadow-sm ring-1 ring-blue-500/20">
+                                <div className="flex items-center gap-1 border border-blue-400 bg-blue-50 dark:bg-slate-800/80 rounded-lg pl-3 pr-1 py-1 transition-all shadow-sm ring-1 ring-blue-500/20">
                                     <input
                                         type="number"
                                         min="0"
@@ -546,7 +546,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
 
                     <button
                         onClick={toggleRecording}
-                        className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold transition-all shadow-lg w-full sm:w-auto ${!patient
+                        className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg w-full sm:w-auto ${!patient
                             ? 'bg-slate-200 dark:bg-zinc-800 text-slate-400 cursor-not-allowed opacity-60'
                             : isRecording ? 'bg-red-500 text-white animate-pulse ring-4 ring-red-200 dark:ring-red-900/30' : countdown !== null ? 'bg-orange-500 text-white animate-pulse ring-4 ring-orange-200' : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 transition-all'}`}
                         disabled={isProcessing || !patient}
@@ -579,8 +579,8 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
             </header>
 
             {!patient && (
-                <div className="mb-6 p-10 bg-slate-50 dark:bg-zinc-900/40 border-2 border-dashed border-slate-300 dark:border-zinc-800 rounded-3xl flex flex-col items-center text-center animate-in fade-in zoom-in duration-300">
-                    <div className="w-20 h-20 bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6">
+                <div className="mb-6 p-10 bg-slate-50 dark:bg-zinc-900/40 border-2 border-dashed border-slate-300 dark:border-zinc-800 rounded-xl flex flex-col items-center text-center animate-in fade-in zoom-in duration-300">
+                    <div className="w-20 h-20 bg-blue-100 dark:bg-blue-600/20 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center mb-6">
                         <Users size={40} />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-3 tracking-tight">{t('odontogram.welcome_patient')}</h2>
@@ -593,7 +593,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
             {isProcessing && <div className="mb-4 p-4 bg-blue-50 text-blue-700 rounded-lg animate-pulse text-center">{t('odontogram.processing')}</div>}
 
             {lastTranscript && (
-                <div className="mb-6 p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800/80 rounded-2xl shadow-sm relative overflow-hidden group/transcript animate-in fade-in slide-in-from-bottom-2">
+                <div className="mb-6 p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800/80 rounded-xl shadow-sm relative overflow-hidden group/transcript animate-in fade-in slide-in-from-bottom-2">
                     <div className="flex justify-between items-start mb-2">
                         <span className="text-xs font-bold text-slate-600 dark:text-slate-400">{t('odontogram.last_detection')}</span>
 
@@ -732,7 +732,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, patient }) => {
                 </div>
             </div>
 
-            <div className="mt-12 p-4 sm:p-8 bg-white dark:bg-zinc-900/40 dark:backdrop-blur-xl rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800/60 relative overflow-hidden group/legend text-slate-800 dark:text-slate-200">
+            <div className="mt-12 p-4 sm:p-8 bg-white dark:bg-zinc-900/40 dark:backdrop-blur-xl rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800/60 relative overflow-hidden group/legend text-slate-800 dark:text-slate-200">
                 <div className={`flex items-center justify-between ${showLegend ? 'mb-6' : ''}`}>
                     <div className="flex items-center gap-3">
                         <div className="w-1.5 h-6 bg-blue-500/80 rounded-full" />
