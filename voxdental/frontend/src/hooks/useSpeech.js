@@ -20,6 +20,7 @@ export const useSpeech = () => {
     const isActiveRef = useRef(false);
     const streamRef = useRef(null);
     const externalContextRef = useRef({});
+    const zeroVolumeStartRef = useRef(null);
 
     // Config
     const SILENCE_THRESHOLD = 0.006; // Lowered from 0.01 for more sensitivity
@@ -43,9 +44,14 @@ export const useSpeech = () => {
             streamRef.current = null;
         }
         if (audioContextRef.current) {
-            audioContextRef.current.close();
+            if (audioContextRef.current.state !== 'closed') {
+                audioContextRef.current.close().catch(console.error);
+            }
             audioContextRef.current = null;
         }
+        analyserRef.current = null;
+        sourceRef.current = null;
+        zeroVolumeStartRef.current = null;
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
         setVolume(0);
@@ -64,6 +70,16 @@ export const useSpeech = () => {
             streamRef.current = stream;
             isActiveRef.current = true;
 
+            if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+                audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+                analyserRef.current = audioContextRef.current.createAnalyser();
+                sourceRef.current = audioContextRef.current.createMediaStreamSource(stream);
+                sourceRef.current.connect(analyserRef.current);
+            }
+            if (audioContextRef.current.state === 'suspended') {
+                await audioContextRef.current.resume();
+            }
+
             // 1. Setup MediaRecorder
             mediaRecorderRef.current = new MediaRecorder(stream);
             chunksRef.current = [];
@@ -76,7 +92,7 @@ export const useSpeech = () => {
 
             // 2. Setup VAD (Voice Activity Detection) if continuous
             if (continuous) {
-                setupVAD(stream, onResultCallback_);
+                setupVAD();
             }
 
             mediaRecorderRef.current.start();
@@ -108,17 +124,14 @@ export const useSpeech = () => {
         }
     };
 
-    const setupVAD = (stream, onResultCallback) => {
-        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        analyserRef.current = audioContextRef.current.createAnalyser();
-        sourceRef.current = audioContextRef.current.createMediaStreamSource(stream);
-        sourceRef.current.connect(analyserRef.current);
-
+    const setupVAD = () => {
+        if (!analyserRef.current) return;
         analyserRef.current.fftSize = 256;
         const bufferLength = analyserRef.current.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
 
         hasSpokenRef.current = false; // Reset speech flag
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
         const checkVolume = () => {
             if (!audioContextRef.current) return;
@@ -136,6 +149,19 @@ export const useSpeech = () => {
             // Update volume state for UI
             const normalizedVol = Math.min(100, Math.round(rms * 500));
             setVolume(normalizedVol);
+
+            if (normalizedVol === 0 && isActiveRef.current) {
+                if (!zeroVolumeStartRef.current) {
+                    zeroVolumeStartRef.current = Date.now();
+                } else if (Date.now() - zeroVolumeStartRef.current > 3000) {
+                    console.warn("Dead microphone stream. Resetting.");
+                    zeroVolumeStartRef.current = null;
+                    stopRecordingLogic(true);
+                    return;
+                }
+            } else {
+                zeroVolumeStartRef.current = null;
+            }
 
             if (rms > SILENCE_THRESHOLD) {
                 // Potential speech detected
@@ -236,7 +262,7 @@ export const useSpeech = () => {
     };
 
     // Public API
-    const stopRecording = (onResult) => {
+    const stopRecording = () => {
         // Manual stop button logic
         // If we are in continuous mode and user presses stop, we want to fully stop.
         // We probably won't have the audio ready in the same way if manually stopped mid-sentence without VAD trigger, 
