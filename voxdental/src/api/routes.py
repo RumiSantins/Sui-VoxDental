@@ -374,6 +374,15 @@ def save_full_record(
         
     db.commit()
     db.refresh(db_record)
+    
+    # IMPORTANTE: Parsear las notas de nuevo a objeto antes de devolver la respuesta
+    # Esto evita el ResponseValidationError
+    if db_record.notes:
+        try:
+            db_record.notes = json.loads(db_record.notes)
+        except:
+            pass
+            
     return db_record
 
 # --- SPEECH REPORTING ---
