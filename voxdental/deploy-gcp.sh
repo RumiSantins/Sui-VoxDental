@@ -13,7 +13,7 @@
 set -e
 
 # --- CONFIGURACIÓN (Edita estos valores) ---
-PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
+PROJECT_ID="sui-production-492623"
 REGION="us-central1"
 BACKEND_IMAGE="gcr.io/${PROJECT_ID}/voxdental-backend"
 FRONTEND_IMAGE="gcr.io/${PROJECT_ID}/voxdental-frontend"
