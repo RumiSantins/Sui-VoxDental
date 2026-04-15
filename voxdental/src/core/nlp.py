@@ -12,6 +12,8 @@ class FindingInput(BaseModel):
 def normalize_text(text: str) -> str:
     """Normalize text for easier regex matching."""
     text = text.lower()
+    # Remove punctuation that might break exact word matches or spacing logic
+    text = re.sub(r'[,\.\-;:!¡¿\?]+', ' ', text)
     # Handle common Spanish number transcriptions for dental quadrants
     replacements = {
         "cuarenta y uno": "41", "cuarenta y dos": "42", "cuarenta y tres": "43", "cuarenta y cuatro": "44",
@@ -42,7 +44,8 @@ def normalize_text(text: str) -> str:
         "gelatina": "palatina", "latina": "palatina", "colatina": "palatina", "pa latina": "palatina",
         "igual": "lingual", "lenguaje": "lingual", "lingüal": "lingual",
         # Phonetic condition corrections
-        "al magma": "amalgama", "un magma": "amalgama"
+        "al magma": "amalgama", "un magma": "amalgama", "amalgaba": "amalgama",
+        "aucente": "ausente", "recina": "resina"
     }
     
     # Sort replacements by length descending to match longer phrases first
@@ -59,9 +62,9 @@ def normalize_text(text: str) -> str:
         # Use regex to replace only whole words
         text = re.sub(fr'\b{w}\b', d, text)
         
-    # 2. Handle 'punto'/'puntos' (decimal format for tooth notation like "2.6" → "26")
-    # Handles: "1 punto 4", "1 puntos 4", "1 coma 4", "1 guión 4", "1 a 4"
-    text = re.sub(r'\b([1-4])\s*(?:\.|puntos?|pontos?|punts?|pe|coma|guión|guion)\s*([1-8])\b', r'\1\2', text)
+    # 2. Nueva Lógica de Numeración "Dos Seis"
+    # Identificar pares de números hablados (ej "2 6") y pegarlos ("26") si corresponden a FDI [11-48sin0ni9]
+    text = re.sub(r'\b([1-4])\s+([1-8])\b', r'\1\2', text)
     
     # 3. Context-aware rescue for dangerous_glued acronyms followed by tooth numbers.
     # e.g. Whisper merges "a l 33" → "al treinta y tres" → after digit replacement → "al 33"
@@ -91,7 +94,7 @@ def decode_acronym(acronym: str) -> tuple:
     # Returns (condition, surface)
     cond_map = {
         'R': 'resina', 'C': 'caries', 'A': 'amalgama', 
-        'E': 'endodoncia', 'EX': 'atraer', 'CR': 'corona', 
+        'E': 'endodoncia', 'EX': 'extraer', 'CR': 'corona', 
         'X': 'ausente', 'B': 'borrar'
     }
     surf_map = {

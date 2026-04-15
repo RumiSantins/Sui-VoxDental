@@ -7,7 +7,7 @@ const getSurfaceColor = (surf, surfaceConditions, isMissing, number) => {
     const condition = surfaceConditions[surf];
     
     if (condition === 'caries') return '#ef4444';      // Red-500
-    if (condition === 'atraer') return '#f97316';      // Orange-500 (Extraer)
+    if (condition === 'extraer') return '#f97316';      // Orange-500 (Extraer)
     if (condition === 'resina') return '#3b82f6';      // Blue-500
     if (condition === 'amalgama') return '#64748b';    // Slate-500 (Silver/Gray)
     if (condition === 'corona') return '#eab308';      // Yellow-500 (Gold)
@@ -29,7 +29,7 @@ const getSurfaceClass = (surf, surfaceConditions) => {
 const RenderAnterior = ({ number, surfaceConditions, darkMode }) => {
     const conditions = Object.values(surfaceConditions);
     const hasEndo = conditions.includes('endodoncia');
-    const isToExtract = conditions.includes('atraer');
+    const isToExtract = conditions.includes('extraer');
     const defaultStroke = darkMode ? '#52525b' : '#94a3b8'; // zinc-600 : slate-400
     
     const isRightQuadrant = Math.floor(number / 10) === 1 || Math.floor(number / 10) === 4;
@@ -75,7 +75,7 @@ const RenderAnterior = ({ number, surfaceConditions, darkMode }) => {
 const RenderPosterior = ({ number, surfaceConditions, darkMode }) => {
     const conditions = Object.values(surfaceConditions);
     const hasEndo = conditions.includes('endodoncia');
-    const isToExtract = conditions.includes('atraer');
+    const isToExtract = conditions.includes('extraer');
     const isMolar = (number % 10 >= 6);
     const defaultStroke = darkMode ? '#52525b' : '#94a3b8'; // zinc-600 : slate-400
     
