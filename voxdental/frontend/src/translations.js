@@ -1,7 +1,7 @@
 export const translations = {
     es: {
         // App / Navigation
-        'app.title': 'SuiEgo | VoxDental',
+        'app.title': 'SuiVoxDental',
         'app.loading': 'Cargando SuiEgo...',
         'app.profile_settings': 'Ajustes de Perfil',
         'app.logout': 'Salir',
@@ -227,7 +227,7 @@ export const translations = {
     },
     en: {
         // App / Navigation
-        'app.title': 'SuiEgo | VoxDental',
+        'app.title': 'SuiVoxDental',
         'app.loading': 'Loading SuiEgo...',
         'app.profile_settings': 'Profile Settings',
         'app.logout': 'Logout',
