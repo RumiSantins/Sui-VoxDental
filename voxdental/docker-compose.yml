@@ -5,12 +5,12 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: voxdental_backend
+    container_name: suiego_backend
     restart: always
     ports:
       - "8000:8000"
     volumes:
-      - ./voxdental.db:/app/voxdental.db
+      - ./suiego.db:/app/suiego.db
       - ./models:/app/models
       - ./src:/app/src
     # Se recomienda .env solo para credenciales, pero docker-compose inyecta las variables también
@@ -21,9 +21,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: voxdental_frontend
+    container_name: suiego_frontend
     restart: always
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - backend

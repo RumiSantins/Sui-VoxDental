@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from .api.routes import router
 
-app = FastAPI(title="Sui VoxDental API", version="0.1.0")
+app = FastAPI(title="SuiEgo API", version="0.1.0")
 
 # Enable CORS for frontend
 # En producción, configurar ALLOWED_ORIGINS=https://tu-dominio.com
