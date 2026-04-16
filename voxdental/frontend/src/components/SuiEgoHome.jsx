@@ -137,6 +137,9 @@ export const SuiEgoHome = ({ onLogin, onRegister, isDark, onToggleTheme, languag
                         {!isMobile && <span style={{ fontSize: '13px', fontFamily: '"JetBrains Mono", monospace', color: theme.textSec, whiteSpace: 'nowrap', lineHeight: 1, paddingTop: '2px', marginLeft: '8px' }}></span>}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '16px', flexShrink: 0 }}>
+                        <button onClick={onToggleTheme} style={{ background: 'transparent', border: 'none', color: theme.textSec, cursor: 'pointer', display: 'flex', padding: 0 }} title="Cambiar Tema">
+                            {isDark ? <Sun size={isMobile ? 16 : 20} /> : <Moon size={isMobile ? 16 : 20} />}
+                        </button>
                         <button onClick={onToggleLanguage} style={{ background: 'transparent', border: 'none', color: theme.textSec, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: 0, fontSize: isMobile ? '10px' : '12px', fontWeight: 600, textTransform: 'uppercase' }} title="Change Language">
                             <Languages size={isMobile ? 12 : 15} />
                             {!isMobile && language}
@@ -146,9 +149,6 @@ export const SuiEgoHome = ({ onLogin, onRegister, isDark, onToggleTheme, languag
                         </button>
                         <button onClick={onRegister} style={{ background: '#2563eb', color: '#ffffff', border: 'none', padding: isMobile ? '4px 10px' : '5px 14px', borderRadius: '6px', fontSize: isMobile ? '10px' : '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 150ms linear', boxShadow: '0 4px 5px 0 rgba(37,99,235,0.39)' }} onMouseOver={e => { e.currentTarget.style.opacity = 0.9; e.currentTarget.style.transform = 'translateY(-1px)'; }} onMouseOut={e => { e.currentTarget.style.opacity = 1; e.currentTarget.style.transform = 'translateY(0)'; }}>
                             {t.register}
-                        </button>
-                        <button onClick={onToggleTheme} style={{ background: 'transparent', border: 'none', color: theme.textSec, cursor: 'pointer', display: 'flex', padding: 0 }} title="Cambiar Tema">
-                            {isDark ? <Sun size={isMobile ? 16 : 20} /> : <Moon size={isMobile ? 16 : 20} />}
                         </button>
                     </div>
                 </div>
