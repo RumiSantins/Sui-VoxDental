@@ -7,6 +7,7 @@ import { Settings, Heart, Activity, Stethoscope, Shield, Dog, Briefcase, User as
 
 // Lazy loaded components for better performance
 const OdontogramView = lazy(() => import('./components/OdontogramView').then(m => ({ default: m.OdontogramView })));
+const SuiEgoHome = lazy(() => import('./components/SuiEgoHome').then(m => ({ default: m.SuiEgoHome })));
 const Register = lazy(() => import('./components/Register').then(m => ({ default: m.Register })));
 const VerifyEmail = lazy(() => import('./components/VerifyEmail').then(m => ({ default: m.VerifyEmail })));
 const WelcomeScreen = lazy(() => import('./components/WelcomeScreen').then(m => ({ default: m.WelcomeScreen })));
@@ -38,7 +39,7 @@ const AVATAR_MAP = {
 
 function AppContent() {
   const { user, token, logout } = useAuth()
-  const { t } = useLanguage()
+  const { t, language, toggleLanguage } = useLanguage()
   const [showWelcome, setShowWelcome] = useState(false)
   const [hasShownWelcome, setHasShownWelcome] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -75,12 +76,36 @@ function AppContent() {
   }
 
   const [authView, setAuthView] = useState(() => {
+    const search = window.location.search;
+    const path = window.location.pathname;
     // Check if we are in verification flow
-    if (window.location.search.includes('token=') && window.location.pathname.includes('/verify')) {
-      return 'verify'
-    }
-    return 'login'
+    if (search.includes('token=') && path.includes('/verify')) return 'verify';
+    if (path.includes('/login')) return 'login';
+    if (path.includes('/register')) return 'register';
+    return 'home';
   })
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path.includes('/verify')) setAuthView('verify');
+      else if (path.includes('/login')) setAuthView('login');
+      else if (path.includes('/register')) setAuthView('register');
+      else setAuthView('home');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = useCallback((view) => {
+    setAuthView(view);
+    const path = view === 'home' ? '/' : `/${view}`;
+    // Only push if different to prevent duplicate history entries
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
+  }, []);
+
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark'
   })
@@ -138,12 +163,14 @@ function AppContent() {
   if (!user) {
     return (
       <Suspense fallback={<LoadingFallback />}>
-        {authView === 'verify' ? (
-          <VerifyEmail onBackToLogin={() => setAuthView('login')} />
+        {authView === 'home' ? (
+          <SuiEgoHome onLogin={() => navigateTo('login')} onRegister={() => navigateTo('register')} isDark={darkMode} onToggleTheme={toggleDarkMode} language={language} onToggleLanguage={toggleLanguage} />
+        ) : authView === 'verify' ? (
+          <VerifyEmail onBackToLogin={() => navigateTo('login')} />
         ) : authView === 'login' ? (
-          <Login onSwitch={() => setAuthView('register')} onAdminAccess={() => setCurrentView('admin')} />
+          <Login onSwitch={() => navigateTo('register')} onAdminAccess={() => setCurrentView('admin')} />
         ) : (
-          <Register onSwitch={() => setAuthView('login')} />
+          <Register onSwitch={() => navigateTo('login')} />
         )}
       </Suspense>
     );

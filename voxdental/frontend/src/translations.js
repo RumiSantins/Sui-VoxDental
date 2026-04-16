@@ -1,8 +1,8 @@
 export const translations = {
     es: {
         // App / Navigation
-        'app.title': 'SuiVoxDental',
-        'app.loading': 'Cargando VoxDental...',
+        'app.title': 'SuiEgo | VoxDental',
+        'app.loading': 'Cargando SuiEgo...',
         'app.profile_settings': 'Ajustes de Perfil',
         'app.logout': 'Salir',
         'app.system_info': '• Sistema Odontológico Inteligente • v1.1.0',
@@ -227,8 +227,8 @@ export const translations = {
     },
     en: {
         // App / Navigation
-        'app.title': 'SuiVoxDental',
-        'app.loading': 'Loading VoxDental...',
+        'app.title': 'SuiEgo | VoxDental',
+        'app.loading': 'Loading SuiEgo...',
         'app.profile_settings': 'Profile Settings',
         'app.logout': 'Logout',
         'app.system_info': '• Intelligent Dental System • v1.1.0',
