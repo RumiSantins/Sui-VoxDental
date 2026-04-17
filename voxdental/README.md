@@ -1,147 +1,48 @@
-# Sui-VoxDental: Odontograma con IA y Voz
+# SuiEgo Platform
 
-![Sui-VoxDental](/voxdental/static/branding/screenshot.png) (Logo/Imagen si aplica)
+SuiEgo es una plataforma centralizada de servicios de salud inteligente, diseñada para gestionar flujos clinicos complejos mediante el uso de inteligencia artificial y procesamiento de voz en tiempo real.
 
-**Sui-VoxDental** es una plataforma clínica moderna e inteligente diseñada para dentistas, que permite el registro manos libres de hallazgos clínicos mediante reconocimiento de voz en tiempo real. Utiliza inteligencia artificial para convertir descripciones clínicas en datos estructurados dentro de un odontograma interactivo.
-
----
-
-## Características Principales
-
-*   **Registro por Voz**: Integración con **Vosk** (local) y **OpenAI Whisper** para transcripción ultra-precisa.
-*   **Odontograma Interactivo**: Representación visual de cada pieza dental con estados clínicos parametrizados (patologías en rojo, tratamientos en azul).
-*   **Autenticación con Google**: Inicio de sesión seguro integrado con Google OAuth 2.0.
-*   **Gestión de Pacientes**: Historias clínicas electrónicas persistentes con SQLite.
-*   **Dashboard de Control**: Vista rápida de la actividad clínica y métricas clave.
-*   **Despliegue Listos para la Nube**: Configuración completa de Docker para GCP (Google Cloud Platform).
+Este repositorio alberga el nucleo de SuiEgo y su extension especializada Sui-VoxDental, un sistema de odontograma interactivo manos libres.
 
 ---
 
-## Stack Tecnológico
+## Documentacion Tecnica Integral
 
-### Backend
-*   **FastAPI** (Python 3.10+): API de alto rendimiento.
-*   **SQLAlchemy**: ORM para gestión de base de datos.
-*   **SQLite**: Base de datos ligera y eficiente.
-*   **Vosk / Whisper**: Motores de procesamiento de lenguaje natural (NLP).
-*   **Poetry**: Gestión de dependencias y paquetes.
+Para facilitar la comprension y el mantenimiento del proyecto, se ha generado una documentacion detallada dividida por modulos. Se recomienda comenzar por el indice principal:
 
-### Frontend
-*   **React 18**: Biblioteca UI dinámica.
-*   **Vite**: Entorno de desarrollo ultra-rápido.
-*   **Tailwind CSS**: Estilizado moderno y responsivo.
-*   **React Router**: Navegación SPA fluida.
+**[Acceder al Indice de Documentacion](documentacion_tecnica/00_indice.md)**
 
-----
+La documentacion incluye:
+- Arquitectura de Sistemas y Flujo de Datos.
+- Guia de Instalacion y Desarrollo Local.
+- Manual de Despliegue en GCP y Mantenimiento de Produccion (SSL, Nginx).
+- Referencia Tecnica del Frontend (React).
+- Referencia Tecnica del Backend (FastAPI).
+
+---
 
 ## Estructura del Proyecto
 
+El proyecto se organiza en dos servicios principales orquestados por Docker:
+
+- **Frontend**: Aplicacion React optimizada con Vite, encargada de la interfaz de usuario y la captura de voz.
+- **Backend**: API construida con FastAPI que gestiona la logica de negocio, autenticacion y procesamiento STT (Speech-to-Text).
+
 ```text
 voxdental/
-├── src/                <-- [BACKEND] Lógica de Python (FastAPI)
-│   ├── api/            <-- Rutas y Endpoints
-│   ├── core/           <-- Configuración, DB session y Seguridad
-│   ├── models/         <-- Modelos de SQLAlchemy
-│   ├── services/       <-- Lógica de negocio (Vosk, Whisper, Odontograma)
-│   └── main.py         <-- Punto de entrada del servidor
-├── frontend/           <-- [FRONTEND] Código de React
-│   ├── src/            <-- Componentes, Contextos y Vistas
-│   ├── public/         <-- Activos estáticos
-│   └── index.html      <-- Punto de entrada
-├── static/             <-- Archivos estáticos servidos por el Backend
-├── models/             <-- Directorio para modelos de Vosk (STT)
-├── Dockerfile          <-- Configuración de imagen Docker para Backend
-├── docker-compose.yml  <-- Orquestación local/producción
-└── voxdental.db        <-- Base de datos principal
+├── src/                <-- Codigo fuente del Backend (Python)
+├── frontend/           <-- Codigo fuente del Frontend (React)
+├── documentacion_tecnica/ <-- Guías detalladas del proyecto
+├── static/             <-- Recursos estaticos
+├── Dockerfile          <-- Configuracion de imagen para Backend
+├── docker-compose.yml  <-- Orquestacion de servicios
+└── suiego.db           <-- Base de datos principal (SQLite)
 ```
 
 ---
 
-## Configuración Local
+## Creditos y Desarrollo
 
-### 1. Variables de Entorno
-
-#### Backend (`voxdental/.env`)
-Crea un archivo `.env` basado en `.env.example`:
-```ini
-SECRET_KEY=tu-clave-secreta
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=tu-email@gmail.com
-SMTP_PASSWORD=tu-contraseña-de-aplicación
-BASE_URL=http://localhost:5173
-```
-
-#### Frontend (`voxdental/frontend/.env`)
-```ini
-VITE_GOOGLE_CLIENT_ID=tu-google-client-id
-VITE_API_URL=http://localhost:8000
-```
-
-### 2. Ejecución del Backend
-
-**Ubicación: `voxdental/`**
-
-```powershell
-# Instalar dependencias con Poetry
-poetry install
-
-# Alternativa con pip
-pip install -r requirements.txt
-
-# Descargar modelos de voz necesarios (Vosk)
-python download_vosk_models.py
-
-# Iniciar servidor
-uvicorn src.main:app --reload
-```
-> [!NOTE]
-> Documentación interactiva en `http://localhost:8000/docs`.
-
-### 3. Ejecución del Frontend
-
-**Ubicación: `voxdental/frontend/`**
-
-```powershell
-npm install
-npm run dev
-```
-> [!TIP]
-> Aplicación accesible en `http://localhost:5173`.
-
----
-
-## Docker y Despliegue
-
-### Docker Compose (Local/Staging)
-Para levantar todo el stack (Backend + Frontend + Nginx):
-```powershell
-docker compose up -d --build
-```
-
-### Despliegue en Google Cloud Platform (GCP)
-El proyecto incluye un script automatizado para desplegar en una instancia de Compute Engine:
-```powershell
-./deploy-gcp.sh
-```
-*(Asegúrate de configurar los permisos de `gcloud` antes de ejecutar).*
-
----
-
-## Desarrollo y Guía Técnica
-
-- **Lógica de Voz**: Revisa `src/services/vosk_service.py` y `src/services/whisper.py`.
-- **Componente Dental**: El núcleo de la interfaz está en `frontend/src/components/OdontogramView.jsx`.
-- **Autenticación**: Gestionada en `frontend/src/context/AuthContext.jsx` y `src/core/security.py`.
-
----
-
-## Contribución
-
-1. Crea una rama para tu feature: `git checkout -b feature/nueva-funcionalidad`
-2. Realiza tus cambios y haz commit: `git commit -m "feat: descripción del cambio"`
-3. Envía tus cambios: `git push origin feature/nueva-funcionalidad`
-
----
-
-¡Diseñado por el equipo de Sui-VoxDental!
+Plataforma desarrollada por el equipo de SuiEgo. 
+Desarrollador Principal: Felipe Santillan.
+Colaboracion: Fausto Software.

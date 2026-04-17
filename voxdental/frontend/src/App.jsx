@@ -1,3 +1,5 @@
+/* Componente raiz de la aplicacion SuiEgo. 
+   Gestiona la autenticacion, el cambio de temas (oscuro/claro) y la navegacion principal. */
 import { useState, useEffect, useCallback, memo, lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { useLanguage } from './context/LanguageContext'

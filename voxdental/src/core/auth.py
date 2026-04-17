@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
+# Utilidades de seguridad y autenticacion.
+# Gestiona el hashing de contraseñas y la creacion/validacion de tokens JWT.
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 

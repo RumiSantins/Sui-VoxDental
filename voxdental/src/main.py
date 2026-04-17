@@ -1,3 +1,5 @@
+# Punto de entrada principal para el servidor FastAPI de SuiEgo.
+# Gestiona la inicialización de la app, middlewares y montaje de rutas estáticas.
 import os
 # Fix for OpenMP runtime conflict (OMP Error #15) on Windows
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"

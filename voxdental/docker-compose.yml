@@ -1,5 +1,6 @@
-
-version: '3.8'
+# Configuracion de orquestacion de servicios para SuiEgo.
+# Define los contenedores para el Backend (API) y el Frontend (UI).
+version: '3.3'
 services:
   backend:
     build: 

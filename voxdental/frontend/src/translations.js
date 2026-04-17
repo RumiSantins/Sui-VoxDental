@@ -1,3 +1,5 @@
+/* Diccionario centralizado de traducciones (i18n) para SuiEgo.
+   Organiza las cadenas de texto por idioma (es/en) y seccion de la aplicación. */
 export const translations = {
     es: {
         // App / Navigation

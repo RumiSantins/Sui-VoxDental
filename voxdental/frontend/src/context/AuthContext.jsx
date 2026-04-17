@@ -1,3 +1,5 @@
+/* Proveedor de contexto para la gestion de autenticacion.
+   Se encarga de almacenar el token JWT, decodificar el perfil de usuario y manejar el cierre de sesion. */
 import { createContext, useState, useContext, useEffect, useMemo, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
