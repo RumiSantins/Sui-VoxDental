@@ -1,16 +1,18 @@
-
+# Configuracion de orquestacion de servicios para EgoS.
+# Define los contenedores para el Backend (API) y el Frontend (UI).
 version: '3.3'
 services:
   backend:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: suiego_backend
+    container_name: egos_backend
     restart: always
     ports:
       - "8000:8000"
     volumes:
-      - ./suiego.db:/app/suiego.db
+      - ./voxdental.db:/app/voxdental.db
+      - ./static/media:/app/static/media
       - ./models:/app/models
       - ./src:/app/src
     # Se recomienda .env solo para credenciales, pero docker-compose inyecta las variables también
@@ -21,7 +23,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: suiego_frontend
+    container_name: egos_frontend
     restart: always
     ports:
       - "3000:80"

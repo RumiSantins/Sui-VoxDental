@@ -1,3 +1,5 @@
+/* Proveedor de contexto para la gestion de autenticacion.
+   Se encarga de almacenar el token JWT, decodificar el perfil de usuario y manejar el cierre de sesion. */
 import { createContext, useState, useContext, useEffect, useMemo, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
@@ -39,12 +41,12 @@ export const AuthProvider = ({ children }) => {
         
         const resetIdleTimer = () => {
             if (idleTimer) clearTimeout(idleTimer);
-            // 20 minutes inactivity timeout
+            // 120 minutes inactivity timeout
             if (token) {
                 idleTimer = setTimeout(() => {
                     console.log("Session timeout due to inactivity. Logging out...");
                     logout();
-                }, 20 * 60 * 1000); 
+                }, 120 * 60 * 1000); 
             }
         };
 

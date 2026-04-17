@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { UserPlus, User, Lock, Mail, ArrowRight, Loader2, CheckCircle2, Camera, Upload, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 
 export const Register = ({ onSwitch }) => {
     const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export const Register = ({ onSwitch }) => {
     const [success, setSuccess] = useState(false);
     const { login } = useAuth();
     const { t } = useLanguage();
+    const { isEgo } = useTheme();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -46,15 +48,15 @@ export const Register = ({ onSwitch }) => {
     // Removed success screen block
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 p-6 transition-colors duration-500 relative overflow-hidden">
-            {/* Ambient Background */}
-            <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-600/10 blur-[140px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 blur-[140px] rounded-full pointer-events-none" />
+        <div className="min-h-screen flex items-center justify-center p-6 transition-colors duration-500 relative overflow-hidden" style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-main)' }}>
+            {/* Ambient Background — only visible in Ego via CSS opacity */}
+            <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] blur-[140px] rounded-full pointer-events-none" style={{ backgroundColor: `rgba(156, 203, 168, var(--blob-green-opacity))` }} />
+            <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] blur-[140px] rounded-full pointer-events-none" style={{ backgroundColor: `rgba(232, 209, 182, var(--blob-warm-opacity))` }} />
 
-            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-xl p-8 relative z-10">
+            <div className={`w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-300 ${isEgo ? 'bg-transparent border-none shadow-none p-0' : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-xl p-8'}`}>
                 <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-purple-50 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-purple-200 dark:border-zinc-700">
-                        <UserPlus className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                    <div className={`w-16 h-16 flex items-center justify-center mx-auto mb-4 active:scale-95 transition-all ${isEgo ? 'bg-transparent border-none' : 'bg-[#9CCBA8]/10 dark:bg-zinc-800 rounded-2xl border border-[#9CCBA8]/30 dark:border-zinc-700'}`}>
+                        <UserPlus className={`w-8 h-8 ${isEgo ? 'text-slate-900 dark:text-white' : 'text-[#9CCBA8] dark:text-[#9CCBA8]/80'}`} />
                     </div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4 tracking-tight">{t('auth.register_title')}</h1>
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">{t('auth.register_subtitle')}</p>
@@ -70,7 +72,7 @@ export const Register = ({ onSwitch }) => {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-purple-500 outline-none transition-all dark:text-white text-sm"
+                                className={`w-full pl-10 pr-4 py-3 outline-none transition-all dark:text-white text-sm ${isEgo ? 'bg-transparent border-b border-slate-200 dark:border-zinc-800 rounded-none focus:border-[#9CCBA8]' : 'bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-[#9CCBA8]'}`}
                                 placeholder={t('auth.name_placeholder_eg')}
                             />
                         </div>
@@ -85,7 +87,7 @@ export const Register = ({ onSwitch }) => {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-10 pr-12 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-purple-500 outline-none transition-all dark:text-white text-sm"
+                                className={`w-full pl-10 pr-12 py-3 outline-none transition-all dark:text-white text-sm ${isEgo ? 'bg-transparent border-b border-slate-200 dark:border-zinc-800 rounded-none focus:border-[#9CCBA8]' : 'bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-[#9CCBA8]'}`}
                                 placeholder={t('auth.password_placeholder')}
                             />
                             <button
@@ -107,7 +109,7 @@ export const Register = ({ onSwitch }) => {
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 mt-2"
+                        className={`w-full font-semibold py-3 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 mt-2 ${isEgo ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-none' : 'bg-[#9CCBA8] hover:bg-[#8DB998] text-white rounded-xl shadow-lg shadow-[#9CCBA8]/20'}`}
                     >
                         {loading ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
@@ -125,7 +127,7 @@ export const Register = ({ onSwitch }) => {
                         {t('auth.have_account')} {' '}
                         <button 
                             onClick={onSwitch}
-                            className="text-purple-600 dark:text-purple-400 font-bold hover:underline"
+                            className="text-[#9CCBA8] dark:text-[#9CCBA8]/80 font-bold hover:underline"
                         >
                             {t('auth.back_login')}
                         </button>

@@ -4,6 +4,7 @@ import { User, Lock, X, Check, Loader2, AlertCircle, Heart, Activity, Stethoscop
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { useTheme } from '../context/ThemeContext';
 
 const DEFAULT_AVATARS = [
     { id: 'user', icon: User, color: 'bg-blue-500' },
@@ -19,6 +20,7 @@ const DEFAULT_AVATARS = [
 export const ProfileModal = ({ onClose }) => {
     const { user, token, login } = useAuth();
     const { language, setLanguage, t } = useLanguage();
+    const { isEgo } = useTheme();
     useScrollLock();
     const fileInputRef = useRef(null);
     const [name, setName] = useState(user?.name || "");
@@ -104,7 +106,7 @@ export const ProfileModal = ({ onClose }) => {
                         type="button"
                         onClick={() => setAvatar(item.id)}
                         className={`aspect-square rounded-2xl flex items-center justify-center transition-all duration-300 transform ${item.color} ${isSelected 
-                            ? 'scale-110 ring-4 ring-offset-4 ring-blue-500 dark:ring-offset-slate-900 shadow-xl z-10' 
+                            ? 'scale-110 ring-4 ring-offset-4 ring-[#9CCBA8] dark:ring-offset-slate-900 shadow-xl z-10' 
                             : 'opacity-60 grayscale-[0.3] hover:opacity-100 hover:scale-105 hover:grayscale-0'}`}
                         title={item.id === 'user' ? 'Médico General' : item.id === 'cat' ? 'Clínica Felina' : 'Médico Especialista'}
                     >
@@ -116,12 +118,11 @@ export const ProfileModal = ({ onClose }) => {
     ), [avatar]);
 
     const modalContent = (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6" style={{ backdropFilter: isEgo ? 'blur(4px)' : 'none' }}>
             {/* Simple solid dark background */}
             <div className="absolute inset-0 bg-zinc-950/80" onClick={onClose} />
             
-            <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden animate-in fade-in duration-150 overflow-y-auto max-h-[92vh] sm:max-h-[90vh]">
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
+            <div className={`relative w-full max-w-md overflow-hidden transition-all duration-300 animate-in fade-in duration-150 overflow-y-auto max-h-[92vh] sm:max-h-[90vh] ${isEgo ? 'bg-white dark:bg-[#111] rounded-none shadow-2xl' : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-xl'}`}>
                 
                 <div className="p-6 sm:p-8 pb-4">
                     <div className="flex justify-between items-center mb-6">
@@ -138,7 +139,7 @@ export const ProfileModal = ({ onClose }) => {
                             
                             <div className="flex flex-col items-center gap-4 mb-4">
                                 <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                    <div className="w-20 h-20 rounded-2xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-blue-500/30 flex items-center justify-center overflow-hidden transition-all group-hover:border-blue-500">
+                                    <div className="w-20 h-20 rounded-2xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-[#9CCBA8]/30 flex items-center justify-center overflow-hidden transition-all group-hover:border-[#9CCBA8]">
                                         {avatar && avatar.startsWith('data:') ? (
                                             <img src={avatar} alt="Preview" className="w-full h-full object-cover" />
                                         ) : (
@@ -146,7 +147,7 @@ export const ProfileModal = ({ onClose }) => {
                                                 const currentAvatar = DEFAULT_AVATARS.find(a => a.id === avatar);
                                                 const Icon = currentAvatar?.icon || User;
                                                 return (
-                                                    <div className={`w-full h-full flex items-center justify-center text-white ${currentAvatar?.color || 'bg-blue-500'}`}>
+                                                    <div className={`w-full h-full flex items-center justify-center text-white ${currentAvatar?.color || 'bg-[#9CCBA8]'}`}>
                                                         <Icon size={32} />
                                                     </div>
                                                 );
@@ -181,9 +182,9 @@ export const ProfileModal = ({ onClose }) => {
                                         key={opt.id}
                                         type="button"
                                         onClick={() => setGender(opt.id)}
-                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-colors duration-100 border ${gender === opt.id 
-                                            ? 'bg-blue-600 border-blue-600 text-white' 
-                                            : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-900'}`}
+                                        className={`flex-1 py-2.5 text-xs font-bold transition-all duration-100 border ${gender === opt.id 
+                                            ? 'bg-[#9CCBA8] border-[#9CCBA8] text-white shadow-md' 
+                                            : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-900'} ${isEgo ? 'rounded-none' : 'rounded-xl'}`}
                                     >
                                         {opt.label}
                                     </button>
@@ -200,27 +201,27 @@ export const ProfileModal = ({ onClose }) => {
                                     required
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full pl-9 pr-4 py-2.5 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 focus:border-blue-500 dark:border-zinc-800 rounded-xl outline-none text-sm dark:text-white transition-colors"
+                                    className={`w-full pl-9 pr-4 py-2.5 outline-none transition-all text-sm dark:text-white ${isEgo ? 'bg-transparent border-0 border-b border-slate-200 dark:border-zinc-800 rounded-none focus:border-[#9CCBA8]' : 'bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 dark:border-zinc-800 rounded-xl focus:border-[#9CCBA8]'}`}
                                     placeholder={t('profile.name_placeholder')}
                                 />
                             </div>
                         </div>
 
                         <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
-                            <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-4 leading-none">{t('profile.language')}</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-[#9CCBA8] mb-4 leading-none">{t('profile.language')}</p>
                             
                             <div className="flex gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setLanguage('es')}
-                                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${language === 'es' ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-900'}`}
+                                    className={`flex-1 py-2.5 text-xs font-bold transition-all border flex items-center justify-center gap-2 ${language === 'es' ? 'bg-[#9CCBA8] border-[#9CCBA8] text-white shadow-lg' : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-900'} ${isEgo ? 'rounded-none' : 'rounded-xl'}`}
                                 >
                                     <span>🇪🇸</span> {t('profile.lang_es')}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setLanguage('en')}
-                                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${language === 'en' ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-900'}`}
+                                    className={`flex-1 py-2.5 text-xs font-bold transition-all border flex items-center justify-center gap-2 ${language === 'en' ? 'bg-[#9CCBA8] border-[#9CCBA8] text-white shadow-lg' : 'bg-slate-100 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-900'} ${isEgo ? 'rounded-none' : 'rounded-xl'}`}
                                 >
                                     <span>🇺🇸</span> {t('profile.lang_en')}
                                 </button>
@@ -228,7 +229,7 @@ export const ProfileModal = ({ onClose }) => {
                         </div>
 
                         <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
-                            <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 leading-none">{t('profile.voice_engine')}</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-[#9CCBA8] mb-3 leading-none">{t('profile.voice_engine')}</p>
                             
                             <div className="space-y-3 mb-4 mt-3">
                                 <div className="flex gap-2">
@@ -238,9 +239,9 @@ export const ProfileModal = ({ onClose }) => {
                                             setSpeechEngine('vosk');
                                             setSpeechModel('vosk-model-small-es-0.42');
                                         }}
-                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border ${speechEngine === 'vosk' 
-                                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                                            : 'bg-slate-100 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600'}`}
+                                        className={`flex-1 py-2.5 text-xs font-bold transition-all border ${speechEngine === 'vosk' 
+                                            ? 'bg-[#9CCBA8] border-[#9CCBA8] text-white shadow-lg' 
+                                            : 'bg-slate-100 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:border-slate-300' } ${isEgo ? 'rounded-none' : 'rounded-xl'}`}
                                     >
                                         Vosk
                                     </button>
@@ -250,9 +251,9 @@ export const ProfileModal = ({ onClose }) => {
                                             setSpeechEngine('whisper');
                                             setSpeechModel('base');
                                         }}
-                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border ${speechEngine === 'whisper' 
-                                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                                            : 'bg-slate-100 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600'}`}
+                                        className={`flex-1 py-2.5 text-xs font-bold transition-all border ${speechEngine === 'whisper' 
+                                            ? 'bg-[#9CCBA8] border-[#9CCBA8] text-white shadow-lg' 
+                                            : 'bg-slate-100 dark:bg-zinc-800/50 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:border-slate-300'} ${isEgo ? 'rounded-none' : 'rounded-xl'}`}
                                     >
                                         Whisper
                                     </button>
@@ -261,7 +262,7 @@ export const ProfileModal = ({ onClose }) => {
                                     <select
                                         value={speechModel}
                                         onChange={(e) => setSpeechModel(e.target.value)}
-                                        className="w-full px-4 py-3 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 dark:border-zinc-800 focus:border-blue-500 rounded-xl outline-none text-xs dark:text-white"
+                                        className="w-full px-4 py-3 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 dark:border-zinc-800 focus:border-[#9CCBA8] rounded-xl outline-none text-xs dark:text-white"
                                     >
                                         <option value="vosk-model-small-es-0.42">{t('profile.vosk_desc')}</option>
                                         <option value="vosk-model-es-0.42">{t('profile.vosk_full')}</option>
@@ -271,7 +272,7 @@ export const ProfileModal = ({ onClose }) => {
                                     <select
                                         value={speechModel}
                                         onChange={(e) => setSpeechModel(e.target.value)}
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-950/50 border border-transparent focus:border-blue-500 rounded-xl outline-none text-xs dark:text-white"
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-950/50 border border-transparent focus:border-[#9CCBA8] rounded-xl outline-none text-xs dark:text-white"
                                     >
                                         <option value="base">{t('profile.whisper_base')}</option>
                                         <option value="tiny">{t('profile.whisper_tiny')}</option>
@@ -286,11 +287,11 @@ export const ProfileModal = ({ onClose }) => {
                         {!user?.is_google && (
                             <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
                                 <div className="flex items-center justify-between mb-3">
-                                    <p className="text-xs font-bold uppercase tracking-widest text-blue-600 leading-none">{t('profile.security')}</p>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-[#9CCBA8] leading-none">{t('profile.security')}</p>
                                     <button 
                                         type="button"
                                         onClick={() => setShowPasswordFields(!showPasswordFields)}
-                                        className="text-[10px] font-bold text-slate-400 hover:text-blue-500 transition-colors uppercase tracking-tight"
+                                        className="text-[10px] font-bold text-slate-400 hover:text-[#9CCBA8] transition-colors uppercase tracking-tight"
                                     >
                                         {showPasswordFields ? t('common.cancel') : t('auth.password')}?
                                     </button>
@@ -305,7 +306,7 @@ export const ProfileModal = ({ onClose }) => {
                                                 value={password}
                                                 autoComplete="new-password"
                                                 onChange={(e) => setPassword(e.target.value)}
-                                                className="w-full pl-9 pr-4 py-2.5 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 focus:border-blue-500 dark:border-zinc-800 rounded-xl outline-none text-xs dark:text-white transition-colors"
+                                                className={`w-full pl-9 pr-4 py-2.5 outline-none text-xs dark:text-white transition-all ${isEgo ? 'bg-transparent border-0 border-b border-slate-200 dark:border-zinc-800 rounded-none focus:border-[#9CCBA8]' : 'bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 rounded-xl focus:border-[#9CCBA8] dark:border-zinc-800'}`}
                                                 placeholder={t('profile.new_password')}
                                             />
                                         </div>
@@ -316,7 +317,7 @@ export const ProfileModal = ({ onClose }) => {
                                                 value={confirmPassword}
                                                 autoComplete="new-password"
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                                className="w-full pl-9 pr-4 py-2.5 bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 focus:border-blue-500 dark:border-zinc-800 rounded-xl outline-none text-xs dark:text-white transition-colors"
+                                                className={`w-full pl-9 pr-4 py-2.5 outline-none text-xs dark:text-white transition-all ${isEgo ? 'bg-transparent border-0 border-b border-slate-200 dark:border-zinc-800 rounded-none focus:border-[#9CCBA8]' : 'bg-slate-100 dark:bg-zinc-950/50 border border-slate-200 rounded-xl focus:border-[#9CCBA8] dark:border-zinc-800'}`}
                                                 placeholder={t('profile.confirm_password')}
                                             />
                                         </div>
@@ -326,11 +327,11 @@ export const ProfileModal = ({ onClose }) => {
                         )}
 
                         <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/50">
-                            <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-4 leading-none">{t('profile.interface_sound')}</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-[#9CCBA8] mb-4 leading-none">{t('profile.interface_sound')}</p>
                             
                             <label className="flex items-center justify-between cursor-pointer group">
-                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-blue-500 transition-colors">{t('profile.sound_action')}</span>
-                                <div className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out ${playSound ? 'bg-blue-600' : 'bg-slate-200 dark:bg-zinc-800'}`}>
+                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-[#9CCBA8] transition-colors">{t('profile.sound_action')}</span>
+                                <div className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out ${playSound ? 'bg-[#9CCBA8]' : 'bg-slate-200 dark:bg-zinc-800'}`}>
                                     <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${playSound ? 'translate-x-6' : 'translate-x-1'}`} />
                                     <input type="checkbox" className="sr-only" checked={playSound} onChange={(e) => setPlaySound(e.target.checked)} />
                                 </div>
@@ -346,7 +347,7 @@ export const ProfileModal = ({ onClose }) => {
                         <button 
                             type="submit" 
                             disabled={loading || success}
-                            className={`w-full py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${success ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white active:scale-95 disabled:opacity-50'}`}
+                            className={`w-full py-3.5 font-bold transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 ${success ? 'bg-green-500 text-white' : isEgo ? 'bg-black dark:bg-white text-white dark:text-black rounded-none uppercase tracking-widest text-[10px]' : 'bg-[#9CCBA8] hover:bg-[#8DB998] text-white rounded-xl shadow-lg'}`}
                         >
                             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : success ? <Check className="w-4 h-4" /> : t('profile.save')}
                         </button>

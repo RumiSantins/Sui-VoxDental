@@ -1,3 +1,5 @@
+# Punto de entrada principal para el servidor FastAPI de EgoS.
+# Gestiona la inicialización de la app, middlewares y montaje de rutas estáticas.
 import os
 # Fix for OpenMP runtime conflict (OMP Error #15) on Windows
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -16,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from .api.routes import router
 
-app = FastAPI(title="SuiEgo API", version="0.1.0")
+app = FastAPI(title="EgoS API", version="0.1.0")
 
 # Enable CORS for frontend
 # En producción, configurar ALLOWED_ORIGINS=https://tu-dominio.com

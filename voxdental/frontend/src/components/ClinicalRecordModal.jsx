@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { FileText, Printer, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { useTheme } from '../context/ThemeContext';
 
 export const ClinicalRecordModal = React.memo(({
     doctor,
@@ -14,6 +15,7 @@ export const ClinicalRecordModal = React.memo(({
     onClose
 }) => {
     const { t, language } = useLanguage();
+    const { isEgo } = useTheme();
     useScrollLock();
 
     const handlePrint = () => {
@@ -84,11 +86,11 @@ export const ClinicalRecordModal = React.memo(({
     if (!mounted) return null;
 
     const modalContent = (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 p-4 sm:p-6 animate-in fade-in duration-200 print-modal-container">
-            <div className="bg-white dark:bg-zinc-900 w-full max-w-4xl rounded-2xl shadow-xl border border-slate-200 dark:border-zinc-800 flex flex-col h-[90vh] print-modal-content">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200 print-modal-container" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: isEgo ? 'blur(4px)' : 'none' }}>
+            <div className={`w-full max-w-4xl flex flex-col h-[90vh] overflow-hidden transition-all duration-300 print-modal-content ${isEgo ? 'bg-white dark:bg-[#111] rounded-none shadow-2xl' : 'bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-slate-200 dark:border-zinc-800'}`}>
                 
                 {/* Header (Non printable actions) */}
-                <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 print-hidden shrink-0">
+                <div className={`flex justify-between items-center p-6 border-b print-hidden shrink-0 transition-all ${isEgo ? 'bg-white dark:bg-[#111] border-slate-100 dark:border-zinc-800' : 'border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900'}`}>
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-blue-50 dark:bg-zinc-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
                             <FileText size={24} />
@@ -99,7 +101,7 @@ export const ClinicalRecordModal = React.memo(({
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md text-sm">
+                        <button onClick={handlePrint} className={`flex items-center gap-2 px-6 py-2 font-bold transition-all active:scale-[0.98] ${isEgo ? 'bg-black dark:bg-white text-white dark:text-black rounded-none uppercase tracking-widest text-[10px]' : 'bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md text-sm'}`}>
                             <Printer size={18} /> <span className="hidden sm:inline">{t('record.print_btn')}</span>
                         </button>
                         <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-400 hover:text-slate-600 transition-colors">
