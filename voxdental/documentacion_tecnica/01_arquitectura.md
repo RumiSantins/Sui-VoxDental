@@ -1,6 +1,6 @@
 # Arquitectura de Sistemas
 
-El sistema SuiEgo esta diseñado bajo una arquitectura de microservicios simplificada basada en contenedores Docker, lo que garantiza la portabilidad y escalabilidad entre entornos de desarrollo y produccion.
+El sistema EgoS esta diseñado bajo una arquitectura de microservicios simplificada basada en contenedores Docker, lo que garantiza la portabilidad y escalabilidad entre entornos de desarrollo y produccion.
 
 ## Stack Tecnologico
 

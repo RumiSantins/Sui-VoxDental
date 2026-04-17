@@ -1,4 +1,4 @@
-# Definicion de los endpoints de la API REST para SuiEgo.
+# Definicion de los endpoints de la API REST para EgoS.
 # Agrupa las rutas de autenticacion, gestion de pacientes, registros clinicos y procesamiento de voz.
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, status, Request
 from fastapi.responses import StreamingResponse

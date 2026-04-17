@@ -1,15 +1,17 @@
-/* Componente raiz de la aplicacion SuiEgo. 
-   Gestiona la autenticacion, el cambio de temas (oscuro/claro) y la navegacion principal. */
+/* Componente raiz de la aplicacion EgoS. 
+   Gestiona la autenticacion, la navegacion principal y el idioma.
+   El tema (diseño + modo oscuro) es gestionado por ThemeContext. */
 import { useState, useEffect, useCallback, memo, lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { useLanguage } from './context/LanguageContext'
+import { useTheme } from './context/ThemeContext'
 import { Login } from './components/Login'
 import { PatientSelector } from './components/PatientSelector'
 import { Settings, Heart, Activity, Stethoscope, Shield, Dog, Briefcase, User as UserIcon, Cat, Loader2, LogOut } from 'lucide-react'
 
 // Lazy loaded components for better performance
 const OdontogramView = lazy(() => import('./components/OdontogramView').then(m => ({ default: m.OdontogramView })));
-const SuiEgoHome = lazy(() => import('./components/SuiEgoHome').then(m => ({ default: m.SuiEgoHome })));
+const EgoSHome = lazy(() => import('./components/EgoSHome').then(m => ({ default: m.EgoSHome })));
 const Register = lazy(() => import('./components/Register').then(m => ({ default: m.Register })));
 const VerifyEmail = lazy(() => import('./components/VerifyEmail').then(m => ({ default: m.VerifyEmail })));
 const WelcomeScreen = lazy(() => import('./components/WelcomeScreen').then(m => ({ default: m.WelcomeScreen })));
@@ -19,10 +21,14 @@ const AdminPanel = lazy(() => import('./components/AdminPanel').then(m => ({ def
 const LoadingFallback = () => {
   const { t } = useLanguage();
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-slate-950">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-        <p className="text-sm font-black uppercase tracking-widest text-blue-600/60 animate-pulse">{t('app.loading')}</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-[#0B0B0B] relative overflow-hidden">
+      {/* Ambient Backgrounds for Loading */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#9CCBA8]/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#E8D1B6]/10 blur-[100px] rounded-full pointer-events-none" />
+
+      <div className="flex flex-col items-center gap-4 relative z-10">
+        <Loader2 className="w-10 h-10 text-[#9CCBA8] animate-spin" />
+        <p className="text-sm font-black uppercase tracking-widest text-[#9CCBA8]/60 animate-pulse">{t('app.loading')}</p>
       </div>
     </div>
   );
@@ -42,17 +48,18 @@ const AVATAR_MAP = {
 function AppContent() {
   const { user, token, logout } = useAuth()
   const { t, language, toggleLanguage } = useLanguage()
+  const { isDark, toggleMode, design, toggleDesign } = useTheme()
   const [showWelcome, setShowWelcome] = useState(false)
   const [hasShownWelcome, setHasShownWelcome] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [currentView, setCurrentView] = useState('main') // 'main' or 'admin'
 
   const renderAvatar = (user, size = 32) => {
-    if (!user?.avatar) return <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white"><UserIcon size={size * 0.6} /></div>
+    if (!user?.avatar) return <div className="w-10 h-10 bg-[#9CCBA8] rounded-xl flex items-center justify-center text-white"><UserIcon size={size * 0.6} /></div>
 
     if (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) {
       return (
-        <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 dark:border-blue-900/30 shadow-md">
+        <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 dark:border-[#9CCBA8]/30 shadow-md">
           <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
         </div>
       )
@@ -71,7 +78,7 @@ function AppContent() {
     }
 
     return (
-      <div className={`w-10 h-10 ${colors[user.avatar] || 'bg-blue-500'} rounded-xl flex items-center justify-center text-white shadow-lg`}>
+      <div className={`w-10 h-10 ${colors[user.avatar] || 'bg-[#9CCBA8]'} rounded-xl flex items-center justify-center text-white shadow-lg`}>
         <Icon size={size * 0.6} />
       </div>
     )
@@ -108,11 +115,8 @@ function AppContent() {
     }
   }, []);
 
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark'
-  })
   const [selectedPatient, setSelectedPatient] = useState(null)
-  
+
   const [speechEngine, setSpeechEngine] = useState(() => localStorage.getItem('speechEngine') || 'vosk')
   const [speechModel, setSpeechModel] = useState(() => localStorage.getItem('speechModel') || 'vosk-model-small-es-0.42')
 
@@ -125,17 +129,6 @@ function AppContent() {
 
   const showWhisperBadge = !(speechEngine === 'whisper' && speechModel === 'base');
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark')
-      document.body.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      document.body.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }, [darkMode])
 
   useEffect(() => {
     // Reset selected patient when user changes (login/logout/different profile)
@@ -150,9 +143,6 @@ function AppContent() {
     }
   }, [user, hasShownWelcome])
 
-  const toggleDarkMode = useCallback(() => {
-    setDarkMode(prev => !prev)
-  }, [])
 
   if (currentView === 'admin') {
     return (
@@ -166,7 +156,7 @@ function AppContent() {
     return (
       <Suspense fallback={<LoadingFallback />}>
         {authView === 'home' ? (
-          <SuiEgoHome onLogin={() => navigateTo('login')} onRegister={() => navigateTo('register')} isDark={darkMode} onToggleTheme={toggleDarkMode} language={language} onToggleLanguage={toggleLanguage} />
+          <EgoSHome onLogin={() => navigateTo('login')} onRegister={() => navigateTo('register')} language={language} onToggleLanguage={toggleLanguage} />
         ) : authView === 'verify' ? (
           <VerifyEmail onBackToLogin={() => navigateTo('login')} />
         ) : authView === 'login' ? (
@@ -179,12 +169,12 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 relative overflow-x-hidden">
+    <div className="min-h-screen relative overflow-x-hidden" style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-main)' }}>
       <Suspense fallback={<LoadingFallback />}>
         {showWelcome && (
           <WelcomeScreen
             user={user}
-            darkMode={darkMode}
+            darkMode={isDark}
             onFinished={() => setShowWelcome(false)}
           />
         )}
@@ -195,16 +185,16 @@ function AppContent() {
               {renderAvatar(user)}
               <div className="flex flex-col">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tighter">{t('app.title')}</h1>
+                  <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-[#9CCBA8] to-[#E8D1B6] bg-clip-text text-transparent tracking-tighter">SuiVoxDental</h1>
                   <button
                     onClick={() => setShowProfile(true)}
-                    className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all shrink-0"
+                    className="p-1.5 text-gray-400 hover:text-[#9CCBA8] hover:bg-[#9CCBA8]/10 rounded-lg transition-all shrink-0"
                     title={t('app.profile_settings')}
                   >
                     <Settings size={14} />
                   </button>
                   {showWhisperBadge && (
-                    <span className="inline-flex px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter rounded-md border border-amber-200 dark:border-amber-800/50 animate-pulse shadow-sm whitespace-nowrap">
+                    <span className="inline-flex px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter rounded-[var(--radius-base)] border border-amber-200 dark:border-amber-800/50 animate-pulse shadow-sm whitespace-nowrap">
                       Whisper Base recomendado
                     </span>
                   )}
@@ -218,7 +208,7 @@ function AppContent() {
 
             <button
               onClick={logout}
-              className="sm:hidden flex items-center justify-center p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all border border-slate-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/30"
+              className={`sm:hidden flex items-center justify-center p-2.5 transition-all ${design === 'ego' ? 'bg-transparent border-none text-red-500' : 'text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-[var(--radius-base)] border border-slate-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/30'}`}
               title={t('app.logout')}
             >
               <LogOut size={16} />
@@ -234,7 +224,7 @@ function AppContent() {
             </div>
             <button
               onClick={logout}
-              className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-zinc-900 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all shadow-sm border border-slate-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/30 text-xs font-bold uppercase tracking-wider"
+              className={`${design === 'ego' ? 'flex items-center gap-2 bg-transparent border-none text-red-500 hover:text-red-600 transition-all font-black text-xs uppercase tracking-widest' : 'hidden sm:flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-zinc-900 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-[var(--radius-base)] transition-all shadow-sm border border-slate-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/30 text-xs font-bold uppercase tracking-wider'}`}
             >
               <LogOut size={14} className="stroke-[2.5]" />
               {t('app.logout')}
@@ -246,9 +236,11 @@ function AppContent() {
 
         <div className="relative z-10">
           <OdontogramView
-            darkMode={darkMode}
-            onToggleTheme={toggleDarkMode}
             patient={selectedPatient}
+            darkMode={isDark}
+            onToggleTheme={toggleMode}
+            design={design}
+            onToggleDesign={toggleDesign}
           />
         </div>
 
@@ -258,7 +250,7 @@ function AppContent() {
           </p>
           <p className="mt-2 text-[10px] font-medium text-slate-400 dark:text-zinc-600">
             {t('app.made_by')} <span className="text-slate-500 dark:text-zinc-400">Felipe Santillan</span> •
-            <a href="https://fausto.app/" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">Fausto</a>
+            <a href="https://fausto.app/" target="_blank" rel="noopener noreferrer" className="ml-1 text-[#9CCBA8] hover:text-[#9CCBA8]/80 dark:text-[#9CCBA8] dark:hover:text-[#9CCBA8]/80 transition-colors">Fausto</a>
           </p>
         </footer>
       </Suspense>

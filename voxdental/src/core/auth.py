@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 # Set a secure secret key via environment variable in production
 SECRET_KEY = "vox-dental-secret-key-development"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 360 # 6 hours for better demo experience
+ACCESS_TOKEN_EXPIRE_MINUTES = 1440 # 24 hours for better demo experience
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
@@ -23,7 +23,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(days=1)
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

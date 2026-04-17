@@ -15,12 +15,12 @@ set -e
 # --- CONFIGURACIÓN (Edita estos valores) ---
 PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
 REGION="us-central1"
-BACKEND_IMAGE="gcr.io/${PROJECT_ID}/suiego-backend"
-FRONTEND_IMAGE="gcr.io/${PROJECT_ID}/suiego-frontend"
+BACKEND_IMAGE="gcr.io/${PROJECT_ID}/EgoS-backend"
+FRONTEND_IMAGE="gcr.io/${PROJECT_ID}/EgoS-frontend"
 TAG="latest"
 
 echo "=========================================="
-echo " SuiEgo - Despliegue a GCP"
+echo " EgoS - Despliegue a GCP"
 echo "=========================================="
 echo "Proyecto: ${PROJECT_ID}"
 echo "Region:   ${REGION}"

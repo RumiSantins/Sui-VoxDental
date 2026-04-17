@@ -1,8 +1,8 @@
-# SuiEgo Platform
+# EgoS Platform
 
-SuiEgo es una plataforma centralizada de servicios de salud inteligente, diseñada para gestionar flujos clinicos complejos mediante el uso de inteligencia artificial y procesamiento de voz en tiempo real.
+EgoS es una plataforma centralizada de servicios de salud inteligente, diseñada para gestionar flujos clinicos complejos mediante el uso de inteligencia artificial y procesamiento de voz en tiempo real.
 
-Este repositorio alberga el nucleo de SuiEgo y su extension especializada Sui-VoxDental, un sistema de odontograma interactivo manos libres.
+Este repositorio alberga el nucleo de EgoS y su extension especializada VoxDental, un sistema de odontograma interactivo manos libres.
 
 ---
 
@@ -36,13 +36,13 @@ voxdental/
 ├── static/             <-- Recursos estaticos
 ├── Dockerfile          <-- Configuracion de imagen para Backend
 ├── docker-compose.yml  <-- Orquestacion de servicios
-└── suiego.db           <-- Base de datos principal (SQLite)
+└── voxdental.db           <-- Base de datos principal (SQLite)
 ```
 
 ---
 
 ## Creditos y Desarrollo
 
-Plataforma desarrollada por el equipo de SuiEgo. 
+Plataforma desarrollada por el equipo de EgoS. 
 Desarrollador Principal: Felipe Santillan.
 Colaboracion: Fausto Software.

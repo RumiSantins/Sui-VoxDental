@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserPlus, Users, Check, ChevronDown, Edit2, Trash2, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 
 export const PatientSelector = ({ onSelect, selectedPatient }) => {
     const [patients, setPatients] = useState([]);
@@ -10,6 +11,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
     const [newPatientName, setNewPatientName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const { t } = useLanguage();
+    const { isEgo } = useTheme();
 
     // Edit/Delete state
     const [editingId, setEditingId] = useState(null);
@@ -123,23 +125,23 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
 
     return (
         <div className="relative">
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className={`flex items-center gap-2 w-full sm:w-auto ${isEgo ? 'border-b border-slate-200 dark:border-zinc-800 pb-0' : ''}`}>
                 <button
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className={`flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-sm hover:border-blue-400 dark:hover:border-zinc-700 transition-all min-w-0 flex-1 sm:min-w-[200px] justify-between ${showDropdown ? 'ring-2 ring-slate-100 dark:ring-zinc-800/50' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-2 hover:border-[#9CCBA8] transition-all min-w-0 flex-1 sm:min-w-[200px] justify-between ${isEgo ? 'bg-transparent border-none shadow-none rounded-none' : 'bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-sm'}`}
                 >
                     <div className="flex items-center gap-2 overflow-hidden">
                         <Users size={18} className="text-slate-500 dark:text-slate-400 flex-shrink-0" />
-                        <span className="truncate font-semibold text-slate-700 dark:text-zinc-200 text-sm">
+                        <span className="truncate font-bold text-slate-700 dark:text-zinc-200 text-sm">
                             {selectedPatient ? selectedPatient.name : t('patient.select_placeholder')}
                         </span>
                     </div>
-                    <ChevronDown size={14} className={`text-slate-400 flex-shrink-0 transition-transform ${showDropdown ? 'rotate-180 text-blue-600' : ''}`} />
+                    <ChevronDown size={14} className={`text-slate-400 flex-shrink-0 transition-transform ${showDropdown ? 'rotate-180 text-[#9CCBA8]' : ''}`} />
                 </button>
 
                 <button
                     onClick={() => { setIsCreating(true); setShowDropdown(true); }}
-                    className="p-2.5 bg-white dark:bg-zinc-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all border border-slate-300 dark:border-zinc-700 shadow-sm flex-shrink-0"
+                    className={`p-2.5 transition-all flex-shrink-0 ${isEgo ? 'bg-transparent border-none text-slate-400' : 'bg-white dark:bg-zinc-800 text-slate-600 dark:text-slate-300 rounded-xl border border-slate-300 dark:border-zinc-700 shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-700'}`}
                     title={t('patient.new_patient')}
                 >
                     <UserPlus size={18} />
@@ -147,7 +149,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
             </div>
 
             {showDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-full sm:min-w-[280px] bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className={`absolute top-full left-0 mt-2 w-full sm:min-w-[280px] z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${isEgo ? 'bg-white dark:bg-zinc-900 border-x border-b border-slate-200 dark:border-zinc-800 rounded-b-lg p-0 shadow-lg' : 'bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-xl'}`}>
                     {isCreating ? (
                         <form onSubmit={handleCreatePatient} className="p-4 bg-slate-50/50 dark:bg-zinc-800/20">
                             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">{t('patient.new_patient')}</label>
@@ -158,9 +160,9 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                     placeholder={t('patient.full_name')}
                                     value={newPatientName}
                                     onChange={(e) => setNewPatientName(e.target.value)}
-                                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-[#9CCBA8]/30 dark:border-[#9CCBA8]/20 rounded-lg outline-none focus:ring-2 focus:ring-[#9CCBA8] text-sm"
                                 />
-                                <button type="submit" className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                                <button type="submit" className="p-2 bg-[#9CCBA8] text-white rounded-lg hover:bg-[#8DB998] transition-colors shadow-sm">
                                     <Check size={18} />
                                 </button>
                             </div>
@@ -181,7 +183,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                     <p className="text-sm text-gray-500 mb-2">{t('patient.no_patients')}</p>
                                     <button
                                         onClick={() => setIsCreating(true)}
-                                        className="text-xs font-bold text-blue-500 hover:underline"
+                                        className="text-xs font-bold text-[#9CCBA8] hover:underline"
                                     >
                                         {t('patient.register_first')}
                                     </button>
@@ -198,7 +200,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                                 </div>
                                             </div>
                                         ) : editingId === p.id ? (
-                                            <form onSubmit={(e) => handleUpdatePatient(e, p.id)} className="p-2 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                                            <form onSubmit={(e) => handleUpdatePatient(e, p.id)} className="p-2 bg-[#9CCBA8]/5 dark:bg-[#9CCBA8]/10 rounded-xl border border-[#9CCBA8]/20 dark:border-[#9CCBA8]/30">
                                                 <div className="flex gap-2">
                                                     <input
                                                         type="text"
@@ -206,9 +208,9 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                                         value={editName}
                                                         onClick={(e) => e.stopPropagation()}
                                                         onChange={(e) => setEditName(e.target.value)}
-                                                        className="flex-1 px-2 py-1 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-md outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                                        className="flex-1 px-2 py-1 bg-white dark:bg-slate-900 border border-[#9CCBA8]/30 dark:border-[#9CCBA8]/20 rounded-md outline-none focus:ring-2 focus:ring-[#9CCBA8] text-sm"
                                                     />
-                                                    <button type="submit" className="p-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm">
+                                                    <button type="submit" className="p-1.5 bg-[#9CCBA8] text-white rounded-md hover:bg-[#8DB998] transition-colors shadow-sm">
                                                         <Check size={14} />
                                                     </button>
                                                     <button type="button" onClick={(e) => { e.stopPropagation(); setEditingId(null); }} className="p-1.5 bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 rounded-md hover:bg-slate-300 dark:hover:bg-zinc-700">
@@ -223,7 +225,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                                     setShowDropdown(false);
                                                 }}
                                                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all text-sm cursor-pointer group ${selectedPatient?.id === p.id
-                                                    ? 'bg-blue-600 text-white shadow-md'
+                                                    ? 'bg-[#9CCBA8] text-white shadow-md'
                                                     : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'}`}
                                             >
                                                 <span className="font-semibold truncate mr-2">{p.name}</span>
@@ -235,7 +237,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                                                 setEditingId(p.id);
                                                                 setEditName(p.name);
                                                             }}
-                                                            className={`p-1 rounded-md transition-colors ${selectedPatient?.id === p.id ? 'hover:bg-blue-700 text-blue-100 hover:text-white' : 'hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-500'}`}
+                                                            className={`p-1 rounded-md transition-colors ${selectedPatient?.id === p.id ? 'hover:bg-[#8DB998] text-[#EBF9F2] hover:text-white' : 'hover:bg-[#9CCBA8]/10 dark:hover:bg-[#9CCBA8]/20 text-[#9CCBA8]'}`}
                                                             title="Editar"
                                                         >
                                                             <Edit2 size={12} />
@@ -245,7 +247,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                                                 e.stopPropagation();
                                                                 setDeletingId(p.id);
                                                             }}
-                                                            className={`p-1 rounded-md transition-colors ${selectedPatient?.id === p.id ? 'hover:bg-blue-700 text-red-200 hover:text-red-100' : 'hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500'}`}
+                                                            className={`p-1 rounded-md transition-colors ${selectedPatient?.id === p.id ? 'hover:bg-red-700/50 text-red-100 hover:text-white' : 'hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500'}`}
                                                             title="Eliminar"
                                                         >
                                                             <Trash2 size={12} />

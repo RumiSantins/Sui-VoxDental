@@ -1,10 +1,10 @@
-/* Diccionario centralizado de traducciones (i18n) para SuiEgo.
+/* Diccionario centralizado de traducciones (i18n) para EgoS.
    Organiza las cadenas de texto por idioma (es/en) y seccion de la aplicación. */
 export const translations = {
     es: {
         // App / Navigation
-        'app.title': 'SuiEgo',
-        'app.loading': 'Cargando SuiEgo...',
+        'app.title': 'EgoS',
+        'app.loading': 'Cargando EgoS...',
         'app.profile_settings': 'Ajustes de Perfil',
         'app.logout': 'Salir',
         'app.system_info': '• Sistema Odontológico Inteligente • v1.1.0',
@@ -62,7 +62,7 @@ export const translations = {
         'auth.register_here': 'Regístrate aquí',
         'auth.name_placeholder': 'Tu nombre de usuario',
         'auth.register_title': 'Crear Cuenta',
-        'auth.register_subtitle': 'Empieza a usar SuiEgo hoy',
+        'auth.register_subtitle': 'Empieza a usar EgoS hoy',
         'auth.register_btn': 'REGISTRARSE',
         'auth.have_account': '¿Ya tienes cuenta?',
         'auth.back_login': 'Inicia sesión aquí',
@@ -229,8 +229,8 @@ export const translations = {
     },
     en: {
         // App / Navigation
-        'app.title': 'SuiEgo',
-        'app.loading': 'Loading SuiEgo...',
+        'app.title': 'EgoS',
+        'app.loading': 'Loading EgoS...',
         'app.profile_settings': 'Profile Settings',
         'app.logout': 'Logout',
         'app.system_info': '• Intelligent Dental System • v1.1.0',
@@ -288,7 +288,7 @@ export const translations = {
         'auth.register_here': 'Register here',
         'auth.name_placeholder': 'Your username',
         'auth.register_title': 'Create Account',
-        'auth.register_subtitle': 'Start using SuiEgo today',
+        'auth.register_subtitle': 'Start using EgoS today',
         'auth.register_btn': 'REGISTER',
         'auth.have_account': 'Already have an account?',
         'auth.back_login': 'Log in here',

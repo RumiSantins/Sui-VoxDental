@@ -1,6 +1,6 @@
-# Indice de Documentacion Tecnica - SuiEgo
+# Indice de Documentacion Tecnica - EgoS
 
-Bienvenido a la documentacion oficial del proyecto SuiEgo. Este repositorio contiene el codigo fuente y las configuraciones necesarias para la plataforma central SuiEgo y su extension especializada VoxDental.
+Bienvenido a la documentacion oficial del proyecto EgoS. Este repositorio contiene el codigo fuente y las configuraciones necesarias para la plataforma central EgoS y su extension especializada VoxDental.
 
 La documentacion esta organizada de forma modular para facilitar su lectura y mantenimiento.
 
@@ -19,7 +19,7 @@ Manual para el mantenimiento del servidor en Google Cloud Platform, gestion de c
 [Ver Manual de Produccion](03_despliegue_produccion.md)
 
 ### 4. Referencia del Frontend (React)
-Detalles sobre la estructura de componentes, gestion de estados globales, internacionalizacion y el sistema de diseño de SuiEgo.
+Detalles sobre la estructura de componentes, gestion de estados globales, internacionalizacion y el sistema de diseño de EgoS.
 [Ver Referencia Frontend](04_frontend.md)
 
 ### 5. Referencia del Backend (FastAPI)
@@ -29,4 +29,4 @@ Explicacion de la logica del servidor, integracion de motores de procesamiento d
 ---
 
 ## Contacto y Mantenimiento
-La documentacion es mantenida por el equipo de desarrollo de SuiEgo. Para actualizaciones o dudas tecnicas, consulte los planes de mejora en el directorio de documentacion de planes.
+La documentacion es mantenida por el equipo de desarrollo de EgoS. Para actualizaciones o dudas tecnicas, consulte los planes de mejora en el directorio de documentacion de planes.

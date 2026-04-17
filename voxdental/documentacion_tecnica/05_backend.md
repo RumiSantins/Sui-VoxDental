@@ -1,6 +1,6 @@
 # Referencia Tecnica del Backend
 
-El backend de SuiEgo es un servidor de alto rendimiento construido con FastAPI y Python 3.10. Su funcion principal es orquestar la seguridad, la persistencia de datos y el procesamiento de inteligencia artificial para voz.
+El backend de EgoS es un servidor de alto rendimiento construido con FastAPI y Python 3.10. Su funcion principal es orquestar la seguridad, la persistencia de datos y el procesamiento de inteligencia artificial para voz.
 
 ## Arquitectura del Servidor
 
@@ -13,7 +13,7 @@ El backend de SuiEgo es un servidor de alto rendimiento construido con FastAPI y
 
 ## Motores de Inteligencia Artificial (Voz)
 
-SuiEgo soporta dos motores principales para la conversion de voz a texto (STT):
+EgoS soporta dos motores principales para la conversion de voz a texto (STT):
 
 ### 1. Whisper (OpenAI)
 Utilizado para alta precision. Puede funcionar mediante llamadas a la API de OpenAI o mediante una implementacion local de `faster-whisper` dependiendo de los recursos del servidor.

@@ -1,6 +1,6 @@
 # Guia de Desarrollo Local
 
-Esta guia describe los pasos necesarios para poner en funcionamiento el entorno de desarrollo de SuiEgo en una maquina local.
+Esta guia describe los pasos necesarios para poner en funcionamiento el entorno de desarrollo de EgoS en una maquina local.
 
 ## Requisitos Previos
 

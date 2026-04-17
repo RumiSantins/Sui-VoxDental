@@ -3,6 +3,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useState } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 export const Login = ({ onSwitch, onAdminAccess }) => {
     const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
     const [error, setError] = useState(null);
     const { login } = useAuth();
     const { t } = useLanguage();
+    const { isEgo } = useTheme();
     const MASTER_KEY = "voxadmin2024";
 
     const handleLogoClick = () => {
@@ -96,19 +98,19 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 p-6 transition-colors duration-500 relative overflow-hidden">
-            {/* Ambient Background */}
-            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 blur-[100px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-800/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="min-h-screen flex items-center justify-center p-6 transition-colors duration-500 relative overflow-hidden" style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-main)' }}>
+            {/* Ambient Background — only visible in Ego via CSS opacity */}
+            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] blur-[100px] rounded-full pointer-events-none" style={{ backgroundColor: `rgba(156, 203, 168, var(--blob-green-opacity))` }} />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] blur-[100px] rounded-full pointer-events-none" style={{ backgroundColor: `rgba(232, 209, 182, var(--blob-warm-opacity))` }} />
 
-            <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-xl p-8 relative z-10 animate-in fade-in zoom-in-95 duration-300">
+            <div className={`w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-300 ${isEgo ? 'bg-transparent border-none shadow-none p-0' : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-xl p-8'}`}>
                 <div className="text-center mb-8">
                     <button 
                         type="button"
                         onClick={handleLogoClick}
-                        className="w-16 h-16 bg-blue-50 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-200 dark:border-zinc-700 active:scale-95 transition-all"
+                        className={`w-16 h-16 flex items-center justify-center mx-auto mb-4 active:scale-95 transition-all ${isEgo ? 'bg-transparent border-none' : 'bg-[#9CCBA8]/10 dark:bg-zinc-800 rounded-2xl border border-[#9CCBA8]/30 dark:border-zinc-700'}`}
                     >
-                        <User className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                        <User className={`w-8 h-8 ${isEgo ? 'text-slate-900 dark:text-white' : 'text-[#9CCBA8] dark:text-[#9CCBA8]/80'}`} />
                     </button>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4 tracking-tight">{t('auth.login_title')}</h1>
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">{t('auth.login_subtitle')}</p>
@@ -142,7 +144,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-blue-500 outline-none transition-all dark:text-white text-sm"
+                                        className={`w-full pl-10 pr-4 py-3 outline-none transition-all dark:text-white text-sm ${isEgo ? 'bg-transparent border-b border-slate-200 dark:border-zinc-800 rounded-none focus:border-[#9CCBA8]' : 'bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-[#9CCBA8]'}`}
                                         placeholder={t('auth.name_placeholder')}
                                     />
                                 </div>
@@ -157,7 +159,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full pl-10 pr-12 py-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-blue-500 outline-none transition-all dark:text-white text-sm"
+                                        className={`w-full pl-10 pr-12 py-3 outline-none transition-all dark:text-white text-sm ${isEgo ? 'bg-transparent border-b border-slate-200 dark:border-zinc-800 rounded-none focus:border-[#9CCBA8]' : 'bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-[#9CCBA8]'}`}
                                         placeholder="••••••••"
                                     />
                                     <button
@@ -179,7 +181,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                             <button 
                                 type="submit" 
                                 disabled={loading}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group disabled:opacity-70"
+                                className={`w-full font-bold py-3.5 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group disabled:opacity-70 ${isEgo ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-none' : 'bg-[#9CCBA8] hover:bg-[#8DB998] text-white rounded-xl shadow-lg shadow-[#9CCBA8]/20'}`}
                             >
                                 {loading ? (
                                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -205,7 +207,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                                     onSuccess={handleGoogleSuccess}
                                     onError={() => setError('Error en la autenticación con Google')}
                                     useOneTap
-                                    theme="filled_blue"
+                                    theme="outline"
                                     shape="pill"
                                 />
                             </div>
@@ -216,7 +218,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                                 {t('auth.no_account')} {' '}
                                 <button 
                                     onClick={onSwitch}
-                                    className="text-blue-600 dark:text-blue-400 font-bold hover:underline"
+                                    className="text-[#9CCBA8] dark:text-[#9CCBA8]/80 font-bold hover:underline"
                                 >
                                     {t('auth.register_here')}
                                 </button>
