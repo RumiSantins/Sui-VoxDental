@@ -15,8 +15,8 @@ set -e
 # --- CONFIGURACIÓN (Edita estos valores) ---
 PROJECT_ID="sui-production-492623"
 REGION="us-central1"
-BACKEND_IMAGE="gcr.io/${PROJECT_ID}/EgoS-backend"
-FRONTEND_IMAGE="gcr.io/${PROJECT_ID}/EgoS-frontend"
+BACKEND_IMAGE="gcr.io/${PROJECT_ID}/egos-backend"
+FRONTEND_IMAGE="gcr.io/${PROJECT_ID}/egos-frontend"
 TAG="latest"
 
 echo "=========================================="
