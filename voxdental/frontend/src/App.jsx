@@ -183,7 +183,20 @@ export default function App() {
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-[#9CCBA8] to-[#E8D1B6] bg-clip-text text-transparent tracking-tighter">SuiVoxDental</h1>
-                <button onClick={() => setShowProfile(true)} className="p-1.5 text-gray-400 hover:text-[#9CCBA8] hover:bg-[#9CCBA8]/10 rounded-lg transition-all"><Settings size={14} /></button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setShowProfile(true)} className="p-1.5 text-gray-400 hover:text-[#9CCBA8] hover:bg-[#9CCBA8]/10 rounded-lg transition-all"><Settings size={14} /></button>
+                  {(() => {
+                    const model = localStorage.getItem('speechModel') || 'vosk-model-small-es-0.42';
+                    if (model !== 'base') {
+                      return (
+                        <span className="text-[8px] sm:text-[10px] font-black text-amber-500 animate-pulse uppercase tracking-widest whitespace-nowrap bg-amber-500/10 px-2 py-1 rounded-lg border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.1)]">
+                          {t('profile.whisper_recommend_hint_short')}
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
               </div>
               <p className="text-[10px] sm:text-xs text-slate-500 font-semibold tracking-tight mt-0.5">{user?.name || user?.email}</p>
             </div>
