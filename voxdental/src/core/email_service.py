@@ -56,7 +56,7 @@ def send_verification_email(email: str, token: str, full_name: str):
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
-            server.sendmail(SMTP_USER, email, message.as_string())
+            server.send_message(message)
         return True
     except Exception as e:
         print(f"Error sending email: {e}")
@@ -69,11 +69,8 @@ def send_feedback_email(name: str, sender_email: str, comment: str):
         return False
 
     message = MIMEMultipart("alternative")
-    subject_text = f"Nuevo comentario de {name} - EgoS"
-    message["Subject"] = Header(subject_text, 'utf-8').encode()
-    
-    from_display = Header("EgoS Feedback", 'utf-8').encode()
-    message["From"] = f"{from_display} <{SMTP_USER}>"
+    message["Subject"] = f"Nuevo comentario de {name} - EgoS"
+    message["From"] = f"EgoS Feedback <{SMTP_USER}>"
     message["To"] = "rumi.04.se@gmail.com"
 
     text = f"Nuevo comentario recibido en EgoS:\n\nDe: {name}\nCorreo: {sender_email}\nComentario:\n{comment}"
@@ -110,7 +107,7 @@ def send_feedback_email(name: str, sender_email: str, comment: str):
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
-            server.sendmail(SMTP_USER, "rumi.04.se@gmail.com", message.as_string())
+            server.send_message(message)
         return True
     except Exception as e:
         print(f"Error sending feedback email: {e}")
