@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import { Mic, MicOff, AlertCircle, Sun, Moon, MessageSquare, Users, FileText, Check, Cloud, Trash2, AlertOctagon, Eye, EyeOff } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
 import { useAuth } from '../context/AuthContext';
@@ -49,18 +49,21 @@ const Quadrant = memo(({ range, findings, notes, onToothClick, getToothState, us
 const isIncisal = (num) => (num % 10 <= 3);
 
 export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleDesign, patient }) => {
+    // Hooks de Contexto
     const { token, user, logout } = useAuth();
     const { t } = useLanguage();
+
+    // Hook de Voz: Gestiona la captura de audio y procesamiento con Whisper/Vosk
     const { isRecording, isProcessing, isContinuous, volume, startRecording, stopRecording, setExternalContext } = useSpeech();
 
-    // 1. All States
+    // --- ESTADOS PRINCIPALES ---
     const [findings, setFindings] = useState([]);
     const [lastTranscript, setLastTranscript] = useState("");
     const [warnings, setWarnings] = useState([]);
     const [activeHelp, setActiveHelp] = useState(null);
     const [notes, setNotes] = useState({});
     const [selectedToothForManual, setSelectedToothForManual] = useState(null);
-    const [timerDelay, setTimerDelay] = useState(10); // Default 10s
+    const [timerDelay, setTimerDelay] = useState(10);
     const [countdown, setCountdown] = useState(null);
     const [isCustomTimer, setIsCustomTimer] = useState(false);
     const [hasManuallyStopped, setHasManuallyStopped] = useState(false);
@@ -158,8 +161,8 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
 
     // Auto-save states
     const [saveStatus, setSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved'
-    const isInitialLoad = React.useRef(true);
-    const saveTimeoutRef = React.useRef(null);
+    const isInitialLoad = useRef(true);
+    const saveTimeoutRef = useRef(null);
 
     // 2. Effects
     useEffect(() => {
@@ -220,7 +223,11 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
         };
     }, [patient?.id, token]);
 
-    // Auto-save effect
+    /**
+     * EFECTO: Autoguardado inteligente.
+     * Dispara una sincronización con la nube tras 1.5s de inactividad
+     * tras cualquier modificación en los hallazgos o notas.
+     */
     useEffect(() => {
         if (!patient?.id) return;
         if (isInitialLoad.current) return;
@@ -306,6 +313,11 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
         } catch (e) { console.error("Audio feedback error:", e); }
     }, []);
 
+    /** 
+     * MANEJADOR DE RESULTADOS DE VOZ:
+     * Traduce los hallazgos recibidos del backend al estado interno de React.
+     * Soporta comandos especiales como 'borrar' o 'stop_system'.
+     */
     const handleSpeechResult = useCallback((data) => {
         if (data.transcription) setLastTranscript(data.transcription);
         if (data.warnings) setWarnings(data.warnings);
@@ -473,7 +485,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
     const activeItem = useMemo(() => legendItems.find(i => i.id === activeHelp), [legendItems, activeHelp]);
 
     return (
-        <div className="p-6 pb-32 max-w-7xl mx-auto">
+        <div className="p-6 pb-32 max-w-7xl mx-auto relative">
             <header className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-end items-center gap-4 transition-colors">
                 <div className="flex flex-wrap justify-center sm:justify-end items-center gap-3 sm:gap-4 w-full sm:w-auto">
                     <button
@@ -501,7 +513,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
                         <span className="hidden xl:inline">{t('odontogram.clear_all')}</span>
                     </button>
 
-                    <DesignToggle />
+
 
                     <button
                         onClick={onToggleTheme}
@@ -774,7 +786,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
                         {showLegend ? <><EyeOff size={16} /> <span className="hidden sm:inline">{t('odontogram.hide_legend')}</span></> : <><Eye size={16} /> <span className="hidden sm:inline">{t('odontogram.show_legend')}</span></>}
                     </button>
                 </div>
-                
+
                 <div className={`transition-all duration-500 ${showLegend ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
                         {legendItems.map((item) => (

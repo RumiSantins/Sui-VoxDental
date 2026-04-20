@@ -58,3 +58,54 @@ def send_verification_email(email: str, token: str, full_name: str):
     except Exception as e:
         print(f"Error sending email: {e}")
         return False
+
+def send_feedback_email(name: str, sender_email: str, comment: str):
+    if not SMTP_USER or not SMTP_PASSWORD:
+        print("WARNING: SMTP credentials not set. Feedback email not sent.")
+        print(f"Feedback from {name} ({sender_email}): {comment}")
+        return False
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = f"Nuevo comentario de {name} - EgoS"
+    message["From"] = f"EgoS Feedback <{SMTP_USER}>"
+    message["To"] = "rumi.04.se@gmail.com"
+
+    text = f"Nuevo comentario recibido en EgoS:\n\nDe: {name}\nCorreo: {sender_email}\nComentario:\n{comment}"
+    
+    html = f"""
+    <html>
+      <body style="font-family: sans-serif; color: #333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
+          <h2 style="color: #9CCBA8; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Nuevo Feedback</h2>
+          <p style="font-size: 14px; color: #64748b; margin-top: 20px;">Has recibido un nuevo mensaje a través del formulario de la landing page:</p>
+          
+          <div style="margin: 20px 0; font-size: 14px;">
+            <p><strong>Nombre:</strong> {name}</p>
+            <p><strong>Email:</strong> {sender_email}</p>
+          </div>
+
+          <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #cbd5e1; margin: 20px 0;">
+            <p style="white-space: pre-wrap; font-style: italic; color: #1e293b;">"{comment}"</p>
+          </div>
+          <p style="font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+            Enviado desde el sistema EgoS.
+          </p>
+        </div>
+      </body>
+    </html>
+    """
+
+    part1 = MIMEText(text, "plain", "utf-8")
+    part2 = MIMEText(html, "html", "utf-8")
+    message.attach(part1)
+    message.attach(part2)
+
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_USER, "rumi.04.se@gmail.com", message.as_string())
+        return True
+    except Exception as e:
+        print(f"Error sending feedback email: {e}")
+        return False

@@ -86,7 +86,10 @@ export const AuthProvider = ({ children }) => {
         }
     }, [token, logout]);
 
-    const login = (newToken) => {
+    const login = async (newToken) => {
+        // Cosmetic delay to allow premium animation to breathe
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
         localStorage.setItem('token', newToken);
         setToken(newToken);
         const decoded = jwtDecode(newToken);

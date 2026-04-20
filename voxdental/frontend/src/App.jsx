@@ -1,15 +1,14 @@
-/* Componente raiz de la aplicacion EgoS. 
-   Gestiona la autenticacion, la navegacion principal y el idioma.
-   El tema (diseño + modo oscuro) es gestionado por ThemeContext. */
-import { useState, useEffect, useCallback, memo, lazy, Suspense } from 'react'
-import { AuthProvider, useAuth } from './context/AuthContext'
+import { useState, useEffect, useCallback, lazy, Suspense, useRef } from 'react'
+import { useAuth } from './context/AuthContext'
 import { useLanguage } from './context/LanguageContext'
 import { useTheme } from './context/ThemeContext'
 import { Login } from './components/Login'
 import { PatientSelector } from './components/PatientSelector'
-import { Settings, Heart, Activity, Stethoscope, Shield, Dog, Briefcase, User as UserIcon, Cat, Loader2, LogOut } from 'lucide-react'
+import { Settings, Loader2, LogOut } from 'lucide-react'
+import { DesignToggle } from './components/DesignToggle'
+import { SymbiosisLogo } from './components/SymbiosisLogo'
 
-// Lazy loaded components for better performance
+// Lazy loaded components
 const OdontogramView = lazy(() => import('./components/OdontogramView').then(m => ({ default: m.OdontogramView })));
 const EgoSHome = lazy(() => import('./components/EgoSHome').then(m => ({ default: m.EgoSHome })));
 const Register = lazy(() => import('./components/Register').then(m => ({ default: m.Register })));
@@ -18,77 +17,82 @@ const WelcomeScreen = lazy(() => import('./components/WelcomeScreen').then(m => 
 const ProfileModal = lazy(() => import('./components/ProfileModal').then(m => ({ default: m.ProfileModal })));
 const AdminPanel = lazy(() => import('./components/AdminPanel').then(m => ({ default: m.AdminPanel })));
 
-const LoadingFallback = () => {
+/**
+ * Pantalla de carga PREMIUM con el logo SIMBIOSIS.
+ */
+const PremiumLoading = () => {
   const { t } = useLanguage();
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-[#0B0B0B] relative overflow-hidden">
-      {/* Ambient Backgrounds for Loading */}
-      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#9CCBA8]/10 blur-[100px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#E8D1B6]/10 blur-[100px] rounded-full pointer-events-none" />
+  const [consolidated, setConsolidated] = useState(false);
 
-      <div className="flex flex-col items-center gap-4 relative z-10">
-        <Loader2 className="w-10 h-10 text-[#9CCBA8] animate-spin" />
-        <p className="text-sm font-black uppercase tracking-widest text-[#9CCBA8]/60 animate-pulse">{t('app.loading')}</p>
+  useEffect(() => {
+    // Iniciar la metamorfosis de consolidación después de 1 segundo de serpenteo
+    const timer = setTimeout(() => setConsolidated(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-[500] overflow-hidden" style={{ backgroundColor: 'var(--bg-main)' }}>
+      {/* Haz de escaneo horizontal (Sutil) */}
+      <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#9CCBA8]/30 to-transparent animate-scan z-10" />
+
+      {/* Fondos ambientales sutiles */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-30">
+        <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-[#9CCBA8]/10 blur-[120px] rounded-full animate-blob" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[60%] bg-[#E8D1B6]/10 blur-[120px] rounded-full animate-blob animation-delay-2000" />
+      </div>
+
+        <div className="relative flex flex-col items-center gap-12 z-20">
+          <div className="relative flex items-center justify-center" style={{ width: '900px', height: '900px' }}>
+            {/* Resplandor externo ampliado */}
+            <div className={`absolute inset-[-200px] bg-[#9CCBA8]/10 blur-[180px] rounded-full transition-opacity duration-[2000ms] ${consolidated ? 'opacity-40' : 'opacity-100'}`} />
+            <SymbiosisLogo size={900} className="premium-logo-force" animating={true} consolidated={consolidated} />
+          </div>
+
+        <div className={`space-y-4 text-center transition-all duration-[1500ms] ${consolidated ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          <h3 className="text-[12px] font-black uppercase tracking-[0.6em] text-[#9CCBA8] drop-shadow-sm">
+            VoxDental Intelligence
+          </h3>
+          <p className="text-[10px] font-bold text-[var(--text-tert)] uppercase tracking-[0.3em] opacity-40">Sistema Consolidado</p>
+        </div>
       </div>
     </div>
   );
 };
 
-const AVATAR_MAP = {
-  'user': UserIcon,
-  'heart': Heart,
-  'activity': Activity,
-  'steth': Stethoscope,
-  'shield': Shield,
-  'dog': Dog,
-  'case': Briefcase,
-  'cat': Cat
-}
+/**
+ * Carga Discreta (Totalmente silenciosa).
+ */
+const DiscretLoading = () => (
+  <div className="fixed inset-0 flex items-center justify-center z-[500]" style={{ backgroundColor: 'var(--bg-main)' }}>
+    <div className="flex flex-col items-center gap-3 opacity-100">
+      <Loader2 className="w-8 h-8 text-[#9CCBA8] animate-spin" />
+      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#9CCBA8]/60">Sincronizando</span>
+    </div>
+  </div>
+);
 
-function AppContent() {
+export default function App() {
   const { user, token, logout } = useAuth()
   const { t, language, toggleLanguage } = useLanguage()
   const { isDark, toggleMode, design, toggleDesign } = useTheme()
+
+  // Flag para detectar si el usuario ha pulsado el botón de login recientemente
+  const [isManualLogin, setIsManualLogin] = useState(false);
+
   const [showWelcome, setShowWelcome] = useState(false)
-  const [hasShownWelcome, setHasShownWelcome] = useState(false)
+
+  // Usamos sessionStorage para que la bienvenida solo aparezca UNA VEZ por sesión de pestaña
+  const [hasShownWelcome, setHasShownWelcome] = useState(() => {
+    return sessionStorage.getItem('welcome_shown') === 'true';
+  })
+
   const [showProfile, setShowProfile] = useState(false)
-  const [currentView, setCurrentView] = useState('main') // 'main' or 'admin'
-
-  const renderAvatar = (user, size = 32) => {
-    if (!user?.avatar) return <div className="w-10 h-10 bg-[#9CCBA8] rounded-xl flex items-center justify-center text-white"><UserIcon size={size * 0.6} /></div>
-
-    if (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) {
-      return (
-        <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 dark:border-[#9CCBA8]/30 shadow-md">
-          <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
-        </div>
-      )
-    }
-
-    const Icon = AVATAR_MAP[user.avatar] || UserIcon
-    const colors = {
-      'user': 'bg-blue-500',
-      'heart': 'bg-red-500',
-      'activity': 'bg-green-500',
-      'steth': 'bg-purple-500',
-      'shield': 'bg-indigo-500',
-      'dog': 'bg-yellow-500',
-      'case': 'bg-slate-700',
-      'cat': 'bg-rose-400',
-    }
-
-    return (
-      <div className={`w-10 h-10 ${colors[user.avatar] || 'bg-[#9CCBA8]'} rounded-xl flex items-center justify-center text-white shadow-lg`}>
-        <Icon size={size * 0.6} />
-      </div>
-    )
-  }
+  const [currentView, setCurrentView] = useState('main')
+  const [selectedPatient, setSelectedPatient] = useState(null)
 
   const [authView, setAuthView] = useState(() => {
-    const search = window.location.search;
     const path = window.location.pathname;
-    // Check if we are in verification flow
-    if (search.includes('token=') && path.includes('/verify')) return 'verify';
+    if (path.includes('/verify')) return 'verify';
     if (path.includes('/login')) return 'login';
     if (path.includes('/register')) return 'register';
     return 'home';
@@ -109,161 +113,113 @@ function AppContent() {
   const navigateTo = useCallback((view) => {
     setAuthView(view);
     const path = view === 'home' ? '/' : `/${view}`;
-    // Only push if different to prevent duplicate history entries
     if (window.location.pathname !== path) {
       window.history.pushState({}, '', path);
     }
   }, []);
 
-  const [selectedPatient, setSelectedPatient] = useState(null)
-
-  const [speechEngine, setSpeechEngine] = useState(() => localStorage.getItem('speechEngine') || 'vosk')
-  const [speechModel, setSpeechModel] = useState(() => localStorage.getItem('speechModel') || 'vosk-model-small-es-0.42')
-
   useEffect(() => {
-    if (!showProfile) {
-      setSpeechEngine(localStorage.getItem('speechEngine') || 'vosk');
-      setSpeechModel(localStorage.getItem('speechModel') || 'vosk-model-small-es-0.42');
-    }
-  }, [showProfile]);
-
-  const showWhisperBadge = !(speechEngine === 'whisper' && speechModel === 'base');
-
-
-  useEffect(() => {
-    // Reset selected patient when user changes (login/logout/different profile)
-    setSelectedPatient(null)
-
-    // Manage welcome screen
-    if (user && !hasShownWelcome) {
+    // CAMBIO CRÍTICO: Solo mostrar bienvenida si NO se ha mostrado en esta sesión Y venimos de un login manual
+    // Si refrescamos la página, hasShownWelcome será true (desde sessionStorage) y se saltará esto.
+    if (user && !hasShownWelcome && isManualLogin) {
       setShowWelcome(true)
       setHasShownWelcome(true)
-    } else if (!user) {
-      setHasShownWelcome(false)
+      sessionStorage.setItem('welcome_shown', 'true');
+      // Aseguramos apagar el modo manual una vez consumido
+      setTimeout(() => setIsManualLogin(false), 4000);
+    } else if (user && !hasShownWelcome) {
+      setHasShownWelcome(true);
+      sessionStorage.setItem('welcome_shown', 'true');
+    } else if (!user && hasShownWelcome) {
+      // Si no hay user, resetear el flag para el siguiente login
+      setHasShownWelcome(false);
     }
-  }, [user, hasShownWelcome])
+  }, [user, hasShownWelcome, isManualLogin])
 
+  const handleManualLoginStart = () => {
+    setIsManualLogin(true);
+  };
+
+  const handleManualLogout = () => {
+    sessionStorage.removeItem('welcome_shown');
+    setHasShownWelcome(false);
+    setIsManualLogin(false);
+    logout();
+  };
 
   if (currentView === 'admin') {
     return (
-      <Suspense fallback={<LoadingFallback />}>
+      <Suspense fallback={<DiscretLoading />}>
         <AdminPanel token={token} onBack={() => setCurrentView('main')} />
       </Suspense>
     );
   }
 
+  // SI NO HAY USUARIO
   if (!user) {
     return (
-      <Suspense fallback={<LoadingFallback />}>
-        {authView === 'home' ? (
-          <EgoSHome onLogin={() => navigateTo('login')} onRegister={() => navigateTo('register')} language={language} onToggleLanguage={toggleLanguage} />
-        ) : authView === 'verify' ? (
-          <VerifyEmail onBackToLogin={() => navigateTo('login')} />
-        ) : authView === 'login' ? (
-          <Login onSwitch={() => navigateTo('register')} onAdminAccess={() => setCurrentView('admin')} />
-        ) : (
-          <Register onSwitch={() => navigateTo('login')} />
-        )}
+      <Suspense fallback={isManualLogin ? <PremiumLoading /> : <DiscretLoading />}>
+        {authView === 'home' ? <EgoSHome onLogin={() => navigateTo('login')} onRegister={() => navigateTo('register')} language={language} onToggleLanguage={toggleLanguage} /> :
+          authView === 'verify' ? <VerifyEmail onBackToLogin={() => navigateTo('login')} /> :
+            authView === 'login' ? <Login onLoginStart={handleManualLoginStart} onSwitch={() => navigateTo('register')} onAdminAccess={() => setCurrentView('admin')} /> :
+              <Register onSwitch={() => navigateTo('login')} />}
       </Suspense>
     );
   }
 
+  // SI HAY USUARIO
   return (
     <div className="min-h-screen relative overflow-x-hidden" style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-main)' }}>
-      <Suspense fallback={<LoadingFallback />}>
-        {showWelcome && (
-          <WelcomeScreen
-            user={user}
-            darkMode={isDark}
-            onFinished={() => setShowWelcome(false)}
-          />
-        )}
+      {showWelcome && (
+        <Suspense fallback={null}>
+          <WelcomeScreen user={user} darkMode={isDark} onFinished={() => setShowWelcome(false)} />
+        </Suspense>
+      )}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 relative z-30 print:hidden">
-          <div className="flex items-center justify-between gap-3 sm:gap-4 w-full sm:w-auto">
-            <div className="flex items-center gap-3 sm:gap-4">
-              {renderAvatar(user)}
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-[#9CCBA8] to-[#E8D1B6] bg-clip-text text-transparent tracking-tighter">SuiVoxDental</h1>
-                  <button
-                    onClick={() => setShowProfile(true)}
-                    className="p-1.5 text-gray-400 hover:text-[#9CCBA8] hover:bg-[#9CCBA8]/10 rounded-lg transition-all shrink-0"
-                    title={t('app.profile_settings')}
-                  >
-                    <Settings size={14} />
-                  </button>
-                  {showWhisperBadge && (
-                    <span className="inline-flex px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[8px] sm:text-[9px] font-black uppercase tracking-tighter rounded-[var(--radius-base)] border border-amber-200 dark:border-amber-800/50 animate-pulse shadow-sm whitespace-nowrap">
-                      Whisper Base recomendado
-                    </span>
-                  )}
-
-                </div>
-                <p className="text-[10px] sm:text-xs text-slate-500 font-semibold tracking-tight truncate max-w-[150px] sm:max-w-none mt-0.5">
-                  {user.gender === 'male' ? t('app.dr_male') : user.gender === 'female' ? t('app.dr_female') : ''}{user.name || user.email}
-                </p>
+      <header className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-30 print:hidden">
+        <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#9CCBA8] rounded-xl flex items-center justify-center text-white shadow-sm border border-[#9CCBA8]/20"><Settings size={20} /></div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-[#9CCBA8] to-[#E8D1B6] bg-clip-text text-transparent tracking-tighter">SuiVoxDental</h1>
+                <button onClick={() => setShowProfile(true)} className="p-1.5 text-gray-400 hover:text-[#9CCBA8] hover:bg-[#9CCBA8]/10 rounded-lg transition-all"><Settings size={14} /></button>
               </div>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold tracking-tight mt-0.5">{user?.name || user?.email}</p>
             </div>
-
-            <button
-              onClick={logout}
-              className={`sm:hidden flex items-center justify-center p-2.5 transition-all ${design === 'ego' ? 'bg-transparent border-none text-red-500' : 'text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-[var(--radius-base)] border border-slate-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/30'}`}
-              title={t('app.logout')}
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
-
-          <div className="flex w-full sm:w-auto gap-3 items-center justify-center sm:justify-end border-t sm:border-none border-gray-100 dark:border-slate-800/50 pt-3 sm:pt-0">
-            <div className="w-full sm:w-auto">
-              <PatientSelector
-                selectedPatient={selectedPatient}
-                onSelect={setSelectedPatient}
-              />
-            </div>
-            <button
-              onClick={logout}
-              className={`${design === 'ego' ? 'flex items-center gap-2 bg-transparent border-none text-red-500 hover:text-red-600 transition-all font-black text-xs uppercase tracking-widest' : 'hidden sm:flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-zinc-900 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-[var(--radius-base)] transition-all shadow-sm border border-slate-200 dark:border-zinc-800 hover:border-red-200 dark:hover:border-red-500/30 text-xs font-bold uppercase tracking-wider'}`}
-            >
-              <LogOut size={14} className="stroke-[2.5]" />
-              {t('app.logout')}
-            </button>
           </div>
         </div>
 
+        <div className="flex w-full sm:w-auto gap-3 items-center justify-center sm:justify-end border-t sm:border-none border-gray-100 dark:border-slate-800/50 pt-3 sm:pt-0">
+          <div className="pr-3 border-r border-gray-100 dark:border-slate-800/50 hidden sm:block">
+            <DesignToggle />
+          </div>
+          {/* En móvil, lo mostramos aparte para que tenga su propio espacio */}
+          <div className="sm:hidden">
+            <DesignToggle />
+          </div>
+          <PatientSelector selectedPatient={selectedPatient} onSelect={setSelectedPatient} />
+          <button 
+            onClick={handleManualLogout} 
+            className="absolute top-4 right-4 sm:relative sm:top-auto sm:right-auto p-2.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all flex items-center gap-2 font-black uppercase text-[10px] tracking-widest leading-none ring-1 ring-red-500/10 sm:ring-0"
+          >
+            <LogOut size={16} /> {t('app.logout')}
+          </button>
+        </div>
+      </header>
+
+      <Suspense fallback={<DiscretLoading />}>
         {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
-
-        <div className="relative z-10">
-          <OdontogramView
-            patient={selectedPatient}
-            darkMode={isDark}
-            onToggleTheme={toggleMode}
-            design={design}
-            onToggleDesign={toggleDesign}
-          />
+        <div className="relative z-10 px-0 sm:px-6">
+          <OdontogramView patient={selectedPatient} darkMode={isDark} onToggleTheme={toggleMode} design={design} onToggleDesign={toggleDesign} />
         </div>
-
-        <footer className="mt-8 pb-12 text-center border-t border-gray-100 dark:border-zinc-800/50">
-          <p className="mt-8 text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400 dark:text-zinc-600">
-            {t('app.title')} {t('app.system_info')}
-          </p>
-          <p className="mt-2 text-[10px] font-medium text-slate-400 dark:text-zinc-600">
-            {t('app.made_by')} <span className="text-slate-500 dark:text-zinc-400">Felipe Santillan</span> •
-            <a href="https://fausto.app/" target="_blank" rel="noopener noreferrer" className="ml-1 text-[#9CCBA8] hover:text-[#9CCBA8]/80 dark:text-[#9CCBA8] dark:hover:text-[#9CCBA8]/80 transition-colors">Fausto</a>
-          </p>
-        </footer>
       </Suspense>
+
+      <footer className="mt-8 pb-12 text-center border-t border-gray-100 dark:border-zinc-800/50 opacity-40">
+        <p className="mt-8 text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400 dark:text-zinc-600">
+          {t('app.title')} {t('app.system_info')}
+        </p>
+      </footer>
     </div>
   )
 }
-
-function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  )
-}
-
-export default App

@@ -92,7 +92,7 @@ export const ClinicalRecordModal = React.memo(({
                 {/* Header (Non printable actions) */}
                 <div className={`flex justify-between items-center p-6 border-b print-hidden shrink-0 transition-all ${isEgo ? 'bg-white dark:bg-[#111] border-slate-100 dark:border-zinc-800' : 'border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900'}`}>
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-blue-50 dark:bg-zinc-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
+                        <div className={`w-12 h-12 flex items-center justify-center rounded-full ${isEgo ? 'bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-slate-200' : 'bg-[#9CCBA8]/10 dark:bg-[#9CCBA8]/10 text-[#9CCBA8]'}`}>
                             <FileText size={24} />
                         </div>
                         <div>
@@ -101,7 +101,7 @@ export const ClinicalRecordModal = React.memo(({
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button onClick={handlePrint} className={`flex items-center gap-2 px-6 py-2 font-bold transition-all active:scale-[0.98] ${isEgo ? 'bg-black dark:bg-white text-white dark:text-black rounded-none uppercase tracking-widest text-[10px]' : 'bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md text-sm'}`}>
+                        <button onClick={handlePrint} className={`flex items-center gap-2 px-6 py-2 font-bold transition-all active:scale-[0.98] ${isEgo ? 'bg-black dark:bg-white text-white dark:text-black rounded-none uppercase tracking-widest text-[10px]' : 'bg-[#9CCBA8] hover:opacity-90 shadow-[0_4px_12px_rgba(156,203,168,0.25)] text-white rounded-xl text-sm'}`}>
                             <Printer size={18} /> <span className="hidden sm:inline">{t('record.print_btn')}</span>
                         </button>
                         <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-400 hover:text-slate-600 transition-colors">
@@ -125,7 +125,7 @@ export const ClinicalRecordModal = React.memo(({
                                         <input 
                                             value={editableRecord.name}
                                             onChange={(e) => setEditableRecord({...editableRecord, name: e.target.value})}
-                                            className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-blue-500 outline-none print-input flex-1 min-w-0 px-1 py-0.5 text-base hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                                            className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-[#9CCBA8] outline-none print-input flex-1 min-w-0 px-1 py-0.5 text-base hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
                                             placeholder={t('record.name_placeholder')}
                                         />
                                     </div>
@@ -135,13 +135,13 @@ export const ClinicalRecordModal = React.memo(({
                                             <input 
                                                 value={editableRecord.age}
                                                 onChange={(e) => setEditableRecord({...editableRecord, age: e.target.value})}
-                                                className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-blue-500 outline-none print-input w-24 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                                                className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-[#9CCBA8] outline-none print-input w-24 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
                                                 placeholder={t('record.age_placeholder')}
                                             />
                                             <input 
                                                 value={editableRecord.document}
                                                 onChange={(e) => setEditableRecord({...editableRecord, document: e.target.value})}
-                                                className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-blue-500 outline-none print-input flex-1 min-w-0 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                                                className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-[#9CCBA8] outline-none print-input flex-1 min-w-0 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
                                                 placeholder={t('record.doc_placeholder')}
                                             />
                                         </div>
@@ -151,7 +151,7 @@ export const ClinicalRecordModal = React.memo(({
                                         <input 
                                             value={editableRecord.doctor}
                                             onChange={(e) => setEditableRecord({...editableRecord, doctor: e.target.value})}
-                                            className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-blue-500 outline-none print-input flex-1 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                                            className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-[#9CCBA8] outline-none print-input flex-1 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
                                         />
                                     </div>
                                     <div className="text-xs text-slate-600 dark:text-slate-400 print-force-black flex items-center gap-2">
@@ -159,14 +159,14 @@ export const ClinicalRecordModal = React.memo(({
                                         <input 
                                             value={editableRecord.date}
                                             onChange={(e) => setEditableRecord({...editableRecord, date: e.target.value})}
-                                            className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-blue-500 outline-none print-input flex-1 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                                            className="bg-transparent border-b border-dashed border-slate-300 dark:border-zinc-700 focus:border-[#9CCBA8] outline-none print-input flex-1 px-1 py-0.5 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
                                         />
                                     </div>
                                 </div>
                             </div>
                             <div className="text-right flex flex-col justify-end mt-4 sm:mt-0 shrink-0">
                                 <p className="text-xl font-bold text-slate-900 dark:text-zinc-100 print-force-black leading-none tracking-tight">VoxDental</p>
-                                <p className="text-[10px] text-blue-600 dark:text-blue-400 print-force-gray font-bold mt-1 uppercase tracking-[0.2em]">{t('record.digital_file')}</p>
+                                <p className="text-[10px] text-[#9CCBA8] dark:text-[#9CCBA8] print-force-gray font-bold mt-1 uppercase tracking-[0.2em]">{t('record.digital_file')}</p>
                             </div>
                         </div>
 
@@ -198,7 +198,7 @@ export const ClinicalRecordModal = React.memo(({
                                             {/* Minimalist Medical Heading */}
                                             <div className="border-b-2 border-slate-100 dark:border-slate-700/50 print-force-border pb-2 mb-3 flex items-baseline gap-2">
                                                 <span className="text-[10px] font-bold text-slate-400 print-force-gray uppercase tracking-widest">{t('record.tooth_piece')}</span>
-                                                <span className="text-xl font-black text-blue-600 dark:text-blue-400 print-force-black leading-none">{displayNum(tooth_number)}</span>
+                                                <span className="text-xl font-black text-[#9CCBA8] dark:text-[#9CCBA8] print-force-black leading-none">{displayNum(tooth_number)}</span>
                                             </div>
                                             
                                             <div className="pl-1">
@@ -216,7 +216,7 @@ export const ClinicalRecordModal = React.memo(({
                                                     <ul className="mb-3 space-y-1.5">
                                                         {surfaceFindings.map((f, idx) => (
                                                             <li key={idx} className="flex items-center gap-2 text-gray-700 dark:text-gray-200 text-sm print-force-black">
-                                                                <span className="w-1 h-1 bg-blue-300 dark:bg-blue-600 rounded-full shrink-0 print-dot" />
+                                                                <span className="w-1 h-1 bg-[#9CCBA8]/60 dark:bg-[#9CCBA8]/80 rounded-full shrink-0 print-dot" />
                                                                 <span>
                                                                     <span className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs print-force-gray">{formatSurface(f.surface) || t('common.general')}:</span> <span className="font-medium capitalize text-[13px]">{findLabel(f.condition).toLowerCase()}</span>
                                                                 </span>
@@ -227,7 +227,7 @@ export const ClinicalRecordModal = React.memo(({
 
                                                 {note && (
                                                     <div className="mt-3 text-sm text-gray-600 dark:text-gray-300 italic relative pl-3 print-force-black">
-                                                        <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-blue-300 dark:bg-blue-800 rounded-full print-dot" />
+                                                        <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-[#9CCBA8]/40 dark:bg-[#9CCBA8]/60 rounded-full print-dot" />
                                                         <p className="leading-relaxed">"{note}"</p>
                                                     </div>
                                                 )}

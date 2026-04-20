@@ -15,8 +15,9 @@ export const ThemeProvider = ({ children }) => {
     const [mode, setMode] = useState(() => {
         const stored = localStorage.getItem('appMode');
         if (!stored) {
-            // Migrate from old 'theme' key
-            return localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+            // Migrar o usar 'light' por defecto para nuevos usuarios
+            const oldSync = localStorage.getItem('theme');
+            return oldSync === 'dark' ? 'dark' : 'light';
         }
         return stored;
     });

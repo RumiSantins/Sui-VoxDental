@@ -4,8 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { SymbiosisLogo } from './SymbiosisLogo';
 
-export const Login = ({ onSwitch, onAdminAccess }) => {
+export const Login = ({ onSwitch, onAdminAccess, onLoginStart }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -43,6 +44,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        onLoginStart?.();
         setLoading(true);
         setError(null);
         
@@ -72,6 +74,7 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
     };
 
     const handleGoogleSuccess = async (credentialResponse) => {
+        onLoginStart?.();
         setLoading(true);
         setError(null);
         try {
@@ -108,9 +111,9 @@ export const Login = ({ onSwitch, onAdminAccess }) => {
                     <button 
                         type="button"
                         onClick={handleLogoClick}
-                        className={`w-16 h-16 flex items-center justify-center mx-auto mb-4 active:scale-95 transition-all ${isEgo ? 'bg-transparent border-none' : 'bg-[#9CCBA8]/10 dark:bg-zinc-800 rounded-2xl border border-[#9CCBA8]/30 dark:border-zinc-700'}`}
+                        className={`w-20 h-20 flex items-center justify-center mx-auto mb-4 active:scale-95 transition-all ${isEgo ? 'bg-transparent border-none' : 'bg-[#9CCBA8]/5 dark:bg-zinc-800/50 rounded-full border border-[#9CCBA8]/10 dark:border-zinc-700/50'}`}
                     >
-                        <User className={`w-8 h-8 ${isEgo ? 'text-slate-900 dark:text-white' : 'text-[#9CCBA8] dark:text-[#9CCBA8]/80'}`} />
+                        <SymbiosisLogo size={60} animating={false} />
                     </button>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4 tracking-tight">{t('auth.login_title')}</h1>
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">{t('auth.login_subtitle')}</p>

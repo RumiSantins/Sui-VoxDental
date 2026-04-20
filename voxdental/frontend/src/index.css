@@ -11,6 +11,32 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   scroll-behavior: smooth;
+  /* Prevenir flash azul/blanco al cargar */
+  background-color: #0B0B0B;
+  background-color: var(--bg-main, #0B0B0B); 
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Evitar saltos en el Logo/Header */
+h1 {
+  min-height: 2rem;
+  will-change: transform, opacity;
+}
+
+/* Evitar el flash azul de Chrome Autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #161616 inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px #161616 inset !important;
 }
 
 /* ============================================================
@@ -46,7 +72,7 @@ body {
     --card-bg:              transparent;
     --card-border:          transparent;
     --card-shadow:          none;
-    --section-gap:          140px;
+    --section-gap:          80px;
     --input-bg:             #161616;
     --surface-toggle-bg:    #161616;
     --surface-toggle-border: rgba(255,255,255,0.1);
@@ -128,13 +154,6 @@ body {
     --surface-toggle-text:  #4B5563;
 }
 
-/* Forza a que el botón de login sea puramente texto en modo Ego */
-:root[data-design="ego"] .login-btn-editorial {
-    border: none !important;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
 /* Los botones de toolbar en modo Ego son ghost/outline mínimo */
 :root[data-design="ego"] .odo-legend-card {
     background: transparent !important;
@@ -142,10 +161,49 @@ body {
     box-shadow: none !important;
 }
 
+/* Aceleración por hardware para animaciones de fondo */
+.bg-ambient-blob {
+  will-change: transform;
+  transform: translateZ(0); 
+}
+
+/* Desvanecimiento suave al cargar vistas */
+.fade-in-premium {
+  animation: fadeInPremium 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInPremium {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @layer utilities {
   .glow-blue {
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
   }
+  .animate-orbital {
+    animation: orbital 3s linear infinite;
+  }
+  .animate-scan {
+    animation: scan 4s ease-in-out infinite;
+  }
+}
+
+@keyframes orbital {
+  0% { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+
+@keyframes scan {
+  0%, 100% { top: -10%; opacity: 0; }
+  10%, 90% { opacity: 0.15; }
+  50% { top: 110%; opacity: 0.3; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0.2; }
+  100% { transform: scale(0.8); opacity: 0.5; }
 }
 
 @layer components {

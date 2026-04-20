@@ -28,7 +28,7 @@ export const DesignToggle = () => {
                 gap: '2px',
                 background: 'var(--surface-toggle-bg)',
                 border: '1px solid var(--surface-toggle-border)',
-                borderRadius: 'var(--radius-base)',
+                borderRadius: isEgo ? '0px' : 'var(--radius-base)',
                 padding: '3px',
             }}
         >
@@ -36,7 +36,7 @@ export const DesignToggle = () => {
                 onClick={() => { if (!isEgo) toggleDesign(); }}
                 style={{
                     ...base,
-                    borderRadius: 'calc(var(--radius-base) - 1px)',
+                    borderRadius: isEgo ? '0px' : 'calc(var(--radius-base) - 1px)',
                     background: isEgo ? 'var(--accent)' : 'transparent',
                     color: isEgo ? '#fff' : 'var(--surface-toggle-text)',
                     cursor: isEgo ? 'default' : 'pointer',
@@ -46,7 +46,7 @@ export const DesignToggle = () => {
                 onClick={() => { if (isEgo) toggleDesign(); }}
                 style={{
                     ...base,
-                    borderRadius: 'calc(var(--radius-base) - 1px)',
+                    borderRadius: isEgo ? '0px' : 'calc(var(--radius-base) - 1px)',
                     background: !isEgo ? 'var(--accent)' : 'transparent',
                     color: !isEgo ? '#fff' : 'var(--surface-toggle-text)',
                     cursor: !isEgo ? 'default' : 'pointer',

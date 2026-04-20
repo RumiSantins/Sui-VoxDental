@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, RefreshCw, AlertCircle, Calendar, MessageSquare, Copy, Check } from 'lucide-react';
+import { ChevronLeft, RefreshCw, AlertCircle, Calendar, MessageSquare, Copy, Loader2 } from 'lucide-react';
 
 export const AdminPanel = ({ token, onBack }) => {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [filter, setFilter] = useState('all'); // 'all' | 'success' | 'error'
+    const [filter, setFilter] = useState('all'); 
 
     const fetchReports = async () => {
         setLoading(true);
@@ -75,130 +75,156 @@ export const AdminPanel = ({ token, onBack }) => {
         const btnId = "copyBtnRoot";
         const btn = document.getElementById(btnId);
         if(btn) {
-            btn.classList.add('text-green-500');
-            setTimeout(() => { btn.classList.remove('text-green-500'); }, 2000);
+            btn.classList.add('text-[#9CCBA8]');
+            setTimeout(() => { btn.classList.remove('text-[#9CCBA8]'); }, 2000);
         }
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 p-6 sm:p-12 animate-in fade-in duration-300">
-            <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div className="min-h-screen p-6 sm:p-12 animate-in fade-in duration-500 relative overflow-hidden" style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-main)' }}>
+            {/* Ambient Background Bloom */}
+            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] blur-[120px] rounded-full pointer-events-none opacity-20 dark:opacity-10" style={{ backgroundColor: '#9CCBA8' }} />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] blur-[120px] rounded-full pointer-events-none opacity-20 dark:opacity-10" style={{ backgroundColor: '#E8D1B6' }} />
+
+            <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8 relative z-10">
                 <div>
-                    <button onClick={onBack} className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-widest mb-4 hover:translate-x-1 transition-transform">
-                        <ChevronLeft size={16} /> Volver al Odontogram
+                    <button onClick={onBack} className="group flex items-center gap-2 text-[#9CCBA8] font-bold text-[10px] uppercase tracking-[0.25em] mb-4 hover:translate-x-[-4px] transition-transform">
+                        <ChevronLeft size={16} /> Volver al Odontograma
                     </button>
-                    <h2 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Panel de Inteligencia</h2>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-sm mt-2 font-medium">Analiza frecuencias para optimizar el motor de voz.</p>
+                    <h2 className="text-4xl sm:text-5xl font-black tracking-tighter bg-gradient-to-r from-[#9CCBA8] via-[#9CCBA8] to-[#E8D1B6] bg-clip-text text-transparent">Panel de Inteligencia</h2>
+                    <p className="text-[var(--text-sec)] max-w-sm mt-4 font-medium border-l-2 border-[#9CCBA8]/30 pl-4 italic leading-relaxed">Optimizando la precisión semántica del motor de voz clínica.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="flex bg-white dark:bg-zinc-900 p-1 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800">
+                <div className="flex items-center gap-4">
+                    <div className="flex p-1.5 rounded-[var(--radius-base)] border border-[var(--border-emphasis)] bg-[var(--bg-surface)] shadow-inner">
                         {['all', 'success', 'error'].map(t => (
                             <button 
                                 key={t} 
                                 onClick={() => setFilter(t)}
-                                className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${filter === t ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+                                className={`px-5 py-2.5 rounded-[calc(var(--radius-base)-2px)] text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 ${filter === t ? 'bg-[#9CCBA8] text-white shadow-xl shadow-[#9CCBA8]/20' : 'text-[var(--text-tert)] hover:text-[var(--text-main)]'}`}
                             >
                                 {t === 'all' ? 'Todos' : t === 'success' ? 'Aciertos' : 'Errores'}
                             </button>
                         ))}
                     </div>
-                    <button id="copyBtnRoot" onClick={handleCopySummary} className="p-3 bg-white dark:bg-zinc-900 rounded-2xl shadow-md border border-slate-200 dark:border-zinc-800 text-slate-500 hover:text-blue-500 transition-colors" title="Copiar resumen">
-                        <Copy size={20} />
-                    </button>
-                    <button onClick={fetchReports} className="p-3 bg-white dark:bg-zinc-900 rounded-2xl shadow-md border border-slate-200 dark:border-zinc-800 text-slate-500 hover:text-blue-500 transition-colors">
-                        <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
-                    </button>
+                    <div className="flex gap-2">
+                        <button id="copyBtnRoot" onClick={handleCopySummary} className="p-3.5 bg-[var(--bg-surface)] rounded-[var(--radius-base)] border border-[var(--border-emphasis)] text-[var(--text-sec)] hover:text-[#9CCBA8] hover:border-[#9CCBA8]/40 transition-all shadow-sm active:scale-90" title="Copiar resumen">
+                            <Copy size={18} />
+                        </button>
+                        <button onClick={fetchReports} className="p-3.5 bg-[var(--bg-surface)] rounded-[var(--radius-base)] border border-[var(--border-emphasis)] text-[var(--text-sec)] hover:text-[#9CCBA8] hover:border-[#9CCBA8]/40 transition-all shadow-sm active:scale-90">
+                            <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                        </button>
+                    </div>
                 </div>
             </header>
 
-            <section className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                <div className="bg-green-50/50 dark:bg-emerald-950/20 border border-green-200/50 dark:border-emerald-900/30 p-6 rounded-2xl">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-green-600 mb-4 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-green-500" /> Lo más Acertado
+            <section className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 relative z-10">
+                <div className="bg-[#9CCBA8]/5 border border-[#9CCBA8]/10 p-10 rounded-[var(--radius-lg)] backdrop-blur-sm">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#1A7A42] dark:text-[#9CCBA8] mb-8 flex items-center gap-3">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#1A7A42] dark:bg-[#9CCBA8] shadow-[0_0_8px_#9CCBA8]" /> Transcripciones Precisas
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {stats.topSuccess.length > 0 ? stats.topSuccess.map(([txt, count], i) => (
-                            <div key={i} className="flex justify-between items-center bg-white dark:bg-slate-900/40 p-3 rounded-xl border border-green-100/50 dark:border-emerald-900/10">
-                                <span className="text-sm italic text-gray-700 dark:text-slate-300">"{txt}"</span>
-                                <span className="text-xs font-black text-green-600 bg-green-100 dark:bg-emerald-900/30 px-2 py-1 rounded-lg">x{count}</span>
+                            <div key={i} className="flex justify-between items-center bg-[var(--bg-surface)] p-5 rounded-[var(--radius-base)] border border-[var(--border-subtle)] hover:shadow-md transition-all">
+                                <span className="text-sm font-medium italic text-[var(--text-main)] leading-tight">"{txt}"</span>
+                                <span className="text-[10px] font-black text-[#1A7A42] dark:text-[#9CCBA8] bg-[#9CCBA8]/10 px-4 py-1.5 rounded-full border border-[#9CCBA8]/5">x{count}</span>
                             </div>
-                        )) : <p className="text-[10px] text-gray-400 uppercase font-bold italic">Esperando datos...</p>}
+                        )) : <p className="text-[10px] text-[var(--text-tert)] uppercase font-black italic tracking-widest text-center py-4 opacity-40">Analizando flujo...</p>}
                     </div>
                 </div>
-                <div className="bg-red-50/50 dark:bg-rose-950/20 border border-red-200/50 dark:border-rose-900/30 p-6 rounded-2xl">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-red-600 mb-4 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-red-500" /> Lo más Errado
+                <div className="bg-red-500/5 border border-red-500/10 p-10 rounded-[var(--radius-lg)] backdrop-blur-sm">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-red-500 mb-8 flex items-center gap-3">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]" /> Conflictos Detectados
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {stats.topError.length > 0 ? stats.topError.map(([txt, count], i) => (
-                            <div key={i} className="flex justify-between items-center bg-white dark:bg-slate-900/40 p-3 rounded-xl border border-red-100/50 dark:border-rose-900/10">
-                                <span className="text-sm italic text-gray-700 dark:text-slate-300">"{txt}"</span>
-                                <span className="text-xs font-black text-red-600 bg-red-100 dark:bg-rose-900/30 px-2 py-1 rounded-lg">x{count}</span>
+                            <div key={i} className="flex justify-between items-center bg-[var(--bg-surface)] p-5 rounded-[var(--radius-base)] border border-[var(--border-subtle)] hover:shadow-md transition-all">
+                                <span className="text-sm font-medium italic text-[var(--text-main)] leading-tight">"{txt}"</span>
+                                <span className="text-[10px] font-black text-red-500 bg-red-500/10 px-4 py-1.5 rounded-full border border-red-500/5">x{count}</span>
                             </div>
-                        )) : <p className="text-[10px] text-gray-400 uppercase font-bold italic">Esperando datos...</p>}
+                        )) : <p className="text-[10px] text-[var(--text-tert)] uppercase font-black italic tracking-widest text-center py-4 opacity-40">Sin anomalías detectadas</p>}
                     </div>
                 </div>
             </section>
 
-            <main className="max-w-6xl mx-auto">
+            <main className="max-w-6xl mx-auto pb-32 relative z-10">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 animate-pulse">
-                        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
-                        <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Cargando Reportes...</p>
+                    <div className="flex flex-col items-center justify-center py-32">
+                        <Loader2 className="w-12 h-12 text-[#9CCBA8] animate-spin mb-6 opacity-80" />
+                        <p className="text-[var(--text-tert)] font-black uppercase tracking-[0.4em] text-[9px] animate-pulse">Sincronizando Core-Intelligence</p>
                     </div>
                 ) : error ? (
-                    <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 p-8 rounded-3xl text-center">
-                        <AlertCircle size={40} className="text-red-500 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold text-red-600 dark:text-red-400 uppercase tracking-widest">Error al cargar datos</h3>
-                        <p className="text-red-400 dark:text-red-900/60 mt-2">{error}</p>
+                    <div className="bg-red-500/5 border border-red-500/10 p-16 rounded-[var(--radius-lg)] text-center animate-in zoom-in-95 duration-500">
+                        <AlertCircle size={48} className="text-red-500/40 mx-auto mb-8" />
+                        <h3 className="text-xl font-black text-red-500 uppercase tracking-widest">Error de Sincronización</h3>
+                        <p className="text-[var(--text-sec)] mt-4 font-medium italic max-w-xs mx-auto text-sm">{error}</p>
                     </div>
                 ) : filteredReports.length === 0 ? (
-                    <div className="bg-slate-50/50 dark:bg-zinc-900/40 border-2 border-dashed border-slate-300 dark:border-zinc-800 p-16 rounded-3xl text-center">
-                        <RefreshCw size={40} className="text-slate-400 dark:text-zinc-700 mx-auto mb-6" />
-                        <h3 className="text-xl font-bold text-slate-500 dark:text-zinc-600 tracking-tight">No hay {filter === 'all' ? 'reportes' : filter === 'success' ? 'aciertos' : 'errores'} todavía</h3>
-                        <p className="text-slate-500 dark:text-zinc-500 max-w-xs mx-auto mt-2">Usa el sistema para generar feedback.</p>
+                    <div className="bg-[var(--bg-surface)] border border-[var(--border-emphasis)] border-dashed border-2 p-32 rounded-[var(--radius-lg)] text-center opacity-60">
+                        <RefreshCw size={48} className="text-[var(--text-tert)] mx-auto mb-8 opacity-20" />
+                        <h3 className="text-xl font-black text-[var(--text-tert)] uppercase tracking-tighter">Sin registros de {filter === 'all' ? 'reportes' : filter === 'success' ? 'aciertos' : 'errores'}</h3>
+                        <p className="text-[var(--text-sec)] max-w-sm mx-auto mt-4 font-medium italic text-sm">El sistema de aprendizaje automático se nutrirá con el dictado clínico diario.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 gap-10">
                         {filteredReports.map((report) => (
-                            <div key={report.id} className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all group">
-                                <div className="flex flex-col md:flex-row gap-8">
-                                <div className="flex-1 space-y-4">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${report.is_correct ? 'bg-green-100 dark:bg-green-900/30 text-green-600' : 'bg-red-100 dark:bg-red-900/30 text-red-600'}`}>
-                                            {report.is_correct ? '👍 Acierto' : '👎 Error / Corrección'}
+                            <div key={report.id} className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] p-12 rounded-[var(--radius-lg)] shadow-sm hover:border-[#9CCBA8]/30 transition-all relative overflow-hidden group/card backdrop-blur-sm">
+                                <div className="absolute top-0 left-0 w-1.5 h-full opacity-0 group-hover/card:opacity-100 transition-opacity" style={{ backgroundColor: report.is_correct ? '#9CCBA8' : '#ef4444' }} />
+                                
+                                <div className="flex flex-col lg:flex-row gap-16">
+                                    <div className="flex-1 space-y-10">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.25em] ${report.is_correct ? 'bg-[#9CCBA8]/10 text-[#1A7A42] dark:text-[#9CCBA8]' : 'bg-red-500/10 text-red-500'}`}>
+                                                {report.is_correct ? '✓ Dictado Validado' : '⚠ Discrepancia Detectada'}
+                                            </div>
+                                            <div className="text-[10px] text-[var(--text-tert)] font-bold tracking-tighter">ID: #{report.id.toString().slice(-4)}</div>
                                         </div>
+                                        
+                                        <div className="space-y-4">
+                                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-tert)] block px-4 border-l border-[#9CCBA8]/30">Dato de Origen</span>
+                                            <p className="text-3xl text-[var(--text-main)] font-black leading-tight tracking-tighter italic drop-shadow-sm">"{report.transcript}"</p>
+                                        </div>
+
+                                        {!report.is_correct && report.expected_meaning && (
+                                            <div className="space-y-4 pt-4">
+                                                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#9CCBA8] block px-4 border-l border-[#9CCBA8]">Intención Clínica</span>
+                                                <div className="p-8 bg-gradient-to-br from-[#9CCBA8]/10 to-transparent border border-[#9CCBA8]/15 rounded-3xl relative">
+                                                    <p className="text-2xl text-[var(--text-main)] leading-relaxed italic font-black tracking-tight">"{report.expected_meaning}"</p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {report.comment && (
+                                            <div className="mt-10 p-6 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-subtle)] relative overflow-hidden">
+                                                <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#9CCBA8]/30"></div>
+                                                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-tert)] mb-4 block flex items-center gap-2 font-mono"><MessageSquare size={12}/> Observación Humana</span>
+                                                <p className="text-base text-[var(--text-sec)] leading-relaxed font-medium italic border-l border-zinc-200 dark:border-zinc-800 pl-4">{report.comment}</p>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Dictado Detectado</span>
-                                        <p className="text-xl text-slate-800 dark:text-white font-bold leading-tight italic">"{report.transcript}"</p>
-                                    </div>
-                                    {!report.is_correct && report.expected_meaning && (
-                                        <div>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2 block">Intención del Doctor</span>
-                                            <div className="p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/20 rounded-2xl">
-                                                <p className="text-lg text-blue-700 dark:text-blue-300 leading-relaxed italic font-bold">"{report.expected_meaning}"</p>
+
+                                    <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-[var(--border-subtle)] pt-10 lg:pt-0 lg:pl-16 space-y-10 flex flex-col justify-between">
+                                        <div className="space-y-8">
+                                            <div className="space-y-3">
+                                                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-tert)] block lg:text-right">Fuente de Datos</span>
+                                                <div className="flex items-center gap-3 lg:justify-end">
+                                                    <div className="w-8 h-8 rounded-lg bg-[#9CCBA8]/10 flex items-center justify-center text-[#9CCBA8] font-black text-xs">
+                                                        {report.user_full_name?.charAt(0) || 'D'}
+                                                    </div>
+                                                    <p className="font-black text-[var(--text-main)] text-sm">{report.user_full_name || 'Doctor de Turno'}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-tert)] block lg:text-right">Fecha Sincronización</span>
+                                                <div className="flex items-center lg:justify-end gap-3 text-[11px] font-black text-[var(--text-sec)] uppercase tracking-[0.1em] font-mono">
+                                                    <Calendar size={14} className="text-[#9CCBA8]/60" />
+                                                    {new Date(report.created_at).toLocaleDateString()} · {new Date(report.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                </div>
                                             </div>
                                         </div>
-                                    )}
-                                    {report.comment && (
-                                        <div className="mt-4">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-2 block flex items-center gap-1"><MessageSquare size={12}/> Comentario del Doctor</span>
-                                            <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl relative">
-                                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-l-xl"></div>
-                                                <p className="text-sm text-slate-700 dark:text-slate-300 ml-2">{report.comment}</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                    <div className="md:w-64 border-l border-slate-100 dark:border-zinc-800 md:pl-8 space-y-4 flex flex-col justify-end">
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 block">Reportado por</span>
-                                            <p className="font-bold text-blue-600 dark:text-blue-400">{report.user_full_name}</p>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                                            <Calendar size={14} />
-                                            {new Date(report.created_at).toLocaleString()}
+
+                                        <div className="pt-8 opacity-20 group-hover/card:opacity-60 transition-opacity hidden lg:block text-right">
+                                            <div className="text-[8px] font-black uppercase tracking-[0.5em] text-[var(--text-tert)]">VoxDental Intelligence v1.1</div>
                                         </div>
                                     </div>
                                 </div>

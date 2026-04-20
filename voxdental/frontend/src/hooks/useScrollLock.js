@@ -1,12 +1,18 @@
 import { useEffect } from 'react';
 
-export const useScrollLock = () => {
+export const useScrollLock = (lock = true) => {
     useEffect(() => {
-        const originalStyle = window.getComputedStyle(document.body).overflow;
+        if (!lock) return;
+
+        const originalBodyStyle = window.getComputedStyle(document.body).overflow;
+        const originalHtmlStyle = window.getComputedStyle(document.documentElement).overflow;
+        
         document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
         
         return () => {
-            document.body.style.overflow = originalStyle;
+            document.body.style.overflow = originalBodyStyle;
+            document.documentElement.style.overflow = originalHtmlStyle;
         };
-    }, []);
+    }, [lock]);
 };

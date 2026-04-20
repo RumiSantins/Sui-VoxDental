@@ -17,7 +17,7 @@ from ..api.schemas import (
     ClinicalRecordCreate, SpeechReportCreate, SpeechReportSchema, ToothMediaSchema
 )
 from ..core.auth import verify_password, get_password_hash, create_access_token, SECRET_KEY, ALGORITHM
-from ..core.email_service import send_verification_email
+from ..core.email_service import send_verification_email, send_feedback_email
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 import uuid
@@ -226,6 +226,18 @@ def update_profile(
         "is_google": current_user.hashed_password == "google_oauth_no_password"
     })
     return {"access_token": access_token, "token_type": "bearer"}
+
+class FeedbackRequest(BaseModel):
+    name: str
+    email: str
+    comment: str
+
+@router.post("/feedback")
+async def receive_feedback(request: FeedbackRequest):
+    success = send_feedback_email(request.name, request.email, request.comment)
+    if not success:
+        raise HTTPException(status_code=500, detail="No se pudo enviar el correo")
+    return {"message": "Feedback enviado con éxito"}
 
 # --- CLINICAL ROUTES ---
 
