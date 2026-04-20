@@ -2,6 +2,7 @@ import smtplib
 import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.header import Header
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,8 +20,10 @@ def send_verification_email(email: str, token: str, full_name: str):
         return False
 
     message = MIMEMultipart("alternative")
-    message["Subject"] = "Verifica tu cuenta en VoxDental"
-    message["From"] = f"VoxDental <{SMTP_USER}>"
+    message["Subject"] = Header("Verifica tu cuenta en VoxDental", 'utf-8').encode()
+    # Para el nombre del remitente con caracteres especiales (opcional pero recomendado)
+    from_name = Header("VoxDental", 'utf-8').encode()
+    message["From"] = f"{from_name} <{SMTP_USER}>"
     message["To"] = email
 
     verification_link = f"{BASE_URL}/verify?token={token}"
@@ -66,8 +69,11 @@ def send_feedback_email(name: str, sender_email: str, comment: str):
         return False
 
     message = MIMEMultipart("alternative")
-    message["Subject"] = f"Nuevo comentario de {name} - EgoS"
-    message["From"] = f"EgoS Feedback <{SMTP_USER}>"
+    subject_text = f"Nuevo comentario de {name} - EgoS"
+    message["Subject"] = Header(subject_text, 'utf-8').encode()
+    
+    from_display = Header("EgoS Feedback", 'utf-8').encode()
+    message["From"] = f"{from_display} <{SMTP_USER}>"
     message["To"] = "rumi.04.se@gmail.com"
 
     text = f"Nuevo comentario recibido en EgoS:\n\nDe: {name}\nCorreo: {sender_email}\nComentario:\n{comment}"
