@@ -25,7 +25,7 @@ export const EgoSHome = ({ onLogin, onRegister, language = 'es', onToggleLanguag
     useScrollLock(isMenuOpen);
 
     const handleSendComment = async () => {
-        if (!comment.trim() || !name.trim() || !email.trim() || !agreedToPrivacy || !agreedToMarketing || feedbackStatus === 'sending') return;
+        if (!comment.trim() || !name.trim() || !email.trim() || !agreedToPrivacy || feedbackStatus === 'sending') return;
         
         setFeedbackStatus('sending');
         try {
@@ -624,7 +624,7 @@ export const EgoSHome = ({ onLogin, onRegister, language = 'es', onToggleLanguag
 
                         <button 
                             onClick={handleSendComment}
-                            disabled={feedbackStatus !== 'idle' || !agreedToPrivacy || !agreedToMarketing || !name.trim() || !email.trim() || !comment.trim()}
+                            disabled={feedbackStatus !== 'idle' || !agreedToPrivacy || !name.trim() || !email.trim() || !comment.trim()}
                             style={{
                                 marginTop: '8px',
                                 backgroundColor: feedbackStatus === 'success' ? '#9CCBA8' : feedbackStatus === 'error' ? '#ef4444' : 'var(--accent)',
@@ -639,9 +639,9 @@ export const EgoSHome = ({ onLogin, onRegister, language = 'es', onToggleLanguag
                                 letterSpacing: '0.1em',
                                 transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                                 boxShadow: '0 4px 12px rgba(156,203,168,0.2)',
-                                opacity: (feedbackStatus === 'idle' && agreedToPrivacy && agreedToMarketing && name.trim() && email.trim() && comment.trim()) ? 1 : 0.5
+                                opacity: (feedbackStatus === 'idle' && agreedToPrivacy && name.trim() && email.trim() && comment.trim()) ? 1 : 0.5
                             }}
-                            onMouseOver={(e) => { if(feedbackStatus === 'idle' && agreedToPrivacy && agreedToMarketing) e.target.style.transform = 'translateY(-2px)'; }}
+                            onMouseOver={(e) => { if(feedbackStatus === 'idle' && agreedToPrivacy) e.target.style.transform = 'translateY(-2px)'; }}
                             onMouseOut={(e) => { e.target.style.transform = 'translateY(0)'; }}
                         >
                             {feedbackStatus === 'sending' ? t.contactSending : 
