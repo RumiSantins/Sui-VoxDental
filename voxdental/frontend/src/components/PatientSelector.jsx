@@ -17,6 +17,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
     const [editingId, setEditingId] = useState(null);
     const [editName, setEditName] = useState("");
     const [deletingId, setDeletingId] = useState(null);
+    const [error, setError] = useState(null);
 
     const { token } = useAuth();
 
@@ -50,6 +51,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
         e.preventDefault();
         if (!newPatientName.trim()) return;
 
+        setError(null);
         try {
             const response = await fetch('/api/v1/patients', {
                 method: 'POST',
@@ -67,9 +69,19 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                 setIsCreating(false);
                 setNewPatientName("");
                 setShowDropdown(false);
+            } else {
+                const errorData = await response.json();
+                const errorMsg = errorData.detail || "Error desconocido";
+                console.error("Error response from server:", errorData);
+                setError(errorMsg);
+                // Si el error es un objeto de validación (422), extraer info legible
+                if (typeof errorMsg === 'object') {
+                    setError(JSON.stringify(errorMsg));
+                }
             }
         } catch (error) {
-            console.error("Error creating patient:", error);
+            console.error("Network error creating patient:", error);
+            setError("Error de red al conectar con el servidor");
         }
     };
 
@@ -166,9 +178,14 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                     <Check size={18} />
                                 </button>
                             </div>
+                            {error && (
+                                <div className="mb-2 p-2 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded text-[10px] text-red-700 dark:text-red-400 font-mono break-words">
+                                    <strong>ERROR:</strong> {error}
+                                </div>
+                            )}
                             <button
                                 type="button"
-                                onClick={() => setIsCreating(false)}
+                                onClick={() => { setIsCreating(false); setError(null); }}
                                 className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                             >
                                 {t('common.cancel')}

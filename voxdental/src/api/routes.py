@@ -294,18 +294,25 @@ def create_patient(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    print(f"DEBUG: Attempting to create patient '{patient.name}' for user {current_user.id}")
     try:
         db_patient = Patient(name=patient.name, user_id=current_user.id)
         db.add(db_patient)
         db.commit()
-        print("DEBUG: Committed patient")
+        print(f"DEBUG: Patient committed successfully. ID: {db_patient.id}")
         db.refresh(db_patient)
-        print(f"DEBUG: Refreshed patient, id: {db_patient.id}")
+        print(f"DEBUG: Patient refreshed successfully.")
         return db_patient
     except Exception as e:
-        print(f"DEBUG: Error in create_patient: {e}")
+        print(f"DEBUG: FATAL Error in create_patient: {str(e)}")
+        import traceback
+        traceback.print_exc()
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return a more descriptive error to the client
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error interno al registrar paciente: {str(e)}"
+        )
 
 @router.put("/patients/{patient_id}", response_model=PatientSchema)
 def update_patient(

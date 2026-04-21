@@ -41,7 +41,7 @@ class FindingSchema(BaseModel):
     condition: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class OdontogramUpdateResponse(BaseModel):
     patient_id: int
@@ -59,10 +59,10 @@ class PatientUpdate(BaseModel):
 class PatientSchema(BaseModel):
     id: int
     name: str
-    created_at: datetime
+    created_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ClinicalRecordSchema(BaseModel):
     id: int
@@ -72,7 +72,7 @@ class ClinicalRecordSchema(BaseModel):
     notes: Optional[dict] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ClinicalRecordCreate(BaseModel):
     findings: List[FindingSchema]
@@ -90,7 +90,7 @@ class SpeechReportCreate(SpeechReportBase):
 class SpeechReportSchema(SpeechReportBase):
     id: int
     user_id: int
-    created_at: datetime
+    created_at: Optional[datetime] = None
     user_full_name: Optional[str] = None
 
     class Config:
@@ -103,7 +103,7 @@ class ToothMediaSchema(BaseModel):
     file_url: str
     file_type: str
     thumbnail_url: Optional[str] = None
-    created_at: datetime
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
