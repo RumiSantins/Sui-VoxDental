@@ -24,7 +24,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
     const fetchPatients = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('/api/v1/patients', {
+            const response = await fetch('/api/v1/patients/', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -53,7 +53,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
 
         setError(null);
         try {
-            const response = await fetch('/api/v1/patients', {
+            const response = await fetch('/api/v1/patients/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

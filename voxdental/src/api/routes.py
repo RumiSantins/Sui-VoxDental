@@ -28,7 +28,8 @@ from pathlib import Path
 # Create tables for MVP (should be in migration script usually)
 Base.metadata.create_all(bind=engine)
 
-router = APIRouter()
+router = APIRouter(redirect_slashes=True)
+# Opcionalmente, podemos desactivar el modo estricto para evitar problemas de proxy
 whisper_service = WhisperService()
 vosk_service = VoskService()
 
