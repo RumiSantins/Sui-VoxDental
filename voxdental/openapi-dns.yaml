@@ -10,17 +10,25 @@ x-google-endpoints:
 paths:
   "/api/v1/auth/login":
     post:
+      operationId: "authLogin"
       responses:
         "200":
           description: "OK"
-  "/api/v1/patients/":
+  "/api/v1/patients":
     get:
+      operationId: "listPatients"
       responses:
         "200":
           description: "OK"
     post:
+      operationId: "createPatient"
       responses:
         "200":
           description: "OK"
-# Permitimos que cualquier otra ruta pase sin validación estricta de Google
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "key"
+    in: "query"
+# Permitimos que cualquier otra ruta pase
 x-google-allow: all
