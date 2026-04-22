@@ -22,6 +22,17 @@ const AVATAR_ICONS = {
   user: UserIcon
 };
 
+const AVATAR_COLORS = {
+  heart: '#ef4444',    // bg-red-500
+  activity: '#22c55e', // bg-green-500
+  steth: '#a855f7',    // bg-purple-500
+  shield: '#6366f1',   // bg-indigo-500
+  dog: '#eab308',      // bg-yellow-500
+  case: '#334155',     // bg-slate-700
+  cat: '#fb7185',      // bg-rose-400
+  user: '#3b82f6'      // bg-blue-500
+};
+
 // Lazy loaded components
 const OdontogramView = lazy(() => import('./components/OdontogramView').then(m => ({ default: m.OdontogramView })));
 const EgoSHome = lazy(() => import('./components/EgoSHome').then(m => ({ default: m.EgoSHome })));
@@ -195,8 +206,8 @@ export default function App() {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setShowProfile(true)}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm border border-[#9CCBA8]/20 overflow-hidden group hover:scale-105 active:scale-95 transition-all"
-              style={{ backgroundColor: 'var(--bg-header-icon, #9CCBA8)' }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm border border-white/10 overflow-hidden group hover:scale-105 active:scale-95 transition-all"
+              style={{ backgroundColor: AVATAR_COLORS[user?.avatar] || '#9CCBA8' }}
             >
               {user?.avatar ? (
                 user.avatar.startsWith('data:') ? (
