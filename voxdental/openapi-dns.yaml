@@ -14,6 +14,12 @@ paths:
       responses:
         "200":
           description: "OK"
+  "/api/v1/auth/me":
+    put:
+      operationId: "updateProfile"
+      responses:
+        "200":
+          description: "OK"
   "/api/v1/patients":
     get:
       operationId: "listPatients"
@@ -22,6 +28,33 @@ paths:
           description: "OK"
     post:
       operationId: "createPatient"
+      responses:
+        "200":
+          description: "OK"
+  "/api/v1/patients/{id}":
+    put:
+      operationId: "updatePatient"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+    delete:
+      operationId: "deletePatient"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+  "/api/v1/feedback":
+    post:
+      operationId: "sendFeedback"
       responses:
         "200":
           description: "OK"

@@ -70,7 +70,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
     if db_user:
         if db_user.is_verified:
-            raise HTTPException(status_code=400, detail="El email ya está registrado")
+            raise HTTPException(status_code=400, detail="La cuenta ya está registrado")
         
         # Si ya existe pero no estaba verificado, lo verificamos directamente
         db_user.is_verified = True
