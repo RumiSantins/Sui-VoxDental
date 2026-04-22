@@ -4,9 +4,23 @@ import { useLanguage } from './context/LanguageContext'
 import { useTheme } from './context/ThemeContext'
 import { Login } from './components/Login'
 import { PatientSelector } from './components/PatientSelector'
-import { Settings, Loader2, LogOut } from 'lucide-react'
+import { 
+  Settings, Loader2, LogOut, User as UserIcon, Heart, Activity, 
+  Stethoscope, Shield, Dog, Briefcase, Cat 
+} from 'lucide-react'
 import { DesignToggle } from './components/DesignToggle'
 import { SymbiosisLogo } from './components/SymbiosisLogo'
+
+const AVATAR_ICONS = {
+  heart: Heart,
+  activity: Activity,
+  steth: Stethoscope,
+  shield: Shield,
+  dog: Dog,
+  case: Briefcase,
+  cat: Cat,
+  user: UserIcon
+};
 
 // Lazy loaded components
 const OdontogramView = lazy(() => import('./components/OdontogramView').then(m => ({ default: m.OdontogramView })));
@@ -179,7 +193,24 @@ export default function App() {
       <header className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-30 print:hidden">
         <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#9CCBA8] rounded-xl flex items-center justify-center text-white shadow-sm border border-[#9CCBA8]/20"><Settings size={20} /></div>
+            <button 
+              onClick={() => setShowProfile(true)}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm border border-[#9CCBA8]/20 overflow-hidden group hover:scale-105 active:scale-95 transition-all"
+              style={{ backgroundColor: 'var(--bg-header-icon, #9CCBA8)' }}
+            >
+              {user?.avatar ? (
+                user.avatar.startsWith('data:') ? (
+                  <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  (() => {
+                    const Icon = AVATAR_ICONS[user.avatar] || Settings;
+                    return <Icon size={20} />;
+                  })()
+                )
+              ) : (
+                <Settings size={20} className="group-hover:rotate-45 transition-transform" />
+              )}
+            </button>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-[#9CCBA8] to-[#E8D1B6] bg-clip-text text-transparent tracking-tighter">SuiVoxDental</h1>
