@@ -1,10 +1,26 @@
 swagger: "2.0"
 info:
-  description: "DNS Configuration for VoxDental"
-  title: "VoxDental DNS"
+  title: "VoxDental API Gateway"
+  description: "Gateway para VoxDental en Google Cloud Endpoints"
   version: "1.0.0"
 host: "egos.endpoints.sui-production-492623.cloud.goog"
 x-google-endpoints:
 - name: "egos.endpoints.sui-production-492623.cloud.goog"
   target: "35.202.203.240"
-paths: {}
+paths:
+  "/api/v1/auth/login":
+    post:
+      responses:
+        "200":
+          description: "OK"
+  "/api/v1/patients/":
+    get:
+      responses:
+        "200":
+          description: "OK"
+    post:
+      responses:
+        "200":
+          description: "OK"
+# Permitimos que cualquier otra ruta pase sin validación estricta de Google
+x-google-allow: all
