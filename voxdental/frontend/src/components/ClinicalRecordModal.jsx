@@ -183,14 +183,22 @@ export const ClinicalRecordModal = React.memo(({
                                     const isExtracted = findings.some(f => f.condition === 'extraer');
                                     const isEndodontic = findings.some(f => f.condition === 'endodoncia');
                                     const isCrown = findings.some(f => f.condition === 'corona');
+                                    const isImplant = findings.some(f => f.condition === 'implante');
+                                    const isChildDentition = findings.some(f => f.condition === 'denticion_ninos');
+                                    const isTotalProsthesis = findings.some(f => f.condition === 'protesis_total');
+                                    const isPartialProsthesis = findings.some(f => f.condition === 'protesis_parcial');
 
                                     const entireToothLabels = [];
                                     if (isMissing) entireToothLabels.push(legendItems.find(i => i.id === 'ausente'));
                                     if (isExtracted) entireToothLabels.push(legendItems.find(i => i.id === 'extraer'));
                                     if (isEndodontic) entireToothLabels.push(legendItems.find(i => i.id === 'endodoncia'));
                                     if (isCrown) entireToothLabels.push(legendItems.find(i => i.id === 'corona'));
+                                    if (isImplant) entireToothLabels.push(legendItems.find(i => i.id === 'implante'));
+                                    if (isChildDentition) entireToothLabels.push(legendItems.find(i => i.id === 'denticion_ninos'));
+                                    if (isTotalProsthesis) entireToothLabels.push(legendItems.find(i => i.id === 'protesis_total'));
+                                    if (isPartialProsthesis) entireToothLabels.push(legendItems.find(i => i.id === 'protesis_parcial'));
 
-                                    const surfaceFindings = findings.filter(f => !['ausente', 'extraer', 'endodoncia', 'corona'].includes(f.condition));
+                                    const surfaceFindings = findings.filter(f => !['ausente', 'extraer', 'endodoncia', 'corona', 'implante', 'denticion_ninos', 'protesis_total', 'protesis_parcial'].includes(f.condition));
 
                                     return (
                                         <div key={tooth_number} className="bg-white dark:bg-zinc-800/40 border border-slate-200 dark:border-zinc-700/50 rounded-2xl p-5 shadow-sm transition-colors hover:shadow-md print-card">

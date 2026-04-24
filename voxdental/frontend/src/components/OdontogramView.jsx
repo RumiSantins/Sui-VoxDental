@@ -68,6 +68,7 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
     const [isCustomTimer, setIsCustomTimer] = useState(false);
     const [hasManuallyStopped, setHasManuallyStopped] = useState(false);
     const [useDottedMode, setUseDottedMode] = useState(false);
+    const [isPediatricMode, setIsPediatricMode] = useState(false);
     const [showClinicalRecord, setShowClinicalRecord] = useState(false);
     const [showErrorReport, setShowErrorReport] = useState(false);
     const [pendingVerification, setPendingVerification] = useState(new Set());
@@ -132,7 +133,11 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
                     corrCondition === 'extraer' ? 'EX' :
                         corrCondition === 'corona' ? 'CR' :
                             corrCondition === 'endodoncia' ? 'E' :
-                                corrCondition === 'ausente' ? 'X' : 'B';
+                                corrCondition === 'ausente' ? 'X' : 
+                                    corrCondition === 'implante' ? 'I' :
+                                        corrCondition === 'denticion_ninos' ? 'DN' :
+                                            corrCondition === 'protesis_total' ? 'PTR' :
+                                                corrCondition === 'protesis_parcial' ? 'PPR' : 'B';
 
         const surfaceCode = corrSurface === 'toda' ? '' : corrSurface;
         const expected = `${conditionCode} ${surfaceCode} ${corrTooth}`.replace(/\s+/g, ' ').trim();
@@ -273,6 +278,10 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
         { id: 'corona', label: t('legend.crown'), color: '#eab308', category: t('legend.cat_prosthesis'), example: t('legend.ex_crown') },
         { id: 'endodoncia', label: t('legend.endo'), color: '#a855f7', category: t('legend.cat_root'), example: t('legend.ex_endo') },
         { id: 'ausente', label: t('legend.missing'), color: '#3b82f6', category: t('legend.cat_state'), example: t('legend.ex_missing'), isSymbol: true },
+        { id: 'implante', label: t('legend.implant'), color: '#0ea5e9', category: t('legend.cat_implant'), example: t('legend.ex_implant') },
+        { id: 'denticion_ninos', label: t('legend.child_dentition'), color: '#ec4899', category: t('legend.cat_state'), example: t('legend.ex_child_dentition') },
+        { id: 'protesis_total', label: t('legend.total_prosthesis'), color: '#8b5cf6', category: t('legend.cat_prosthesis'), example: t('legend.ex_total_prosthesis') },
+        { id: 'protesis_parcial', label: t('legend.partial_prosthesis'), color: '#14b8a6', category: t('legend.cat_prosthesis'), example: t('legend.ex_partial_prosthesis') },
         { id: 'borrar', label: t('legend.delete'), color: '#334155', category: t('legend.cat_correction'), example: t('legend.ex_delete') }
     ], [t]);
 
@@ -495,6 +504,13 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
                         disabled={!patient}
                     >
                         <FileText size={16} /> <span className="hidden xl:inline">{t('odontogram.clinical_record')}</span>
+                    </button>
+                    <button
+                        onClick={() => setIsPediatricMode(!isPediatricMode)}
+                        className={`px-4 py-2 rounded-[var(--radius-base)] shadow-[var(--card-shadow)] font-bold border transition-all text-xs tracking-wider whitespace-nowrap uppercase ${isPediatricMode ? 'bg-[#ec4899]/10 text-[#ec4899] border-[#ec4899]/30 hover:bg-[#ec4899]/20' : 'bg-[var(--card-bg)] text-[#9CCBA8] border-[var(--card-border)] hover:bg-[#9CCBA8]/10'}`}
+                        title={isPediatricMode ? t('odontogram.mode_adult') : t('odontogram.mode_pediatric')}
+                    >
+                        {isPediatricMode ? t('odontogram.mode_adult') : t('odontogram.mode_pediatric')}
                     </button>
                     <button
                         onClick={() => setUseDottedMode(!useDottedMode)}
@@ -747,27 +763,27 @@ export const OdontogramView = memo(({ darkMode, onToggleTheme, design, onToggleD
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-10 w-full">
                 <div className="space-y-2 min-w-0">
-                    <h3 className={`text-center font-bold text-[10px] pb-1 mb-4 block tracking-[0.2em] uppercase w-fit mx-auto transition-all ${design === 'ego' ? 'border-b border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-500' : 'text-slate-500 dark:text-zinc-600 border-none mb-1'}`}>{t('odontogram.quad_upper_right')}</h3>
+                    <h3 className={`text-center font-bold text-[10px] pb-1 mb-4 block tracking-[0.2em] uppercase w-fit mx-auto transition-all ${design === 'ego' ? 'border-b border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-500' : 'text-slate-500 dark:text-zinc-600 border-none mb-1'}`}>{t('odontogram.quad_upper_right').replace('C1', isPediatricMode ? 'C5' : 'C1').replace('Q1', isPediatricMode ? 'Q5' : 'Q1')}</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
-                        <Quadrant range={[18, 17, 16, 15, 14, 13, 12, 11]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
+                        <Quadrant range={isPediatricMode ? [55, 54, 53, 52, 51] : [18, 17, 16, 15, 14, 13, 12, 11]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
                 <div className="space-y-2 min-w-0">
-                    <h3 className={`text-center font-bold text-[10px] pb-1 mb-4 block tracking-[0.2em] uppercase w-fit mx-auto transition-all ${design === 'ego' ? 'border-b border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-500' : 'text-slate-500 dark:text-zinc-600 border-none mb-1'}`}>{t('odontogram.quad_upper_left')}</h3>
+                    <h3 className={`text-center font-bold text-[10px] pb-1 mb-4 block tracking-[0.2em] uppercase w-fit mx-auto transition-all ${design === 'ego' ? 'border-b border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-500' : 'text-slate-500 dark:text-zinc-600 border-none mb-1'}`}>{t('odontogram.quad_upper_left').replace('C2', isPediatricMode ? 'C6' : 'C2').replace('Q2', isPediatricMode ? 'Q6' : 'Q2')}</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
-                        <Quadrant range={[21, 22, 23, 24, 25, 26, 27, 28]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
+                        <Quadrant range={isPediatricMode ? [61, 62, 63, 64, 65] : [21, 22, 23, 24, 25, 26, 27, 28]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
                 <div className="space-y-2 min-w-0">
-                    <h3 className={`text-center font-bold text-[10px] pb-1 mb-4 block tracking-[0.2em] uppercase w-fit mx-auto transition-all ${design === 'ego' ? 'border-b border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-500' : 'text-slate-500 dark:text-zinc-600 border-none mb-1'}`}>{t('odontogram.quad_lower_right')}</h3>
+                    <h3 className={`text-center font-bold text-[10px] pb-1 mb-4 block tracking-[0.2em] uppercase w-fit mx-auto transition-all ${design === 'ego' ? 'border-b border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-500' : 'text-slate-500 dark:text-zinc-600 border-none mb-1'}`}>{t('odontogram.quad_lower_right').replace('C4', isPediatricMode ? 'C8' : 'C4').replace('Q4', isPediatricMode ? 'Q8' : 'Q4')}</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
-                        <Quadrant range={[48, 47, 46, 45, 44, 43, 42, 41]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
+                        <Quadrant range={isPediatricMode ? [85, 84, 83, 82, 81] : [48, 47, 46, 45, 44, 43, 42, 41]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
                 <div className="space-y-2 min-w-0">
-                    <h3 className={`text-center font-bold text-[10px] pb-1 mb-4 block tracking-[0.2em] uppercase w-fit mx-auto transition-all ${design === 'ego' ? 'border-b border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-500' : 'text-slate-500 dark:text-zinc-600 border-none mb-1'}`}>{t('odontogram.quad_lower_left')}</h3>
+                    <h3 className={`text-center font-bold text-[10px] pb-1 mb-4 block tracking-[0.2em] uppercase w-fit mx-auto transition-all ${design === 'ego' ? 'border-b border-slate-200 dark:border-zinc-800/60 text-slate-400 dark:text-zinc-500' : 'text-slate-500 dark:text-zinc-600 border-none mb-1'}`}>{t('odontogram.quad_lower_left').replace('C3', isPediatricMode ? 'C7' : 'C3').replace('Q3', isPediatricMode ? 'Q7' : 'Q3')}</h3>
                     <div className="w-full overflow-x-auto pb-2 sm:-mx-2 sm:px-2 scrollbar-none">
-                        <Quadrant range={[31, 32, 33, 34, 35, 36, 37, 38]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
+                        <Quadrant range={isPediatricMode ? [71, 72, 73, 74, 75] : [31, 32, 33, 34, 35, 36, 37, 38]} findings={findings} notes={notes} onToothClick={handleToothClick} getToothState={getToothState} useDottedMode={useDottedMode} pendingVerification={pendingVerification} onVerify={handleVerification} darkMode={darkMode} />
                     </div>
                 </div>
             </div>

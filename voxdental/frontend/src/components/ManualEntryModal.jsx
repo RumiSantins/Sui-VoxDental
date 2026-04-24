@@ -168,7 +168,7 @@ export const ManualEntryModal = React.memo(({
                         <h4 className="text-xs font-bold uppercase tracking-widest text-[#9CCBA8] mb-4">{t('manual.step_2')}</h4>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             {legendItems.filter(i => i.id !== 'borrar').map(item => {
-                                const isWholeTooth = ['ausente', 'corona', 'endodoncia', 'extraer'].includes(item.id);
+                                const isWholeTooth = ['ausente', 'corona', 'endodoncia', 'extraer', 'implante', 'denticion_ninos', 'protesis_total', 'protesis_parcial'].includes(item.id);
                                 const isDisabled = (selectedSurface === 'pieza' && !isWholeTooth) || (selectedSurface !== 'pieza' && isWholeTooth && item.id !== 'borrar');
                                 const isApplied = localFindings.some(f => f.condition === item.id && (f.surface === selectedSurface || (selectedSurface === 'pieza' && !f.surface)));
 

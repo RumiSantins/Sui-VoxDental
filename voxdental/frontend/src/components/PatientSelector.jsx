@@ -4,9 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 
-export const PatientSelector = ({ onSelect, selectedPatient }) => {
+import { PatientDirectoryModal } from './PatientDirectoryModal';
+
+export const PatientSelector = ({ onSelect, selectedPatient, onOpenDirectory }) => {
     const [patients, setPatients] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showDirectory, setShowDirectory] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [newPatientName, setNewPatientName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +50,21 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
         if (token) fetchPatients();
     }, [token]);
 
+    const handleSelectPatient = async (p) => {
+        onSelect(p);
+        setShowDropdown(false);
+        try {
+            await fetch(`/api/v1/patients/${p.id}/touch`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            // Re-fetch to update sorting
+            fetchPatients();
+        } catch (error) {
+            console.error("Error touching patient:", error);
+        }
+    };
+
     const handleCreatePatient = async (e) => {
         e.preventDefault();
         if (!newPatientName.trim()) return;
@@ -64,24 +82,28 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
 
             if (response.ok) {
                 const newPatient = await response.json();
-                setPatients([...patients, newPatient]);
-                onSelect(newPatient);
+                setPatients([newPatient, ...patients]);
+                handleSelectPatient(newPatient);
                 setIsCreating(false);
                 setNewPatientName("");
-                setShowDropdown(false);
             } else {
-                const errorData = await response.json();
-                const errorMsg = errorData.detail || "Error desconocido";
-                console.error("Error response from server:", errorData);
-                setError(errorMsg);
-                // Si el error es un objeto de validación (422), extraer info legible
-                if (typeof errorMsg === 'object') {
-                    setError(JSON.stringify(errorMsg));
+                let errorMsg = `Error ${response.status}: ${response.statusText}`;
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.detail || errorMsg;
+                    if (typeof errorMsg === 'object') {
+                        errorMsg = JSON.stringify(errorMsg);
+                    }
+                } catch (parseError) {
+                    // Si no es JSON, podría ser un HTML de error de Vite (ej. 502 Bad Gateway)
+                    const textData = await response.text().catch(() => "");
+                    console.error("Non-JSON error response:", textData);
                 }
+                setError(errorMsg);
             }
         } catch (error) {
             console.error("Network error creating patient:", error);
-            setError("Error de red al conectar con el servidor");
+            setError("Error de red: " + error.message);
         }
     };
 
@@ -161,7 +183,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
             </div>
 
             {showDropdown && (
-                <div className={`absolute top-full left-0 mt-2 w-full sm:min-w-[280px] z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${isEgo ? 'bg-white dark:bg-zinc-900 border-x border-b border-slate-200 dark:border-zinc-800 rounded-b-lg p-0 shadow-lg' : 'bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-xl'}`}>
+                <div className={`absolute top-full left-0 mt-2 w-full sm:min-w-[280px] z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${isEgo ? 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-none p-0 shadow-lg' : 'bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-xl shadow-xl'}`}>
                     {isCreating ? (
                         <form onSubmit={handleCreatePatient} className="p-4 bg-slate-50/50 dark:bg-zinc-800/20">
                             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase mb-2">{t('patient.new_patient')}</label>
@@ -206,10 +228,10 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                     </button>
                                 </div>
                             ) : (
-                                patients.map(p => (
+                                patients.slice(0, 5).map(p => (
                                     <div key={p.id} className="group relative">
                                         {deletingId === p.id ? (
-                                            <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-900/30 animate-in fade-in zoom-in duration-200">
+                                            <div className={`flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 animate-in fade-in zoom-in duration-200 ${isEgo ? 'rounded-none' : 'rounded-xl'}`}>
                                                 <span className="text-xs font-bold text-red-700 dark:text-red-400">{t('common.delete_confirm_short')}</span>
                                                 <div className="flex gap-1">
                                                     <button onClick={(e) => handleDeletePatient(e, p.id)} className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm text-xs font-bold px-2">{t('common.yes')}</button>
@@ -217,7 +239,7 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                                 </div>
                                             </div>
                                         ) : editingId === p.id ? (
-                                            <form onSubmit={(e) => handleUpdatePatient(e, p.id)} className="p-2 bg-[#9CCBA8]/5 dark:bg-[#9CCBA8]/10 rounded-xl border border-[#9CCBA8]/20 dark:border-[#9CCBA8]/30">
+                                            <form onSubmit={(e) => handleUpdatePatient(e, p.id)} className={`p-2 bg-[#9CCBA8]/5 dark:bg-[#9CCBA8]/10 border border-[#9CCBA8]/20 dark:border-[#9CCBA8]/30 ${isEgo ? 'rounded-none' : 'rounded-xl'}`}>
                                                 <div className="flex gap-2">
                                                     <input
                                                         type="text"
@@ -237,11 +259,8 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                             </form>
                                         ) : (
                                             <div
-                                                onClick={() => {
-                                                    onSelect(p);
-                                                    setShowDropdown(false);
-                                                }}
-                                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all text-sm cursor-pointer group ${selectedPatient?.id === p.id
+                                                onClick={() => handleSelectPatient(p)}
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 transition-all text-sm cursor-pointer group ${isEgo ? 'rounded-none' : 'rounded-xl'} ${selectedPatient?.id === p.id
                                                     ? 'bg-[#9CCBA8] text-white shadow-md'
                                                     : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'}`}
                                             >
@@ -279,6 +298,20 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                                     </div>
                                 ))
                             )}
+                            
+                            {/* View All Button */}
+                            {!isLoading && patients.length > 5 && (
+                                <button 
+                                    onClick={() => {
+                                        setShowDropdown(false);
+                                        setShowDirectory(true);
+                                        if (onOpenDirectory) onOpenDirectory();
+                                    }}
+                                    className={`w-full mt-2 p-2.5 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors ${isEgo ? 'rounded-none' : 'rounded-xl'}`}
+                                >
+                                    {t('patient.view_all')}
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -293,6 +326,47 @@ export const PatientSelector = ({ onSelect, selectedPatient }) => {
                         setIsCreating(false);
                         setEditingId(null);
                         setDeletingId(null);
+                    }}
+                />
+            )}
+
+            {showDirectory && (
+                <PatientDirectoryModal
+                    patients={patients}
+                    onClose={() => setShowDirectory(false)}
+                    onSelect={handleSelectPatient}
+                    onUpdate={async (id, newName) => {
+                        try {
+                            const response = await fetch(`/api/v1/patients/${id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ name: newName })
+                            });
+                            if (response.ok) {
+                                const updated = await response.json();
+                                setPatients(patients.map(p => p.id === id ? updated : p));
+                                if (selectedPatient?.id === id) onSelect(updated);
+                            }
+                        } catch (error) {
+                            console.error("Error updating patient in directory:", error);
+                        }
+                    }}
+                    onDelete={async (id) => {
+                        try {
+                            const response = await fetch(`/api/v1/patients/${id}`, {
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            if (response.ok) {
+                                setPatients(patients.filter(p => p.id !== id));
+                                if (selectedPatient?.id === id) onSelect(null);
+                            }
+                        } catch (error) {
+                            console.error("Error deleting patient in directory:", error);
+                        }
                     }}
                 />
             )}

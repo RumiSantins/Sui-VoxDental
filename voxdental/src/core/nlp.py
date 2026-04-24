@@ -45,7 +45,9 @@ def normalize_text(text: str) -> str:
         "igual": "lingual", "lenguaje": "lingual", "lingüal": "lingual",
         # Phonetic condition corrections
         "al magma": "amalgama", "un magma": "amalgama", "amalgaba": "amalgama",
-        "aucente": "ausente", "recina": "resina"
+        "aucente": "ausente", "recina": "resina",
+        "prótecis": "prótesis", "protecis": "prótesis", "protección": "prótesis",
+        "protecís": "prótesis", "prótecís": "prótesis"
     }
     
     # Sort replacements by length descending to match longer phrases first
@@ -95,16 +97,24 @@ def decode_acronym(acronym: str) -> tuple:
     cond_map = {
         'R': 'resina', 'C': 'caries', 'A': 'amalgama', 
         'E': 'endodoncia', 'EX': 'extraer', 'CR': 'corona', 
-        'X': 'ausente', 'B': 'borrar'
+        'X': 'ausente', 'B': 'borrar',
+        'IMP': 'implante', 'DN': 'denticion_ninos',
+        'PT': 'protesis_total', 'PP': 'protesis_parcial'
     }
     surf_map = {
         'O': 'oclusal', 'I': 'incisal', 'M': 'mesial', 
         'D': 'distal', 'V': 'vestibular', 'P': 'palatina', 'L': 'lingual'
     }
-    if acronym in ['E', 'X', 'EX', 'CR', 'B']:
+    if acronym in cond_map:
         return cond_map[acronym], None
-    if len(acronym) == 2:
-        return cond_map.get(acronym[0], ''), surf_map.get(acronym[1], None)
+    
+    # Check for condition + surface combination
+    for cond_acr in cond_map.keys():
+        if acronym.startswith(cond_acr):
+            surf_acr = acronym[len(cond_acr):]
+            if surf_acr in surf_map:
+                return cond_map[cond_acr], surf_map[surf_acr]
+                
     return "", None
 
 def extract_findings_from_text(text: str, context_tooth: Optional[int] = None) -> List[FindingInput]:
@@ -183,7 +193,15 @@ def extract_findings_from_text(text: str, context_tooth: Optional[int] = None) -
     cond_words = {
         "resina": "R", "caries": "C", "amalgama": "A", "endodoncia": "E",
         "extracción": "EX", "extraer": "EX", "corona": "CR", "ausente": "X",
-        "ausencia": "X", "borrar": "B", "limpiar": "B"
+        "ausencia": "X", "borrar": "B", "limpiar": "B",
+        "implante": "IMP", "implantes": "IMP",
+        "prótesis total": "PT", "protesis total": "PT", "prótesis totales": "PT", "protesis totales": "PT",
+        "prótesis parcial": "PP", "protesis parcial": "PP", "prótesis parciales": "PP", "protesis parciales": "PP",
+        "dentición niños": "DN", "denticion niños": "DN", "dentición de niño": "DN", "denticion de niño": "DN",
+        "dentición de niños": "DN", "denticion de niños": "DN",
+        "dentición infantil": "DN", "denticion infantil": "DN",
+        "diente de leche": "DN", "dientes de leche": "DN",
+        "dentición temporal": "DN", "denticion temporal": "DN"
     }
     # Surfaces
     surf_words = {
@@ -211,7 +229,7 @@ def extract_findings_from_text(text: str, context_tooth: Optional[int] = None) -
         normalized_text = re.sub(pattern, replacement, normalized_text)
 
     # 3. Extract Findings
-    acronym_matches = list(re.finditer(r"ACRONYM_([A-Z]{1,2})", normalized_text))
+    acronym_matches = list(re.finditer(r"ACRONYM_([A-Z]+)", normalized_text))
     
     for i, match in enumerate(acronym_matches):
         acronym = match.group(1)
@@ -256,6 +274,10 @@ def extract_findings_from_text(text: str, context_tooth: Optional[int] = None) -
             if surface is None and condition_std in ["caries", "resina", "amalgama"]:
                 from .validator import is_anterior
                 surface = "incisal" if is_anterior(tooth_num) else "oclusal"
+                
+            # Full-tooth findings implicitly have no specific surface
+            if condition_std in ["endodoncia", "extraer", "corona", "ausente", "borrar", "implante", "denticion_ninos", "protesis_total", "protesis_parcial"]:
+                surface = None
                 
             is_valid, warning = validate_finding(tooth_num, surface, condition_std)
             findings.append(FindingInput(

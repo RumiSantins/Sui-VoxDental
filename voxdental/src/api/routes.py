@@ -100,7 +100,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         access_token = create_access_token(data={
             "sub": new_user.email, 
             "name": new_user.full_name,
-            "avatar": new_user.profile_image,
+            "avatar": new_user.profile_image if new_user.profile_image and not new_user.profile_image.startswith("data:image") else None,
             "gender": new_user.gender,
             "is_admin": new_user.is_admin,
             "is_google": new_user.hashed_password == "google_oauth_no_password"
@@ -140,7 +140,7 @@ def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2Passw
     access_token = create_access_token(data={
         "sub": user.email, 
         "name": user.full_name,
-        "avatar": user.profile_image,
+        "avatar": user.profile_image if user.profile_image and not user.profile_image.startswith("data:image") else None,
         "gender": user.gender,
         "is_admin": user.is_admin,
         "is_google": user.hashed_password == "google_oauth_no_password"
@@ -183,7 +183,7 @@ def google_login(request: GoogleLoginRequest, db: Session = Depends(get_db)):
         access_token = create_access_token(data={
             "sub": user.email, 
             "name": user.full_name,
-            "avatar": user.profile_image,
+            "avatar": user.profile_image if user.profile_image and not user.profile_image.startswith("data:image") else None,
             "gender": user.gender,
             "is_admin": user.is_admin,
             "is_google": True
@@ -209,7 +209,31 @@ def update_profile(
         current_user.hashed_password = get_password_hash(data.password)
     
     if data.profile_image is not None:
-        current_user.profile_image = data.profile_image
+        if data.profile_image.startswith("data:image"):
+            import base64
+            import uuid
+            from pathlib import Path
+            try:
+                # Extraer info base64 (ej: data:image/png;base64,iVBORw0KGgo...)
+                header, encoded = data.profile_image.split(",", 1)
+                ext = header.split(";")[0].split("/")[1]
+                
+                media_dir = Path("static/media")
+                media_dir.mkdir(parents=True, exist_ok=True)
+                
+                filename = f"avatar_{uuid.uuid4()}.{ext}"
+                filepath = media_dir / filename
+                
+                with open(filepath, "wb") as f:
+                    f.write(base64.b64decode(encoded))
+                
+                current_user.profile_image = f"/api/v1/media/stream/{filename}"
+            except Exception as e:
+                print(f"Error saving avatar image: {e}")
+                # Fallback to default or icon if fails
+                pass
+        else:
+            current_user.profile_image = data.profile_image
     
     if data.gender is not None:
         current_user.gender = data.gender
@@ -221,7 +245,7 @@ def update_profile(
     access_token = create_access_token(data={
         "sub": current_user.email, 
         "name": current_user.full_name,
-        "avatar": current_user.profile_image,
+        "avatar": current_user.profile_image if current_user.profile_image and not current_user.profile_image.startswith("data:image") else None,
         "gender": current_user.gender,
         "is_admin": current_user.is_admin,
         "is_google": current_user.hashed_password == "google_oauth_no_password"
@@ -287,7 +311,8 @@ def list_patients(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return db.query(Patient).filter(Patient.user_id == current_user.id).all()
+    from sqlalchemy import desc
+    return db.query(Patient).filter(Patient.user_id == current_user.id).order_by(desc(Patient.updated_at)).all()
 
 @router.post("/patients", response_model=PatientSchema)
 def create_patient(
@@ -342,6 +367,20 @@ def delete_patient(
     db.delete(db_patient)
     db.commit()
     return {"message": "Paciente eliminado correctamente"}
+
+@router.post("/patients/{patient_id}/touch")
+def touch_patient(
+    patient_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from datetime import datetime
+    db_patient = db.query(Patient).filter(Patient.id == patient_id, Patient.user_id == current_user.id).first()
+    if not db_patient:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado")
+    db_patient.updated_at = datetime.utcnow()
+    db.commit()
+    return {"message": "Paciente actualizado correctamente"}
 
 @router.get("/patients/{patient_id}/records", response_model=List[ClinicalRecordSchema])
 def get_patient_records(

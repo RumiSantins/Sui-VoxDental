@@ -78,7 +78,11 @@ export const translations = {
         'patient.new_patient': 'Nuevo Paciente',
         'patient.full_name': 'Nombre Completo',
         'patient.no_patients': 'No se encontraron pacientes',
-        'patient.register_first': 'Registra a tu primer paciente aquí',
+        'patient.register_first': 'Registrar Primer Paciente',
+        'patient.directory_title': 'Directorio de Pacientes',
+        'patient.view_all': 'Ver todos los pacientes',
+        'patient.search_placeholder': 'Buscar paciente por nombre...',
+        'patient.total_count': 'Total: {count} pacientes',
 
         // Odontogram
         'odontogram.clinical_record': 'Registro Clínico',
@@ -97,8 +101,9 @@ export const translations = {
         'odontogram.processing': 'Procesando...',
         'odontogram.select_patient_prompt': 'Selecciona un Paciente',
         'odontogram.starting_in': 'Iniciando en {s}s...',
-        'odontogram.stop': 'Detener',
         'odontogram.start_voice': 'Iniciar "Manos Libres"',
+        'odontogram.mode_pediatric': 'Modo Infantil',
+        'odontogram.mode_adult': 'Modo Adulto',
         'odontogram.welcome_patient': 'Comienza por seleccionar un paciente',
         'odontogram.welcome_desc': 'Para registrar un odontograma, primero debes seleccionar un paciente de la lista superior o crear uno nuevo.',
         'odontogram.last_detection': 'Última Detección',
@@ -209,6 +214,16 @@ export const translations = {
         'legend.delete': 'BORRAR (B)',
         'legend.cat_correction': 'Corrección',
         'legend.ex_delete': '"B O 16" o "B 11" o di: "borrar oclusal del 16"',
+        
+        'legend.cat_implant': 'Implante',
+        'legend.implant': 'Implante Dental (IMP)',
+        'legend.ex_implant': '"IMP 46" o di: "implante en el 46"',
+        'legend.child_dentition': 'Dentición Niños (DN)',
+        'legend.ex_child_dentition': '"DN 84" o di: "dentición de niño en el 84"',
+        'legend.total_prosthesis': 'Prótesis Total (PT)',
+        'legend.ex_total_prosthesis': '"PT 11" o di: "prótesis total en el 11"',
+        'legend.partial_prosthesis': 'Prótesis Parcial (PP)',
+        'legend.ex_partial_prosthesis': '"PP 35" o di: "prótesis parcial en el 35"',
 
         // Speech Report
         'speech.report_title': 'Reportar Error de Voz',
@@ -306,7 +321,11 @@ export const translations = {
         'patient.new_patient': 'New Patient',
         'patient.full_name': 'Full Name',
         'patient.no_patients': 'No patients found',
-        'patient.register_first': 'Register your first patient here',
+        'patient.register_first': 'Register First Patient',
+        'patient.directory_title': 'Patient Directory',
+        'patient.view_all': 'View all patients',
+        'patient.search_placeholder': 'Search patient by name...',
+        'patient.total_count': 'Total: {count} patients',
 
         // Odontogram
         'odontogram.clinical_record': 'Clinical Record',
@@ -325,8 +344,9 @@ export const translations = {
         'odontogram.processing': 'Processing...',
         'odontogram.select_patient_prompt': 'Select a Patient',
         'odontogram.starting_in': 'Starting in {s}s...',
-        'odontogram.stop': 'Stop',
         'odontogram.start_voice': 'Start "Hands-Free"',
+        'odontogram.mode_pediatric': 'Pediatric Mode',
+        'odontogram.mode_adult': 'Adult Mode',
         'odontogram.welcome_patient': 'Start by selecting a patient',
         'odontogram.welcome_desc': 'To record an odontogram, you must first select a patient from the list above or create a new one.',
         'odontogram.last_detection': 'Last Detection',
@@ -437,6 +457,16 @@ export const translations = {
         'legend.delete': 'DELETE (B)',
         'legend.cat_correction': 'Correction',
         'legend.ex_delete': '"B O 16" or "B 11" or say: "delete occlusal on 16"',
+
+        'legend.cat_implant': 'Implant',
+        'legend.implant': 'Dental Implant (IMP)',
+        'legend.ex_implant': '"IMP 46" or say: "implant on 46"',
+        'legend.child_dentition': 'Children Dentition (CD)',
+        'legend.ex_child_dentition': '"C D 84" or say: "children dentition on 84"',
+        'legend.total_prosthesis': 'Total Prosthesis (TP)',
+        'legend.ex_total_prosthesis': '"T P 11" or say: "total prosthesis on 11"',
+        'legend.partial_prosthesis': 'Partial Prosthesis (PP)',
+        'legend.ex_partial_prosthesis': '"P P 35" or say: "partial prosthesis on 35"',
 
         // Speech Report
         'speech.report_title': 'Speech Error Report',

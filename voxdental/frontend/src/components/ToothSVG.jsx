@@ -12,6 +12,10 @@ const getSurfaceColor = (surf, surfaceConditions, isMissing, number) => {
     if (condition === 'amalgama') return '#64748b';    // Slate-500 (Silver/Gray)
     if (condition === 'corona') return '#eab308';      // Yellow-500 (Gold)
     if (condition === 'endodoncia') return '#a855f7';  // Purple
+    if (condition === 'implante') return '#0ea5e9';    // Cyan
+    if (condition === 'denticion_ninos') return '#ec4899'; // Pink
+    if (condition === 'protesis_total') return '#8b5cf6'; // Violet
+    if (condition === 'protesis_parcial') return '#14b8a6'; // Teal
 
     return 'white'; // Default
 };
@@ -29,7 +33,25 @@ const RenderAnterior = ({ number, surfaceConditions, darkMode }) => {
     const conditions = Object.values(surfaceConditions);
     const hasEndo = conditions.includes('endodoncia');
     const isToExtract = conditions.includes('extraer');
+    const hasImplant = conditions.includes('implante');
     const defaultStroke = darkMode ? '#52525b' : '#94a3b8'; // zinc-600 : slate-400
+
+    const getRootStroke = () => {
+        if (hasEndo) return '#a855f7';
+        if (isToExtract) return '#f97316';
+        if (hasImplant) return '#0ea5e9';
+        return defaultStroke;
+    };
+
+    const getCrownStroke = () => {
+        if (conditions.includes('corona')) return '#eab308';
+        if (conditions.includes('protesis_total')) return '#8b5cf6';
+        if (conditions.includes('protesis_parcial')) return '#14b8a6';
+        if (conditions.includes('denticion_ninos')) return '#ec4899';
+        return defaultStroke;
+    };
+
+    const hasThickCrownStroke = conditions.includes('corona') || conditions.includes('protesis_total') || conditions.includes('protesis_parcial') || conditions.includes('denticion_ninos');
 
     const isRightQuadrant = Math.floor(number / 10) === 1 || Math.floor(number / 10) === 4;
     const leftSurface = isRightQuadrant ? 'distal' : 'mesial';
@@ -40,14 +62,15 @@ const RenderAnterior = ({ number, surfaceConditions, darkMode }) => {
             {/* Root (Anterior: Single) */}
             <path d="M15,75 Q25,120 35,75" 
                   fill="none" 
-                  stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
-                  strokeWidth={hasEndo ? "3" : "1.5"} 
+                  stroke={getRootStroke()} 
+                  strokeWidth={(hasEndo || hasImplant) ? "3" : "1.5"} 
                   className="transition-all duration-300" />
             
             {/* Crown Outline */}
             <path d="M25,5 Q40,5 45,20 L45,60 Q45,75 25,75 Q5,75 5,60 L5,20 Q10,5 25,5 Z" 
-                  className={`fill-white dark:fill-zinc-800 transition-all duration-300 ${conditions.includes('corona') ? 'stroke-[#eab308]' : 'stroke-slate-400 dark:stroke-zinc-600'}`} 
-                  strokeWidth={conditions.includes('corona') ? "3" : "1.5"} />
+                  className={`fill-white dark:fill-zinc-800 transition-all duration-300`} 
+                  stroke={getCrownStroke()}
+                  strokeWidth={hasThickCrownStroke ? "3" : "1.5"} />
 
             {/* Surfaces */}
             <path d="M10,20 Q25,10 40,20 L35,30 Q25,25 15,30 Z"
@@ -75,8 +98,26 @@ const RenderPosterior = ({ number, surfaceConditions, darkMode }) => {
     const conditions = Object.values(surfaceConditions);
     const hasEndo = conditions.includes('endodoncia');
     const isToExtract = conditions.includes('extraer');
-    const isMolar = (number % 10 >= 6);
+    const hasImplant = conditions.includes('implante');
+    const isMolar = (number % 10 >= 6) || (number > 50 && number % 10 >= 4);
     const defaultStroke = darkMode ? '#52525b' : '#94a3b8'; // zinc-600 : slate-400
+
+    const getRootStroke = () => {
+        if (hasEndo) return '#a855f7';
+        if (isToExtract) return '#f97316';
+        if (hasImplant) return '#0ea5e9';
+        return defaultStroke;
+    };
+
+    const getCrownStroke = () => {
+        if (conditions.includes('corona')) return '#eab308';
+        if (conditions.includes('protesis_total')) return '#8b5cf6';
+        if (conditions.includes('protesis_parcial')) return '#14b8a6';
+        if (conditions.includes('denticion_ninos')) return '#ec4899';
+        return defaultStroke;
+    };
+
+    const hasThickCrownStroke = conditions.includes('corona') || conditions.includes('protesis_total') || conditions.includes('protesis_parcial') || conditions.includes('denticion_ninos');
 
     // Mesial and Distal dynamically flip based on quadrant (Left vs Right side of midline)
     const isRightQuadrant = Math.floor(number / 10) === 1 || Math.floor(number / 10) === 4;
@@ -90,41 +131,42 @@ const RenderPosterior = ({ number, surfaceConditions, darkMode }) => {
                 {isMolar ? (
                     <>
                         <path d="M10,70 Q5,100 15,115 Q20,100 15,70" 
-                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
-                            strokeWidth={hasEndo ? "2" : "1.5"} 
+                            stroke={getRootStroke()} 
+                            strokeWidth={(hasEndo || hasImplant) ? "2" : "1.5"} 
                             fill="none" className="transition-all duration-300" />
                         <path d="M25,75 Q25,120 25,75" 
-                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
-                            strokeWidth={hasEndo ? "2" : "1.5"} 
+                            stroke={getRootStroke()} 
+                            strokeWidth={(hasEndo || hasImplant) ? "2" : "1.5"} 
                             fill="none" className="transition-all duration-300" />
                         <path d="M40,70 Q45,100 35,115 Q30,100 35,70" 
-                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
-                            strokeWidth={hasEndo ? "2" : "1.5"} 
+                            stroke={getRootStroke()} 
+                            strokeWidth={(hasEndo || hasImplant) ? "2" : "1.5"} 
                             fill="none" className="transition-all duration-300" />
                     </>
                 ) : (number === 14 || number === 24) ? (
                     <>
                         <path d="M15,70 Q10,105 18,115 Q25,105 22,70" 
-                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
-                            strokeWidth={hasEndo ? "2" : "1.5"} 
+                            stroke={getRootStroke()} 
+                            strokeWidth={(hasEndo || hasImplant) ? "2" : "1.5"} 
                             fill="none" className="transition-all duration-300" />
                         <path d="M35,70 Q40,105 32,115 Q25,105 28,70" 
-                            stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
-                            strokeWidth={hasEndo ? "2" : "1.5"} 
+                            stroke={getRootStroke()} 
+                            strokeWidth={(hasEndo || hasImplant) ? "2" : "1.5"} 
                             strokeDasharray="2,2" opacity="0.4"
                             fill="none" className="transition-all duration-300" />
                     </>
                 ) : (
                     <path d="M18,70 Q25,115 32,70" 
-                        stroke={hasEndo ? '#a855f7' : (isToExtract ? '#f97316' : defaultStroke)} 
-                        strokeWidth={hasEndo ? "3" : "1.5"} 
+                        stroke={getRootStroke()} 
+                        strokeWidth={(hasEndo || hasImplant) ? "3" : "1.5"} 
                         fill="none" className="transition-all duration-300" />
                 )}
             </g>
 
             <path d="M10,10 Q25,5 40,10 L45,25 L45,55 L40,70 Q25,75 10,70 L5,55 L5,25 Z"
-                className={`fill-white dark:fill-zinc-800 transition-all duration-300 ${conditions.includes('corona') ? 'stroke-[#eab308]' : 'stroke-slate-400 dark:stroke-zinc-600'}`}
-                strokeWidth={conditions.includes('corona') ? "3" : "1.5"} />
+                className={`fill-white dark:fill-zinc-800 transition-all duration-300`}
+                stroke={getCrownStroke()}
+                strokeWidth={hasThickCrownStroke ? "3" : "1.5"} />
 
             <path d="M10,15 Q25,8 40,15 L35,25 Q25,20 15,25 Z"
                 fill={getSurfaceColor('vestibular', surfaceConditions, false)} fillOpacity={getSurfaceOpacity('vestibular', surfaceConditions)} className={`transition-all duration-300 ${getSurfaceClass('vestibular', surfaceConditions)}`} stroke="#ccc" strokeWidth="0.5" />

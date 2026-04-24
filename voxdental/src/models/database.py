@@ -28,6 +28,7 @@ class Patient(Base):
     name = Column(String, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     owner = relationship("User", back_populates="patients")
     records = relationship("ClinicalRecord", back_populates="patient", cascade="all, delete-orphan")

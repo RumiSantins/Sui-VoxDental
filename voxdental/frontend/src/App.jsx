@@ -210,7 +210,7 @@ export default function App() {
               style={{ backgroundColor: AVATAR_COLORS[user?.avatar] || '#9CCBA8' }}
             >
               {user?.avatar ? (
-                user.avatar.startsWith('data:') ? (
+                user.avatar.startsWith('data:') || user.avatar.startsWith('/api') || user.avatar.startsWith('http') ? (
                   <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   (() => {

@@ -79,6 +79,8 @@ export const SymbiosisLogo = ({ consolidated = false, size = 180, animating = tr
             <img 
                 src="/logo.png" 
                 alt="Symbiosis Logo"
+                fetchpriority="high"
+                decoding="sync"
                 style={{
                     width: '100%',
                     height: '100%',

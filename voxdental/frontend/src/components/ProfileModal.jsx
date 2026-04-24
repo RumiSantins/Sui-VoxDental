@@ -76,8 +76,8 @@ export const ProfileModal = ({ onClose }) => {
                 body: JSON.stringify(body)
             });
 
-            const data = await resp.json();
             if (resp.ok) {
+                const data = await resp.json();
                 localStorage.setItem('speechEngine', speechEngine);
                 localStorage.setItem('speechModel', speechModel);
                 localStorage.setItem('playSound', playSound.toString());
@@ -85,11 +85,18 @@ export const ProfileModal = ({ onClose }) => {
                 setSuccess(true);
                 setTimeout(() => onClose(), 1500);
             } else {
-                setError(data.detail || t('profile.error_update'));
+                let errorMsg = `Error ${resp.status}: ${resp.statusText}`;
+                try {
+                    const data = await resp.json();
+                    errorMsg = data.detail || t('profile.error_update');
+                } catch (e) {
+                    // Ignorar error de parseo, usar mensaje genérico con status
+                }
+                setError(errorMsg);
             }
         } catch (err) {
             console.error('Profile save error:', err);
-            setError(t('verify.connection_error'));
+            setError(t('verify.connection_error') + " " + err.message);
         } finally {
             setLoading(false);
         }
@@ -140,7 +147,7 @@ export const ProfileModal = ({ onClose }) => {
                             <div className="flex flex-col items-center gap-4 mb-4">
                                 <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                     <div className="w-20 h-20 rounded-2xl bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-[#9CCBA8]/30 flex items-center justify-center overflow-hidden transition-all group-hover:border-[#9CCBA8]">
-                                        {avatar && avatar.startsWith('data:') ? (
+                                        {avatar && (avatar.startsWith('data:') || avatar.startsWith('/api') || avatar.startsWith('http')) ? (
                                             <img src={avatar} alt="Preview" className="w-full h-full object-cover" />
                                         ) : (
                                             (() => {

@@ -42,14 +42,14 @@ export const WelcomeScreen = ({ user, darkMode, onFinished }) => {
     }, [onFinished]);
 
     const renderAvatarIcon = () => {
-        if (userAvatar?.startsWith('http') || userAvatar?.startsWith('data:')) {
+        if (userAvatar?.startsWith('http') || userAvatar?.startsWith('data:') || userAvatar?.startsWith('/api')) {
             return <img src={userAvatar} alt="Avatar" className="w-full h-full object-cover" />
         }
         const Icon = AVATAR_MAP[userAvatar] || User;
         return <Icon className="w-16 h-16 text-white relative z-10" />
     }
 
-    const gradientClass = (userAvatar?.startsWith('http') || userAvatar?.startsWith('data:')) ? 'from-[#9CCBA8] to-[#6BA07D]' : (COLORS[userAvatar] || 'from-[#9CCBA8] to-[#6BA07D]');
+    const gradientClass = (userAvatar?.startsWith('http') || userAvatar?.startsWith('data:') || userAvatar?.startsWith('/api')) ? 'from-[#9CCBA8] to-[#6BA07D]' : (COLORS[userAvatar] || 'from-[#9CCBA8] to-[#6BA07D]');
 
     return (
         <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-1000 ease-in-out overflow-hidden ${darkMode ? 'bg-[#0a0a0b]' : 'bg-[#FAFAF8]'} ${isLeaving ? 'opacity-0 scale-105 blur-2xl' : 'opacity-100'}`}>
